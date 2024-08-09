@@ -56,7 +56,7 @@ function Comparison() {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/submit_application', {
+      const response = await fetch('/api/submit_application', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
