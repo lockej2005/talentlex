@@ -9,7 +9,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/application" element={<Application />} />
-          <Route path="/comparison" element={<Comparison />} />
+          <Route path="/" element={<Comparison />} />
         </Routes>
       </div>
     </Router>
