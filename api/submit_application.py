@@ -4,13 +4,11 @@ from openai import OpenAI
 import os
 
 app = Flask(__name__)
-CORS(app)  # This allows CORS for all domains on all routes
+CORS(app)
 
-# Initialize OpenAI client
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-@app.route('/api/submit_application', methods=['POST'])
-def submit_application():
+def submit_application(request):
     data = request.json
     application_text = data.get('applicationText')
     
@@ -18,7 +16,6 @@ def submit_application():
         return jsonify({"error": "No application text provided"}), 400
 
     try:
-        # Call OpenAI API
         completion = client.chat.completions.create(
             model="ft:gpt-4o-mini-2024-07-18:personal:4omini-v1:9u6vf9Ey",
             messages=[
@@ -27,7 +24,6 @@ def submit_application():
             ]
         )
 
-        # Extract the AI's response
         ai_feedback = completion.choices[0].message.content
 
         return jsonify({
@@ -37,5 +33,3 @@ def submit_application():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-# No need for app.run(), Vercel handles the server
