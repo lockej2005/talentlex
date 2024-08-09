@@ -1,0 +1,30 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "api/**/*.py",
+        "use": "@vercel/python"
+      },
+      {
+        "src": "src/**/*",
+        "use": "@vercel/static-build",
+        "config": {
+          "distDir": "build"
+        }
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "/api/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/src/$1"
+      }
+    ],
+    "env": {
+      "OPENAI_API_KEY": "@openai_api_key"
+    }
+  }
+  
