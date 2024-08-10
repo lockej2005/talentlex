@@ -118,12 +118,6 @@ function Comparison() {
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
   };
-  
-  const applyBracketStyle = (text) => {
-    return text.replace(/\[(.*?)\]/g, (match, p1) => {
-        return `<span class="bracketed-text">[${p1}]</span>`;
-    });
-};
 
   useEffect(() => {
     return () => {
@@ -159,8 +153,7 @@ function Comparison() {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-    
-
+  
       const data = await response.json();
       console.log(data);
       setFeedback(data.feedback);
@@ -290,12 +283,10 @@ function Comparison() {
             </div>
           </div>
           <div className="text-content">
-          <EditableContent 
-                value={applicationText} 
-                onChange={(newText) => setApplicationText(newText)} 
-                dangerouslySetInnerHTML={{ __html: applyBracketStyle(applicationText) }} 
+            <EditableContent 
+              value={applicationText} 
+              onChange={(newText) => setApplicationText(newText)} 
             />
-
           </div>
         </div>
         <div className="divider" ref={dividerRef} onMouseDown={handleMouseDown}>
@@ -316,12 +307,7 @@ function Comparison() {
           </div>
           <div className="text-content">
             {feedback ? (
-              <ReactMarkdown 
-              children={applyBracketStyle(feedback)} 
-              components={{
-                  p: ({node, children}) => <p dangerouslySetInnerHTML={{ __html: children }} />,
-              }} 
-          />          
+              <ReactMarkdown>{feedback}</ReactMarkdown>
             ) : (
               <p>{isLoading ? 'Generating your review...' : 'Submit your application to receive feedback.'}</p>
             )}
