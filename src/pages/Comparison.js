@@ -2,7 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
 import ReactMarkdown from 'react-markdown';
+import Select from 'react-select';
+import { loadStripe } from '@stripe/stripe-js';
 import './comparison.css';
+
+// Initialize Stripe
+const stripePromise = loadStripe('pk_live_51P4eASP1v3Dm1cKPvctekur3arCo5DAO0Bdgk9cHm1V4i3MPJWnFTS94UsfF45bUUlilPdShd2TdpLNht3IZBhXI00lZTdbwPr');
 
 function EditableContent({ value, onChange }) {
   const handleInput = (e) => {
@@ -24,8 +29,28 @@ function Comparison() {
   const [applicationText, setApplicationText] = useState("Enter your application here.");
   const [feedback, setFeedback] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedFirm, setSelectedFirm] = useState({ value: "Goodwin", label: "Goodwin" });
+  const [selectedQuestion, setSelectedQuestion] = useState({ value: "Why this firm?", label: "Why this firm?" });
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
+
+  const firms = [
+    { value: "Goodwin", label: "Goodwin" },
+    { value: "Jones Day", label: "Jones Day" },
+    { value: "White & Case", label: "White & Case" },
+    { value: "Dechert", label: "Dechert" },
+    { value: "Covington & Burling", label: "Covington & Burling" },
+    { value: "Herbert Smith Freehills", label: "Herbert Smith Freehills" },
+    { value: "Clifford Chance", label: "Clifford Chance" },
+    { value: "Freshfields", label: "Freshfields" },
+    { value: "Sidley Austin", label: "Sidley Austin" }
+  ];
+  const questions = [
+    { value: "Why this firm?", label: "Why this firm?" },
+    { value: "Why commercial law?", label: "Why commercial law?" },
+    { value: "Why you?", label: "Why you?" },
+    { value: "Other question", label: "Other question" }
+  ];
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -61,7 +86,11 @@ function Comparison() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ applicationText }),
+        body: JSON.stringify({ 
+          applicationText, 
+          firm: selectedFirm.value, 
+          question: selectedQuestion.value 
+        }),
       });
 
       if (!response.ok) {
@@ -78,6 +107,55 @@ function Comparison() {
     }
   };
 
+  const handleDonation = async () => {
+    const stripe = await stripePromise;
+    const { error } = await stripe.redirectToCheckout({
+      lineItems: [
+        {
+          price: 'price_1Pm2thP1v3Dm1cKPxOHMHY6o',
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      successUrl: window.location.origin,
+      cancelUrl: window.location.origin,
+    });
+  
+    if (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const customStyles = {
+    control: (provided) => ({
+      ...provided,
+      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+      border: 'none',
+      borderRadius: '10px',
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+      padding: '5px',
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected ? '#276D8B' : 'white',
+      color: state.isSelected ? 'white' : '#276D8B',
+      '&:hover': {
+        backgroundColor: '#e6f3f7',
+      },
+    }),
+    singleValue: (provided) => ({
+      ...provided,
+      color: '#276D8B',
+    }),
+    menu: (provided) => ({
+      ...provided,
+      borderRadius: '10px',
+      overflow: 'hidden',
+      marginTop: '8px',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    }),
+  };
+
   return (
     <div className="comparison-container">
       <div className="header">
@@ -92,7 +170,22 @@ function Comparison() {
           </div>
           <div className="title-card">
             <h3>Your Application</h3>
-            <p className="subtext">Goodwin | Why Goodwin? (100 Words)</p>
+            <div className="dropdown-container">
+              <Select
+                value={selectedFirm}
+                onChange={setSelectedFirm}
+                options={firms}
+                styles={customStyles}
+                isSearchable={false}
+              />
+              <Select
+                value={selectedQuestion}
+                onChange={setSelectedQuestion}
+                options={questions}
+                styles={customStyles}
+                isSearchable={false}
+              />
+            </div>
           </div>
           <div className="text-content">
             <EditableContent value={applicationText} onChange={setApplicationText} />
@@ -106,6 +199,11 @@ function Comparison() {
           <div className="divider-line bottom"></div>
         </div>
         <div className="right-column" style={{width: `${100 - leftWidth}%`}}>
+          <div className="button-container">
+            <button className="stripe-button" onClick={handleDonation}>
+              Did you get value? Donate us $1.
+            </button>
+          </div>
           <div className="title-card">
             <h3>Your Feedback</h3>
             <p className="subtext">AI-Generated Feedback</p>

@@ -20,27 +20,6 @@
     margin: 0;
   }
   
-  .view-toggle {
-    display: flex;
-    background-color: #b8c7ce;
-    border-radius: 20px;
-    overflow: hidden;
-  }
-  
-  .view-toggle button {
-    padding: 10px 20px;
-    border: none;
-    background-color: transparent;
-    color: #276D8B;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  .view-toggle button.active {
-    background-color: #276D8B;
-    color: white;
-  }
-  
   .content {
     display: flex;
     position: relative;
@@ -148,6 +127,20 @@
     align-self: center;
     font-size: 1rem;
   }
+
+  .stripe-button {
+    background-color: #500872;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 10px 30px;
+    width: calc(100% - 60px);
+    align-self: center;
+    font-size: 1rem;
+  }
   
   .submit-button:hover {
     background-color: #3a3a3a;
@@ -174,6 +167,57 @@
     white-space: pre-wrap;
   }
   
+  /* iOS-style dropdown styles */
+  .dropdown-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .dropdown-container > div {
+    width: 48%;
+  }
+  
+  /* react-select custom styles */
+  .css-1s2u09g-control {
+    cursor: pointer !important;
+    background-color: rgba(255, 255, 255, 0.8) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    padding: 5px !important;
+  }
+  
+  .css-1pahdxg-control {
+    box-shadow: 0 0 0 1px #276D8B !important;
+    background-color: rgba(255, 255, 255, 0.8) !important;
+  }
+  
+  .css-26l3qy-menu {
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    margin-top: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  .css-1n7v3ny-option {
+    cursor: pointer !important;
+    background-color: white !important;
+    color: #276D8B !important;
+  }
+  
+  .css-1n7v3ny-option:hover {
+    background-color: #e6f3f7 !important;
+  }
+  
+  .css-1pndypt-Input {
+    color: #276D8B !important;
+  }
+  
+  .css-qc6sy-singleValue {
+    color: #276D8B !important;
+  }
+  
   /* Responsive design */
   @media (max-width: 768px) {
     .content {
@@ -187,5 +231,14 @@
   
     .divider {
       display: none;
+    }
+  
+    .dropdown-container {
+      flex-direction: column;
+    }
+  
+    .dropdown-container > div {
+      width: 100%;
+      margin-bottom: 10px;
     }
   }
