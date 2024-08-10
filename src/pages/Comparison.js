@@ -237,7 +237,7 @@ function Comparison() {
         <div className="left-column" style={{width: `${leftWidth}%`}}>
           <div className="button-container">
             <button className="submit-button" onClick={handleSubmit} disabled={isLoading}>
-              {isLoading ? 'Updating...' : 'Update'}
+              {isLoading ? 'Sending...' : 'Send for Review'}
             </button>
           </div>
           <div className="title-card">
