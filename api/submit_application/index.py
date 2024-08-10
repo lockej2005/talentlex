@@ -90,8 +90,8 @@ New application to be analyzed:
         log_print(traceback.format_exc())
         return {'statusCode': 500, 'body': json.dumps({"error": str(e)})}
 
-def handler(request):
-    if request.method == 'OPTIONS':
+def handler(event, context):
+    if event['httpMethod'] == 'OPTIONS':
         return {
             'statusCode': 200,
             'headers': {
@@ -99,13 +99,21 @@ def handler(request):
                 'Access-Control-Allow-Methods': 'POST, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type',
             },
+            'body': ''
         }
-    elif request.method == 'POST':
-        response = handle_request(request.body)
+    elif event['httpMethod'] == 'POST':
+        response = handle_request(event['body'])
         response['headers'] = {
             'Access-Control-Allow-Origin': '*',
             'Content-Type': 'application/json',
         }
         return response
     else:
-        return {'statusCode': 405, 'body': 'Method Not Allowed'}
+        return {
+            'statusCode': 405,
+            'body': json.dumps({'error': 'Method Not Allowed'}),
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+            }
+        }
