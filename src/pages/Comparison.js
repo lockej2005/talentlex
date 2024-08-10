@@ -213,7 +213,7 @@ function Comparison() {
         <div className="right-column" style={{width: `${100 - leftWidth}%`}}>
           <div className="button-container">
             <button className="stripe-button" onClick={handleDonation}>
-              Did you get value? Donate us $1.
+              Did you get value? Donate $1
             </button>
           </div>
           <div className="title-card">
