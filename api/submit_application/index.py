@@ -25,7 +25,7 @@ class handler(BaseHTTPRequestHandler):
             self.end_headers()
             response = json.dumps({
                 "success": True,
-                "feedback": "Coming Soon"
+                "feedback": "Coming Soon... Only Goodwin is active right now."
             })
             self.wfile.write(response.encode('utf-8'))
             return

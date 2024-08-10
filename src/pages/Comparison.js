@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import Select from 'react-select';
 import { loadStripe } from '@stripe/stripe-js';
 import { createClient } from '@supabase/supabase-js';
+import EmailPopup from './EmailPopup';
 import './comparison.css';
 
 // Initialize Stripe
@@ -46,6 +47,7 @@ function Comparison() {
   const [responseTime, setResponseTime] = useState(null);
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
+  const [showPopup, setShowPopup] = useState(false);
 
   const firms = [
     { value: "Goodwin", label: "Goodwin" },
@@ -79,6 +81,18 @@ function Comparison() {
       default:
         return [{ value: "Coming Soon", label: "Coming Soon" }];
     }
+  };
+
+  useEffect(() => {
+    // Check if the email cookie exists
+    const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email='));
+    if (!emailCookie) {
+      setShowPopup(true);
+    }
+  }, []);
+
+  const closePopup = () => {
+    setShowPopup(false);
   };
 
   useEffect(() => {
@@ -119,7 +133,9 @@ function Comparison() {
       // Get device info
       const userAgent = navigator.userAgent;
       const screenSize = `${window.screen.width}x${window.screen.height}`;
-
+      const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email='));
+      const email = emailCookie ? emailCookie.split('=')[1] : null;
+  
       // Send application to your API
       const response = await fetch('/api/submit_application', {
         method: 'POST',
@@ -129,18 +145,19 @@ function Comparison() {
         body: JSON.stringify({ 
           applicationText, 
           firm: selectedFirm.value, 
-          question: selectedQuestion.value 
+          question: selectedQuestion.value,
+          email,  // Include the email in the submission
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-
+  
       const data = await response.json();
       console.log(data);
       setFeedback(data.feedback);
-
+  
       // Record data in Supabase
       const { data: insertData, error } = await supabase
         .from('applications')
@@ -149,23 +166,24 @@ function Comparison() {
           question: selectedQuestion.value,
           application_text: applicationText,
           feedback: data.feedback,
+          email,  // Include email here as well
           device: userAgent,
           screen_size: screenSize,
           timestamp: new Date().toISOString()
         });
-
+  
       if (error) throw error;
-
+  
       const endTime = Date.now();
       setResponseTime((endTime - startTime) / 1000); // Convert to seconds
-
+  
     } catch (error) {
       console.error("Error:", error);
       setFeedback("Error: Unable to process your application. Please try again later.");
     } finally {
       setIsLoading(false);
     }
-  };
+  };  
 
   const handleDonation = async () => {
     try {
@@ -230,6 +248,7 @@ function Comparison() {
 
   return (
     <div className="comparison-container">
+    {showPopup && <EmailPopup onClose={closePopup} />}
       <div className="header">
         <h2>Law App Review AI</h2>
       </div>
