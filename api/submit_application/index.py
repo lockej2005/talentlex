@@ -33,8 +33,6 @@ class handler(BaseHTTPRequestHandler):
         try:
             system_prompt = """You are a recruiter at the law firm {firm} in the London office that screens applications for vacation schemes and shortlists them. You have reviewed several applications and shorlisted/rejected them. Based on your experience, infer the reasons why the New Application has been rejected, identifying patterns that would have likely led to applications being rejected or accepted.
 
-You must provide a score out of 100 to determine how much more the application can be optimised to ensure the highest chances of being shortlisted. The closer to 100, the more optimised the application. and the closer to 0, the less optimised. Establish a threshold beyond which an application must cross to be optimised. Base this score on the patterns between the analyses of successful and unsuccessful applications in the training dataset. Display this score at the top.
-
 Below are some applications you have reviewed and their analyses:
 
 [The rest of the provided text goes here, including all the example applications and reviews]
