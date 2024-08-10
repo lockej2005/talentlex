@@ -121,7 +121,7 @@ function Comparison() {
       const screenSize = `${window.screen.width}x${window.screen.height}`;
 
       // Send application to your API
-      const response = await fetch('http://localhost:8000/api/submit_application', {
+      const response = await fetch('/api/submit_application', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ function Comparison() {
   const handleDonation = async () => {
     try {
       // Create checkout session
-      const response = await fetch('http://localhost:8000/api/create-checkout-session', {
+      const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
