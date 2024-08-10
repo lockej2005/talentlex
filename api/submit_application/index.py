@@ -12,13 +12,26 @@ class handler(BaseHTTPRequestHandler):
         data = json.loads(post_data.decode('utf-8'))
         
         application_text = data.get('applicationText')
+        firm = data.get('firm')
+        question = data.get('question')
         
-        if not application_text:
-            self.send_error(400, "No application text provided")
+        if not application_text or not firm or not question:
+            self.send_error(400, "Missing required data")
+            return
+
+        if firm not in ["Goodwin", "Jones Day"]:
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps({
+                "success": True,
+                "feedback": "Coming Soon"
+            })
+            self.wfile.write(response.encode('utf-8'))
             return
 
         try:
-            system_prompt = """You are a recruiter at the law firm Goodwin Procter in the London office that screens applications for vacation schemes and shortlists them. You have reviewed several applications and shorlisted/rejected them. Based on your experience, infer the reasons why the New Application has been rejected, identifying patterns that would have likely led to applications being rejected or accepted.
+            system_prompt = """You are a recruiter at the law firm {firm} in the London office that screens applications for vacation schemes and shortlists them. You have reviewed several applications and shorlisted/rejected them. Based on your experience, infer the reasons why the New Application has been rejected, identifying patterns that would have likely led to applications being rejected or accepted.
 
 You must provide a score out of 100 to determine how much more the application can be optimised to ensure the highest chances of being shortlisted. The closer to 100, the more optimised the application. and the closer to 0, the less optimised. Establish a threshold beyond which an application must cross to be optimised. Base this score on the patterns between the analyses of successful and unsuccessful applications in the training dataset. Display this score at the top.
 
@@ -50,11 +63,17 @@ Format all points in this structure:
 [Explain issue/point] with evidence from rejected applications: [Insert quote/example] and improvement suggestion [insert improvement suggestion].
 (Repeat for each point)"""
 
+            user_prompt = f"""Firm: {firm}
+Question: {question}
+New application to be analyzed:
+
+{application_text}"""
+
             completion = client.chat.completions.create(
                 model="ft:gpt-4o-mini-2024-07-18:personal:4omini-v1:9u6vf9Ey",
                 messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"New application to be analyzed:\n\n{application_text}"}
+                    {"role": "system", "content": system_prompt.format(firm=firm)},
+                    {"role": "user", "content": user_prompt}
                 ]
             )
 
