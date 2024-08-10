@@ -5,33 +5,29 @@ import json
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-class handler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        data = json.loads(post_data.decode('utf-8'))
-        
-        application_text = data.get('applicationText')
-        firm = data.get('firm')
-        question = data.get('question')
-        
-        if not application_text or not firm or not question:
-            self.send_error(400, "Missing required data")
-            return
+def log_print(message):
+    print(message)
 
-        if firm not in ["Goodwin", "Jones Day"]:
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            response = json.dumps({
-                "success": True,
-                "feedback": "This firm is coming soon!"
-            })
-            self.wfile.write(response.encode('utf-8'))
-            return
+def handle_request(request_body):
+    data = json.loads(request_body)
+    
+    application_text = data.get('applicationText')
+    firm = data.get('firm')
+    question = data.get('question')
+    
+    log_print(f"Received request - Firm: {firm}, Question: {question}")
+    log_print(f"Application Text: {application_text[:100]}...")  # Log first 100 chars
+    
+    if not application_text or not firm or not question:
+        log_print("Missing required data")
+        return {'statusCode': 400, 'body': json.dumps({"error": "Missing required data"})}
 
-        try:
-            system_prompt = """You are a recruiter at the law firm {firm} in the London office that screens applications for vacation schemes and shortlists them. You have reviewed several applications and shorlisted/rejected them. Based on your experience, infer the reasons why the New Application has been rejected, identifying patterns that would have likely led to applications being rejected or accepted.
+    if firm not in ["Goodwin", "Jones Day"]:
+        log_print(f"Unsupported firm: {firm} - Sending 'coming soon' response")
+        return {'statusCode': 200, 'body': json.dumps({"success": True, "feedback": "This firm is coming soon!"})}
+
+    try:
+        system_prompt = """You are a recruiter at the law firm {firm} in the London office that screens applications for vacation schemes and shortlists them. You have reviewed several applications and shorlisted/rejected them. Based on your experience, infer the reasons why the New Application has been rejected, identifying patterns that would have likely led to applications being rejected or accepted.
 
 You must provide a score out of 100 to determine how much more the application can be optimised to ensure the highest chances of being shortlisted. The closer to 100, the more optimised the application. and the closer to 0, the less optimised. Establish a threshold beyond which an application must cross to be optimised. Base this score on the patterns between the analyses of successful and unsuccessful applications in the training dataset. Display this score at the top.
 
@@ -63,37 +59,54 @@ Format all points in this structure:
 [Explain issue/point] with evidence from rejected applications: [Insert quote/example] and improvement suggestion [insert improvement suggestion].
 (Repeat for each point)"""
 
-            user_prompt = f"""Firm: {firm}
+        user_prompt = f"""Firm: {firm}
 Question: {question}
 New application to be analyzed:
 
 {application_text}"""
 
-            completion = client.chat.completions.create(
-                model="ft:gpt-4o-mini-2024-07-18:personal:4omini-v1:9u6vf9Ey",
-                messages=[
-                    {"role": "system", "content": system_prompt.format(firm=firm)},
-                    {"role": "user", "content": user_prompt}
-                ]
-            )
+        log_print(f"Sending request to OpenAI for firm: {firm}")
+        log_print(f"User prompt sent to ChatBot: {user_prompt[:500]}...")  # Log first 500 chars
 
-            ai_feedback = completion.choices[0].message.content
+        completion = client.chat.completions.create(
+            model="ft:gpt-4o-mini-2024-07-18:personal:4omini-v1:9u6vf9Ey",
+            messages=[
+                {"role": "system", "content": system_prompt.format(firm=firm)},
+                {"role": "user", "content": user_prompt}
+            ]
+        )
+        log_print("Received response from OpenAI")
 
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            response = json.dumps({
-                "success": True,
-                "feedback": ai_feedback
-            })
-            self.wfile.write(response.encode('utf-8'))
+        ai_feedback = completion.choices[0].message.content
+        log_print(f"AI Feedback: {ai_feedback[:500]}...")  # Log first 500 chars
 
-        except Exception as e:
-            self.send_error(500, str(e))
+        return {
+            'statusCode': 200,
+            'body': json.dumps({"success": True, "feedback": ai_feedback})
+        }
 
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.end_headers()
+    except Exception as e:
+        log_print(f"Error occurred: {str(e)}")
+        import traceback
+        log_print(traceback.format_exc())
+        return {'statusCode': 500, 'body': json.dumps({"error": str(e)})}
+
+def handler(request):
+    if request.method == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type',
+            },
+        }
+    elif request.method == 'POST':
+        response = handle_request(request.body)
+        response['headers'] = {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+        }
+        return response
+    else:
+        return {'statusCode': 405, 'body': 'Method Not Allowed'}
