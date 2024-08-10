@@ -244,3 +244,8 @@ h2 {
         margin-bottom: 10px;
     }
 }
+
+.text-content .bracketed-text {
+    color: #FFD700; /* Gold color */
+    font-style: italic;
+}
