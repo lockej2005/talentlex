@@ -16,16 +16,22 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 function EditableContent({ value, onChange }) {
-  const handleInput = (e) => {
-    onChange(e.target.innerText);
-  };
-
   return (
-    <div
+    <textarea
       className="editable-content"
-      contentEditable
-      onInput={handleInput}
-      dangerouslySetInnerHTML={{ __html: value.replace(/\n/g, '<br>') }}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      style={{
+        width: '100%',
+        height: '100%',
+        border: 'none',
+        resize: 'none',
+        backgroundColor: 'transparent',
+        color: 'inherit',
+        font: 'inherit',
+        padding: '10px',
+        boxSizing: 'border-box',
+      }}
     />
   );
 }
@@ -36,7 +42,7 @@ function Comparison() {
   const [feedback, setFeedback] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFirm, setSelectedFirm] = useState({ value: "Goodwin", label: "Goodwin" });
-  const [selectedQuestion, setSelectedQuestion] = useState({ value: "Why this firm?", label: "Why this firm?" });
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
 
@@ -51,12 +57,33 @@ function Comparison() {
     { value: "Freshfields", label: "Freshfields" },
     { value: "Sidley Austin", label: "Sidley Austin" }
   ];
-  const questions = [
-    { value: "Why this firm?", label: "Why this firm?" },
-    { value: "Why commercial law?", label: "Why commercial law?" },
-    { value: "Why you?", label: "Why you?" },
-    { value: "Other question", label: "Other question" }
+
+  const goodwinQuestions = [
+    { value: "Why are you applying to Goodwin? (100 words)", label: "Why are you applying to Goodwin? (100 words)" },
+    { value: "What is your personal motivation for seeking a career in corporate/commercial law? (100 words)", label: "What is your personal motivation for seeking a career in corporate/commercial law? (100 words)" },
+    { value: "Provide an example of a change in society, the economy, or in a market sector which interests you and which you think could impact the legal sector. Discuss the impact it has had or could have. (350 words)", label: "Provide an example of a change in society, the economy, or in a market sector which interests you and which you think could impact the legal sector. Discuss the impact it has had or could have. (350 words)" },
+    { value: "Describe a recent goal you worked towards and specify how you approached the achievement of that goal, including any lessons learned. (500 words)", label: "Describe a recent goal you worked towards and specify how you approached the achievement of that goal, including any lessons learned. (500 words)" },
+    { value: "Identify a current commercial issue which has attracted your attention recently. Why do you consider it to be significant? Who are the key stakeholders in this situation and what are the implications for those concerned? (400 words)", label: "Identify a current commercial issue which has attracted your attention recently. Why do you consider it to be significant? Who are the key stakeholders in this situation and what are the implications for those concerned? (400 words)" },
+    { value: "Please briefly summarise anything else that you would like to add which you think is relevant to your application. This can be positions of responsibility, extra-curricular activities and achievements or academic awards or scholarships. Please also include any information about which other firms you are applying to. (300 words)", label: "Please briefly summarise anything else that you would like to add which you think is relevant to your application. This can be positions of responsibility, extra-curricular activities and achievements or academic awards or scholarships. Please also include any information about which other firms you are applying to. (300 words)" }
   ];
+
+  const getQuestions = (firm) => {
+    switch (firm) {
+      case 'Goodwin':
+        return goodwinQuestions;
+      case 'Jones Day':
+        return [{ value: "Cover letter (300 words)", label: "Cover letter (300 words)" }];
+      case 'White & Case':
+        return [{ value: "Cover letter", label: "Cover letter" }];
+      default:
+        return [{ value: "Coming Soon", label: "Coming Soon" }];
+    }
+  };
+
+  useEffect(() => {
+    const questions = getQuestions(selectedFirm.value);
+    setSelectedQuestion(questions[0]);
+  }, [selectedFirm]);
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -109,7 +136,7 @@ function Comparison() {
       }
 
       const data = await response.json();
-      console.log(data)
+      console.log(data);
       setFeedback(data.feedback);
 
       // Record data in Supabase
@@ -213,7 +240,11 @@ function Comparison() {
             <div className="dropdown-container">
               <Select
                 value={selectedFirm}
-                onChange={setSelectedFirm}
+                onChange={(option) => {
+                  setSelectedFirm(option);
+                  const questions = getQuestions(option.value);
+                  setSelectedQuestion(questions[0]);
+                }}
                 options={firms}
                 styles={customStyles}
                 isSearchable={false}
@@ -221,14 +252,17 @@ function Comparison() {
               <Select
                 value={selectedQuestion}
                 onChange={setSelectedQuestion}
-                options={questions}
+                options={getQuestions(selectedFirm.value)}
                 styles={customStyles}
                 isSearchable={false}
               />
             </div>
           </div>
           <div className="text-content">
-            <EditableContent value={applicationText} onChange={setApplicationText} />
+            <EditableContent 
+              value={applicationText} 
+              onChange={(newText) => setApplicationText(newText)} 
+            />
           </div>
         </div>
         <div className="divider" ref={dividerRef} onMouseDown={handleMouseDown}>
