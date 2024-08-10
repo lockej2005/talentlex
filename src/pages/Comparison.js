@@ -226,7 +226,7 @@ function Comparison() {
   return (
     <div className="comparison-container">
       <div className="header">
-        <h2>TalentLex AI</h2>
+        <h2>Law App Review AI</h2>
       </div>
       <div className="content" ref={containerRef}>
         <div className="left-column" style={{width: `${leftWidth}%`}}>
