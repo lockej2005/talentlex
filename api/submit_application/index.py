@@ -19,7 +19,7 @@ class handler(BaseHTTPRequestHandler):
             self.send_error(400, "Missing required data")
             return
 
-        if firm not in ["Goodwin", "Jones Day"]:
+        if firm not in ["Goodwin"]:
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
