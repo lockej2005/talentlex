@@ -1,14 +1,12 @@
+from http.server import BaseHTTPRequestHandler
 import stripe
 import os
 import json
-from http.server import BaseHTTPRequestHandler
 
-# Initialize Stripe
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 
-def create_checkout_session(event):
+def create_checkout_session():
     try:
-        # Create Stripe checkout session
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[
@@ -28,51 +26,27 @@ def create_checkout_session(event):
             success_url='https://talentlex.vercel.app/success',
             cancel_url='https://talentlex.vercel.app/cancel',
         )
-
         return {
             "statusCode": 200,
-            "headers": {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type",
-            },
-            "body": json.dumps({
-                "success": True,
-                "sessionId": checkout_session.id
-            })
+            "body": json.dumps({"sessionId": checkout_session.id})
         }
-
     except Exception as e:
         return {
             "statusCode": 500,
-            "headers": {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type",
-            },
-            "body": json.dumps({
-                "success": False,
-                "error": str(e)
-            })
+            "body": json.dumps({"error": str(e)})
         }
 
-def handler(event, context):
-    if event.get('httpMethod') == 'OPTIONS':
-        return {
-            "statusCode": 200,
-            "headers": {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "POST, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type",
-            },
-            "body": ""
-        }
-    elif event.get('httpMethod') == 'POST':
-        return create_checkout_session(event)
-    else:
-        return {
-            "statusCode": 405,
-            "body": "Method Not Allowed"
-        }
+class handler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        result = create_checkout_session()
+        self.send_response(result["statusCode"])
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(result["body"].encode('utf-8'))
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
