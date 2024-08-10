@@ -1,5 +1,18 @@
 {
-    "rewrites": [
-      { "source": "/(.*)", "destination": "/index.html" }
-    ]
+    "version": 2,
+    "builds": [
+      {
+        "src": "/api/create-checkout-session/index.py",
+        "use": "@vercel/python@3.1.30"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/create-checkout-session",
+        "dest": "/api/create-checkout-session/index.py"
+      }
+    ],
+    "env": {
+      "PYTHONPATH": "/var/task"
+    }
   }
