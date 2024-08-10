@@ -43,6 +43,7 @@ function Comparison() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFirm, setSelectedFirm] = useState({ value: "Goodwin", label: "Goodwin" });
   const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const [responseTime, setResponseTime] = useState(null);
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
 
@@ -113,6 +114,7 @@ function Comparison() {
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    const startTime = Date.now();
     try {
       // Get device info
       const userAgent = navigator.userAgent;
@@ -153,6 +155,9 @@ function Comparison() {
         });
 
       if (error) throw error;
+
+      const endTime = Date.now();
+      setResponseTime((endTime - startTime) / 1000); // Convert to seconds
 
     } catch (error) {
       console.error("Error:", error);
@@ -274,14 +279,18 @@ function Comparison() {
         </div>
         <div className="right-column" style={{width: `${100 - leftWidth}%`}}>
           <div className="title-card">
-            <h3>Your Feedback</h3>
-            <p className="subtext">AI-Generated Feedback</p>
+            <h3>Your Review</h3>
+            <p className="subtext">
+              {isLoading ? '⏳🙄👀' : 
+               feedback ? `Your review took ${responseTime.toFixed(2)} seconds to generate` : 
+               'It\'s kind of empty here.'}
+            </p>
           </div>
           <div className="text-content">
             {feedback ? (
               <ReactMarkdown>{feedback}</ReactMarkdown>
             ) : (
-              <p>Submit your application to receive feedback.</p>
+              <p>{isLoading ? 'Generating your review...' : 'Submit your application to receive feedback.'}</p>
             )}
           </div>
         </div>
