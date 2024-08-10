@@ -1,51 +1,55 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import os
+from http.server import BaseHTTPRequestHandler
 import stripe
-import logging
+import os
+import json
 
-app = Flask(__name__)
-CORS(app)  # This will enable CORS for all routes
+# Initialize Stripe
+stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Set your secret key. Remember to switch to your live secret key in production.
-stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
-
-@app.route('/api/create-checkout-session', methods=['POST'])
-def create_checkout_session():
-    logger.info('Received request to create checkout session')
-    try:
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[
-                {
-                    'price_data': {
-                        'currency': 'usd',
-                        'unit_amount': 100,  # $1.00
-                        'product_data': {
-                            'name': 'TalentLex AI Donation',
-                            'description': 'Support TalentLex AI with a $1 donation',
+class handler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        try:
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            data = json.loads(post_data.decode('utf-8'))
+            
+            # Create Stripe checkout session
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=[
+                    {
+                        'price_data': {
+                            'currency': 'usd',
+                            'unit_amount': 100,  # $1.00
+                            'product_data': {
+                                'name': 'TalentLex AI Donation',
+                                'description': 'Support TalentLex AI with a $1 donation',
+                            },
                         },
+                        'quantity': 1,
                     },
-                    'quantity': 1,
-                },
-            ],
-            mode='payment',
-            success_url='http://localhost:3000/success',
-            cancel_url='http://localhost:3000/cancel',
-        )
+                ],
+                mode='payment',
+                success_url='https://talentlex.vercel.app/success',
+                cancel_url='https://talentlex.vercel.app/cancel',
+            )
 
-        logger.info('Checkout session created successfully')
-        return jsonify({'sessionId': checkout_session.id})
+            # Send response
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps({
+                "success": True,
+                "sessionId": checkout_session.id
+            })
+            self.wfile.write(response.encode('utf-8'))
 
-    except Exception as e:
-        logger.error(f'Error creating checkout session: {str(e)}')
-        return jsonify({'error': str(e)}), 500
+        except Exception as e:
+            self.send_error(500, str(e))
 
-if __name__ == '__main__':
-    logger.info('Starting the Flask server...')
-    logger.info('Server is running on http://localhost:5000')
-    app.run(port=5000, debug=True)
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
