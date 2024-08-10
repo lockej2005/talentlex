@@ -4,10 +4,16 @@ import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
 import ReactMarkdown from 'react-markdown';
 import Select from 'react-select';
 import { loadStripe } from '@stripe/stripe-js';
+import { createClient } from '@supabase/supabase-js';
 import './comparison.css';
 
 // Initialize Stripe
 const stripePromise = loadStripe('pk_live_51P4eASP1v3Dm1cKPvctekur3arCo5DAO0Bdgk9cHm1V4i3MPJWnFTS94UsfF45bUUlilPdShd2TdpLNht3IZBhXI00lZTdbwPr');
+
+// Initialize Supabase
+const supabaseUrl = 'https://atbphpeswwgqvwlbplko.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 function EditableContent({ value, onChange }) {
   const handleInput = (e) => {
@@ -81,6 +87,11 @@ function Comparison() {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
+      // Get device info
+      const userAgent = navigator.userAgent;
+      const screenSize = `${window.screen.width}x${window.screen.height}`;
+
+      // Send application to your API
       const response = await fetch('/api/submit_application', {
         method: 'POST',
         headers: {
@@ -99,9 +110,25 @@ function Comparison() {
 
       const data = await response.json();
       setFeedback(data.feedback);
+
+      // Record data in Supabase
+      const { data: insertData, error } = await supabase
+        .from('applications')
+        .insert({
+          firm: selectedFirm.value,
+          question: selectedQuestion.value,
+          application_text: applicationText,
+          feedback: data.feedback,
+          device: userAgent,
+          screen_size: screenSize,
+          timestamp: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
     } catch (error) {
-      console.error("Error submitting application:", error);
-      setFeedback("Error: Unable to get feedback. Please try again later.");
+      console.error("Error:", error);
+      setFeedback("Error: Unable to process your application. Please try again later.");
     } finally {
       setIsLoading(false);
     }
@@ -211,11 +238,6 @@ function Comparison() {
           <div className="divider-line bottom"></div>
         </div>
         <div className="right-column" style={{width: `${100 - leftWidth}%`}}>
-          <div className="button-container">
-            <button className="stripe-button" onClick={handleDonation}>
-              Did you get value? Donate $1
-            </button>
-          </div>
           <div className="title-card">
             <h3>Your Feedback</h3>
             <p className="subtext">AI-Generated Feedback</p>
