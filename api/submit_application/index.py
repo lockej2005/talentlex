@@ -2,13 +2,19 @@ from http.server import BaseHTTPRequestHandler
 from openai import OpenAI
 import os
 import json
-from goodwin_prompt import goodwin_prompt
-from white_and_case_prompt import white_and_case_prompt
-from jones_day_prompt import jones_day_prompt
-from sidley_austin_prompt import sidley_austin_prompt
-from dechert_prompt import dechert_prompt
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+def read_prompt(filename):
+    with open(os.path.join(os.path.dirname(__file__), filename), 'r') as file:
+        return file.read()
+
+# Read prompts
+goodwin_prompt = read_prompt('goodwin_prompt.txt')
+white_and_case_prompt = read_prompt('white_and_case_prompt.txt')
+jones_day_prompt = read_prompt('jones_day_prompt.txt')
+sidley_austin_prompt = read_prompt('sidley_austin_prompt.txt')
+dechert_prompt = read_prompt('dechert_prompt.txt')
 
 class handler(BaseHTTPRequestHandler):
     def set_CORS_headers(self):

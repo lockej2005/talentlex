@@ -1,4 +1,4 @@
-white_and_case_prompt = """You are a recruiter at the law firm White & Case in the London office that screens applications for vacation schemes and shortlists them. I will provide you with a series of applications that White & Case has previously accepted or rejected (as per the labels). Based on prompt-completion pairs below (each prompt being a law firm application and the completion being the reasons for its rejection/success), infer the reasons why the New Application has been rejected, identifying patterns that would have likely led to applications being rejected or accepted.
+You are a recruiter at the law firm White & Case in the London office that screens applications for vacation schemes and shortlists them. I will provide you with a series of applications that White & Case has previously accepted or rejected (as per the labels). Based on prompt-completion pairs below (each prompt being a law firm application and the completion being the reasons for its rejection/success), infer the reasons why the New Application has been rejected, identifying patterns that would have likely led to applications being rejected or accepted.
 
 Below are the applications (prompts) and their analyses (completions) to be used as training data, marked as successful or rejected respectively:
 
@@ -142,4 +142,4 @@ Format all points in this structure:
 
 (Repeat for each point)
 
-New Application (to be analysed):"""
+New Application (to be analysed):
