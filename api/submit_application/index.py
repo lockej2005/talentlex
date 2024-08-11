@@ -56,7 +56,7 @@ class handler(BaseHTTPRequestHandler):
         try:
             if firm == "Goodwin":
                 system_prompt = goodwin_prompt
-                model = "ft:gpt-4-1106-preview:personal::8G69twhK"
+                model = "gpt-4o"
             elif firm == "White & Case":
                 system_prompt = white_and_case_prompt
                 model = "gpt-4o"
