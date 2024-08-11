@@ -6,7 +6,7 @@ import json
 from goodwin_prompt import goodwin_prompt
 from white_and_case_prompt import white_and_case_prompt
 from jones_day_prompt import jones_day_prompt
-from sidely_austin_prompt import sidely_austin_prompt
+from sidley_austin_prompt import sidley_austin_prompt
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 

@@ -3,6 +3,7 @@ import goodwin_prompt from './goodwin_prompt.js';
 import white_and_case_prompt from './white_and_case_prompt.js';
 import jones_day_prompt from './jones_day_prompt.js';
 import sidley_austin_prompt from './sidley_austin_prompt.js';
+import dechert_prompt from './dechert_prompt.js';
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -28,10 +29,10 @@ export default async function handler(req, res) {
       return;
     }
 
-    if (!["Goodwin", "White & Case", "Jones Day", "Sidley Austin"].includes(firm)) {
+    if (!["Goodwin", "White & Case", "Jones Day", "Sidley Austin", "Dechert"].includes(firm)) {
       res.status(200).json({
         success: true,
-        feedback: "Coming Soon... Only Goodwin, White & Case, Jones Day, and Sidley Austin are active right now."
+        feedback: "Coming Soon... Only Goodwin, White & Case, Jones Day, Sidley Austin, and Dechert are active right now."
       });
       return;
     }
@@ -46,15 +47,19 @@ export default async function handler(req, res) {
           break;
         case "White & Case":
           system_prompt = white_and_case_prompt;
-          model = "gpt-4-1106-preview";
+          model = "gpt-4o";
           break;
         case "Jones Day":
           system_prompt = jones_day_prompt;
-          model = "gpt-4-1106-preview";
+          model = "gpt-4o";
           break;
         case "Sidley Austin":
           system_prompt = sidley_austin_prompt;
-          model = "gpt-4-1106-preview";
+          model = "gpt-4o";
+          break;
+        case "Dechert":
+          system_prompt = dechert_prompt;
+          model = "gpt-4o";
           break;
         default:
           throw new Error("Invalid firm specified");
