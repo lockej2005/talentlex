@@ -7,6 +7,7 @@ from goodwin_prompt import goodwin_prompt
 from white_and_case_prompt import white_and_case_prompt
 from jones_day_prompt import jones_day_prompt
 from sidley_austin_prompt import sidley_austin_prompt
+from dechert_prompt import dechert_prompt
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
@@ -34,14 +35,14 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_error(400, "Missing required data")
             return
 
-        if firm not in ["Goodwin", "White & Case", "Jones Day", "Sidley Austin"]:
+        if firm not in ["Goodwin", "White & Case", "Jones Day", "Sidley Austin", "Dechert"]:
             self.send_response(200)
             self.set_CORS_headers()
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             response = json.dumps({
                 "success": True,
-                "feedback": "Coming Soon... Only Goodwin, White & Case, Jones Day, and Sidley Austin are active right now."
+                "feedback": "Coming Soon... Only Goodwin, White & Case, Jones Day, Sidley Austin, and Dechert are active right now."
             })
             self.wfile.write(response.encode('utf-8'))
             return
@@ -52,13 +53,16 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
                 model = "ft:gpt-4-1106-preview:personal::8G69twhK"
             elif firm == "White & Case":
                 system_prompt = white_and_case_prompt
-                model = "gpt-4-1106-preview"
+                model = "gpt-4o"
             elif firm == "Jones Day":
                 system_prompt = jones_day_prompt
-                model = "gpt-4-1106-preview"
+                model = "gpt-4o"
             elif firm == "Sidley Austin":
                 system_prompt = sidley_austin_prompt
-                model = "gpt-4-1106-preview"
+                model = "gpt-4o"
+            elif firm == "Dechert":
+                system_prompt = dechert_prompt
+                model = "gpt-4o"
 
             user_prompt = f"""Firm: {firm}
             Question: {question}
