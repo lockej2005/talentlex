@@ -1,14 +1,14 @@
-from http.server import BaseHTTPRequestHandler
+import http.server
+import socketserver
 from openai import OpenAI
 import os
 import json
 from goodwin_prompt import goodwin_prompt
 from white_and_case_prompt import white_and_case_prompt
-from jones_day_prompt import jones_day_prompt
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-class handler(BaseHTTPRequestHandler):
+class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
     def set_CORS_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
@@ -32,14 +32,14 @@ class handler(BaseHTTPRequestHandler):
             self.send_error(400, "Missing required data")
             return
 
-        if firm not in ["Goodwin", "White & Case", "Jones Day"]:
+        if firm not in ["Goodwin", "White & Case"]:
             self.send_response(200)
             self.set_CORS_headers()
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             response = json.dumps({
                 "success": True,
-                "feedback": "Coming Soon... Only Goodwin, White & Case, and Jones Day are active right now."
+                "feedback": "Coming Soon... Only Goodwin and White & Case are active right now."
             })
             self.wfile.write(response.encode('utf-8'))
             return
@@ -50,10 +50,7 @@ class handler(BaseHTTPRequestHandler):
                 model = "ft:gpt-4o-mini-2024-07-18:personal:4omini-v1:9u6vf9Ey"
             elif firm == "White & Case":
                 system_prompt = white_and_case_prompt
-                model = "gpt-4o"
-            elif firm == "Jones Day":
-                system_prompt = jones_day_prompt
-                model = "gpt-4o"
+                model = "gpt-4-0125-preview"
 
             user_prompt = f"""Firm: {firm}
             Question: {question}
@@ -83,3 +80,9 @@ class handler(BaseHTTPRequestHandler):
 
         except Exception as e:
             self.send_error(500, str(e))
+
+if __name__ == "__main__":
+    PORT = 8000
+    with socketserver.TCPServer(("", PORT), CORSRequestHandler) as httpd:
+        print(f"Serving at port {PORT}")
+        httpd.serve_forever()
