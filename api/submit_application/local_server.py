@@ -6,6 +6,7 @@ import json
 from goodwin_prompt import goodwin_prompt
 from white_and_case_prompt import white_and_case_prompt
 from jones_day_prompt import jones_day_prompt
+from sidely_austin_prompt import sidely_austin_prompt
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
@@ -33,14 +34,14 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.send_error(400, "Missing required data")
             return
 
-        if firm not in ["Goodwin", "White & Case", "Jones Day"]:
+        if firm not in ["Goodwin", "White & Case", "Jones Day", "Sidley Austin"]:
             self.send_response(200)
             self.set_CORS_headers()
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             response = json.dumps({
                 "success": True,
-                "feedback": "Coming Soon... Only Goodwin, White & Case, and Jones Day are active right now."
+                "feedback": "Coming Soon... Only Goodwin, White & Case, Jones Day, and Sidley Austin are active right now."
             })
             self.wfile.write(response.encode('utf-8'))
             return
@@ -48,13 +49,16 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
         try:
             if firm == "Goodwin":
                 system_prompt = goodwin_prompt
-                model = "ft:gpt-4o-mini-2024-07-18:personal:4omini-v1:9u6vf9Ey"
+                model = "ft:gpt-4-1106-preview:personal::8G69twhK"
             elif firm == "White & Case":
                 system_prompt = white_and_case_prompt
-                model = "gpt-4-0125-preview"
+                model = "gpt-4-1106-preview"
             elif firm == "Jones Day":
                 system_prompt = jones_day_prompt
-                model = "gpt-4-0125-preview"  # Assuming same model as White & Case, adjust if needed
+                model = "gpt-4-1106-preview"
+            elif firm == "Sidley Austin":
+                system_prompt = sidley_austin_prompt
+                model = "gpt-4-1106-preview"
 
             user_prompt = f"""Firm: {firm}
             Question: {question}
