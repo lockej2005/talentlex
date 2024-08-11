@@ -1,97 +1,94 @@
-import { OpenAI } from 'openai';
-import goodwin_prompt from './goodwin_prompt.js';
-import white_and_case_prompt from './white_and_case_prompt.js';
-import jones_day_prompt from './jones_day_prompt.js';
-import sidley_austin_prompt from './sidley_austin_prompt.js';
-import dechert_prompt from './dechert_prompt.js';
+from http.server import BaseHTTPRequestHandler
+from openai import OpenAI
+import os
+import json
+from goodwin_prompt import goodwin_prompt
+from white_and_case_prompt import white_and_case_prompt
+from jones_day_prompt import jones_day_prompt
+from sidley_austin_prompt import sidley_austin_prompt
+from dechert_prompt import dechert_prompt
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+class handler(BaseHTTPRequestHandler):
+    def set_CORS_headers(self):
+        self.send_header('Access-Control-Allow-Credentials', 'true')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT')
+        self.send_header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version')
 
-  // Handle preflight request
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.set_CORS_headers()
+        self.end_headers()
 
-  if (req.method === 'POST') {
-    const { applicationText, firm, question } = req.body;
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        data = json.loads(post_data.decode('utf-8'))
+        
+        application_text = data.get('applicationText')
+        firm = data.get('firm')
+        question = data.get('question')
+        
+        if not application_text or not firm or not question:
+            self.send_error(400, "Missing required data")
+            return
 
-    if (!applicationText || !firm || !question) {
-      res.status(400).json({ error: "Missing required data" });
-      return;
-    }
+        if firm not in ["Goodwin", "White & Case", "Jones Day", "Sidley Austin", "Dechert"]:
+            self.send_response(200)
+            self.set_CORS_headers()
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps({
+                "success": True,
+                "feedback": "Coming Soon... Only Goodwin, White & Case, Jones Day, Sidley Austin, and Dechert are active right now."
+            })
+            self.wfile.write(response.encode('utf-8'))
+            return
 
-    if (!["Goodwin", "White & Case", "Jones Day", "Sidley Austin", "Dechert"].includes(firm)) {
-      res.status(200).json({
-        success: true,
-        feedback: "Coming Soon... Only Goodwin, White & Case, Jones Day, Sidley Austin, and Dechert are active right now."
-      });
-      return;
-    }
+        try:
+            if firm == "Goodwin":
+                system_prompt = goodwin_prompt
+                model = "ft:gpt-4-1106-preview:personal::8G69twhK"
+            elif firm == "White & Case":
+                system_prompt = white_and_case_prompt
+                model = "gpt-4o"
+            elif firm == "Jones Day":
+                system_prompt = jones_day_prompt
+                model = "gpt-4o"
+            elif firm == "Sidley Austin":
+                system_prompt = sidley_austin_prompt
+                model = "gpt-4o"
+            elif firm == "Dechert":
+                system_prompt = dechert_prompt
+                model = "gpt-4o"
 
-    try {
-      let system_prompt, model;
+            user_prompt = f"""Firm: {firm}
+            Question: {question}
+            New application to be analyzed:
 
-      switch (firm) {
-        case "Goodwin":
-          system_prompt = goodwin_prompt;
-          model = "ft:gpt-4-1106-preview:personal::8G69twhK";
-          break;
-        case "White & Case":
-          system_prompt = white_and_case_prompt;
-          model = "gpt-4o";
-          break;
-        case "Jones Day":
-          system_prompt = jones_day_prompt;
-          model = "gpt-4o";
-          break;
-        case "Sidley Austin":
-          system_prompt = sidley_austin_prompt;
-          model = "gpt-4o";
-          break;
-        case "Dechert":
-          system_prompt = dechert_prompt;
-          model = "gpt-4o";
-          break;
-        default:
-          throw new Error("Invalid firm specified");
-      }
+            {application_text}"""
 
-      const user_prompt = `Firm: ${firm}
-      Question: ${question}
-      New application to be analyzed:
+            completion = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ]
+            )
 
-      ${applicationText}`;
+            ai_feedback = completion.choices[0].message.content
 
-      const completion = await client.chat.completions.create({
-        model: model,
-        messages: [
-          { role: "system", content: system_prompt },
-          { role: "user", content: user_prompt }
-        ]
-      });
+            self.send_response(200)
+            self.set_CORS_headers()
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps({
+                "success": True,
+                "feedback": ai_feedback
+            })
+            self.wfile.write(response.encode('utf-8'))
 
-      const ai_feedback = completion.choices[0].message.content;
-
-      res.status(200).json({
-        success: true,
-        feedback: ai_feedback
-      });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "An error occurred while processing your request." });
-    }
-  } else {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
-  }
-}
+        except Exception as e:
+            self.send_error(500, str(e))
