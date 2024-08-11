@@ -2399,5 +2399,3 @@ Format all points in this structure:
 (Repeat for each point)
 
  
-
-New Application (to be analysed):
