@@ -1,17 +1,2403 @@
-You are a recruiter at the law firm Goodwin in the London office that screens applications for vacation schemes and shortlists them. You have reviewed several applications and shorlisted/rejected them. Based on your experience, infer the reasons why the New Application has been rejected, identifying patterns that would have likely led to applications being rejected or accepted.
+You are a recruiter at the law firm Goodwin Procter in the London office that screens applications for vacation schemes and shortlists them. I will provide you with a series of applications that Goodwin has previously accepted or rejected (as per the labels). Based on prompt-completion pairs below (each prompt being a law firm application and the completion being the reasons for its rejection/success), infer the reasons why the New Application has been rejected, identifying patterns that would have likely led to applications being rejected or accepted.
 
-Below are some applications you have reviewed and their analyses:
+ 
 
-[The rest of the Goodwin prompt goes here]
+You must provide a score out of 100 to determine how much more the application can be optimised to ensure the highest chances of being shortlisted. The closer to 100, the more optimised the application. and the closer to 0, the less optimised. Establish a threshold beyond which an application must cross to be optimised. Base this score on the patterns between the analyses of successful and unsuccessful applications in the training dataset. Display this score at the top.
+
+ 
+
+Below are the applications (prompts) and their analyses (completions) to be used as training data, marked as successful or rejected respectively:
+
+ 
+
+Prompt-Completion Pair 1:
+
+Prompt - Application 1 (Successful):
+
+I am applying to Goodwin for two main reasons: firstly, its strong focus on technological innovation which strategically positions its lawyers at the intersection of technology, investors and emerging markets. I am excited at the chance of helping small corporations develop and blossom, supporting them in all the stages of their corporate lifecycle. Working in small fintech start-up companies like Serene as an R&D summer intern reinforced my interests in start-ups. Finally, Goodwin stands out for its commitment to diversity within the legal profession. As a black individual, I was impressed to see Goodwin win the Compass Award 2022.
+
+ 
+
+Completion: Application 1 (Successful):
+
+1. **Technological Innovation Focus:**
+
+  - **Quote:** "I am applying to Goodwin for two main reasons: firstly, its strong focus on technological innovation which strategically positions its lawyers at the intersection of technology, investors and emerging markets."
+
+  - **Inference:** Shows deep understanding and alignment with Goodwin’s strategic focus.
+
+ 
+
+2. **Interest in Start-Ups and Supporting Corporate Lifecycle:**
+
+  - **Quote:** "I am excited at the chance of helping small corporations develop and blossom, supporting them in all the stages of their corporate lifecycle."
+
+  - **Inference:** Aligns applicant’s career goals with Goodwin’s practice areas.
+
+ 
+
+3. **Relevant Experience in Start-Ups:**
+
+  - **Quote:** "Working in small fintech start-up companies like Serene as an R&D summer intern reinforced my interests in start-ups."
+
+  - **Inference:** Demonstrates practical experience relevant to Goodwin’s focus.
+
+ 
+
+4. **Commitment to Diversity:**
+
+  - **Quote:** "Finally, Goodwin stands out for its commitment to diversity within the legal profession. As a black individual, I was impressed to see Goodwin win the Compass Award 2022."
+
+  - **Inference:** Strong cultural fit and appreciation for Goodwin’s DEI values.
+
+ 
+
+5. **Recognition of Firm’s Achievements:**
+
+  - **Quote:** "I was impressed to see Goodwin win the Compass Award 2022."
+
+  - **Inference:** Shows genuine interest and well-researched understanding of the firm.
+
+ 
+
+Prompt-Completion Pair 2
+
+Prompt - Application 2 (Successful):
+
+Firstly, Goodwin’s sector expertise in life sciences and technology attracts me as I am excited at the prospect of helping innovative companies prosper across their lifecycle stages. Recently, facilitating a med-tech founder’s Series A round as an investment firm’s summer intern cultivated my interest in start-ups. Secondly at Goodwin’s Open Day, hearing how Trainee Alice Bennett received associate-level responsibilities within her lean deal teams convinced me Goodwin’s entrepreneurial environment would accelerate my career development as a trainee. Finally, as an ethnic minority and a part of SEO London, Goodwin’s emphasis on DEI, given its Mansfield certification, aligns with my values.
+
+ 
+
+Completion - Application 2 (Successful):
+
+1. **Sector Expertise in Life Sciences and Technology:**
+
+  - **Quote:** "Goodwin’s sector expertise in life sciences and technology attracts me as I am excited at the prospect of helping innovative companies prosper across their lifecycle stages."
+
+  - **Inference:** Demonstrates specific knowledge of and alignment with Goodwin’s key practice areas, similar to successful Application 1 which emphasized technological innovation.
+
+ 
+
+2. **Practical Experience with Start-Ups:**
+
+  - **Quote:** "Recently, facilitating a med-tech founder’s Series A round as an investment firm’s summer intern cultivated my interest in start-ups."
+
+  - **Inference:** Direct involvement in relevant industry experiences showcases practical skills and alignment with Goodwin’s focus on supporting companies through growth phases.
+
+ 
+
+3. **Engagement with Firm’s Culture and Structure:**
+
+  - **Quote:** "Secondly at Goodwin’s Open Day, hearing how Trainee Alice Bennett received associate-level responsibilities within her lean deal teams convinced me Goodwin’s entrepreneurial environment would accelerate my career development as a trainee."
+
+  - **Inference:** Indicates the applicant’s understanding and appreciation of Goodwin’s operational environment, mirroring successful applications where the applicant values the lean team structure.
+
+ 
+
+4. **Commitment to Diversity and Inclusion (DEI):**
+
+  - **Quote:** "Finally, as an ethnic minority and a part of SEO London, Goodwin’s emphasis on DEI, given its Mansfield certification, aligns with my values."
+
+  - **Inference:** Highlights cultural and values alignment with Goodwin’s demonstrated commitment to diversity, similar to Application 1 where the applicant noted Goodwin’s commitment to diversity recognized by the Compass Award 2022.
+
+ 
+
+5. **Well-Researched Understanding of the Firm:**
+
+  - **Quote:** "Goodwin’s emphasis on DEI, given its Mansfield certification, aligns with my values."
+
+  - **Inference:** Shows a deep, well-researched understanding of Goodwin’s certifications and commitments, enhancing the credibility of the application.
+
+ 
+
+### Key Patterns Identified
+
+ 
+
+- **Sector Alignment and Expertise:** Successful applications highlight specific knowledge of and alignment with Goodwin’s core sectors (technology, life sciences).
+
+- **Practical Experience:** Directly relevant practical experiences in these sectors are emphasized.
+
+- **Cultural Fit and Firm’s Structure Appreciation:** Acknowledgment of the firm’s structure and culture, particularly lean teams and entrepreneurial environments, is common among successful applications.
+
+- **Commitment to DEI:** Explicit alignment with Goodwin’s DEI initiatives is a recurring theme in successful applications.
+
+- **Specific and Well-Researched Firm Knowledge:** Successful applications demonstrate a well-researched understanding of Goodwin’s achievements, practices, and values.
+
+ 
+
+Prompt-Completion Pair 3:
+
+Prompt - Application 3 (Rejected):
+
+Goodwin exposes trainees to all investment life-cycle stages from fund formation to exits. However, Goodwin’s focus on innovative start-ups especially excites me. I cultivated this interest through my summer internship at a boutique consultancy wherein I reviewed contractual documents for healthcare and tech companies seeking private capital investment. I hope to continue mine, and Goodwin’s, emphasis on cultivating entrepreneurship through law.
+
+ 
+
+Goodwin’s practice area strengths appeal to me. In particular, Trainee Apsana Rai and I discussed Goodwin’s sector-focused approach. The firm’s life sciences and technology expertise support its private equity (PE) growth strategies, therefore winning a Chambers Band 1 ranking.
+
+ 
+
+Completion - Application 3 (Rejected):
+
+1. **General Interest in Start-Ups:**
+
+  - **Quote:** "However, Goodwin’s focus on innovative start-ups especially excites me."
+
+  - **Inference:** While the applicant expresses excitement about start-ups, the statement lacks the specific alignment with Goodwin’s strategic focus on technology and life sciences sectors observed in successful applications.
+
+ 
+
+2. **Experience in Consultancy, Not Legal Practice:**
+
+  - **Quote:** "I cultivated this interest through my summer internship at a boutique consultancy wherein I reviewed contractual documents for healthcare and tech companies seeking private capital investment."
+
+  - **Inference:** The experience is related to consultancy rather than direct legal practice or in-depth involvement with start-ups’ legal challenges. Successful applications typically showcase direct, relevant legal or closely related experiences.
+
+ 
+
+3. **Lack of Depth in Mentioning Goodwin’s Achievements:**
+
+  - **Quote:** "The firm’s life sciences and technology expertise support its private equity (PE) growth strategies, therefore winning a Chambers Band 1 ranking."
+
+  - **Inference:** While mentioning Goodwin’s achievements, the application fails to connect these achievements to personal experiences or specific interests deeply, unlike successful applications that show a well-researched and personal connection to such details.
+
+ 
+
+4. **Missing Personal Connection or Specific Goals with Firm’s Culture:**
+
+  - **Inference:** Unlike successful applications, this application does not effectively highlight a personal connection or specific career goals aligned with Goodwin’s culture or values, such as DEI commitments or the firm's structural benefits like lean teams.
+
+ 
+
+5. **Vague Expression of Interest:**
+
+  - **Quote:** "I hope to continue mine, and Goodwin’s, emphasis on cultivating entrepreneurship through law."
+
+  - **Inference:** The statement is vague and lacks specificity about how the applicant plans to engage with or contribute to Goodwin’s specific initiatives or sectors. Successful applications often include detailed plans or clear visions of their roles within the firm.
+
+### Analysis of Application 3 (Rejected)
+
+ 
+
+1. **General Interest in Start-Ups:**
+
+  - **Quote:** "However, Goodwin’s focus on innovative start-ups especially excites me."
+
+  - **Inference:** Lacks specific alignment with Goodwin’s strategic focus on technology and life sciences sectors. Successful applications clearly align with these core sectors.
+
+ 
+
+2. **Experience in Consultancy, Not Legal Practice:**
+
+  - **Quote:** "I cultivated this interest through my summer internship at a boutique consultancy wherein I reviewed contractual documents for healthcare and tech companies seeking private capital investment."
+
+  - **Inference:** Experience is in consultancy rather than direct legal practice. Successful applications showcased direct, relevant legal experiences.
+
+ 
+
+3. **Lack of Depth in Mentioning Goodwin’s Achievements:**
+
+  - **Quote:** "The firm’s life sciences and technology expertise support its private equity (PE) growth strategies, therefore winning a Chambers Band 1 ranking."
+
+  - **Inference:** Mentions achievements without showing a personal connection or deep understanding. Successful applications demonstrated a well-researched and personal connection.
+
+ 
+
+4. **Missing Personal Connection or Specific Goals with Firm’s Culture:**
+
+  - **Inference:** Does not effectively highlight a personal connection or specific career goals aligned with Goodwin’s culture or values, such as DEI commitments or lean teams. Successful applications clearly conveyed personal alignment with firm culture and values.
+
+ 
+
+5. **Vague Expression of Interest:**
+
+  - **Quote:** "I hope to continue mine, and Goodwin’s, emphasis on cultivating entrepreneurship through law."
+
+  - **Inference:** Statement is vague and lacks specificity about engagement with Goodwin’s initiatives or sectors. Successful applications included detailed plans or clear visions of their roles within the firm.
+
+ 
+
+### Key Patterns Identified
+
+ 
+
+- **Sector Alignment and Expertise:** Successful applications highlight specific knowledge of and alignment with Goodwin’s core sectors (technology, life sciences).
+
+- **Practical Experience:** Directly relevant practical experiences in these sectors are emphasized.
+
+- **Cultural Fit and Firm’s Structure Appreciation:** Acknowledgment of the firm’s structure and culture, particularly lean teams and entrepreneurial environments, is common among successful applications.
+
+- **Commitment to DEI:** Explicit alignment with Goodwin’s DEI initiatives is a recurring theme in successful applications.
+
+- **Specific and Well-Researched Firm Knowledge:** Successful applications demonstrate a well-researched understanding of Goodwin’s achievements, practices, and values.
+
+ 
+
+Prompt-Completion Pair 4:
+
+Prompt - Application 4 (Rejected):
+
+Goodwin’s market-leading focus on technology and life-sciences startups incorporates the exciting venture-based financing deals that first drew me to commercial law. Specifically, the distinguishing integrated practice that trainee George Fagan described would provide me both target and investor-side exposure throughout a company’s maturation. This would help me understand how my contributions synergise with the overarching deals, accelerating my personal and professional growth.
+
+ 
+
+Moreover, incoming trainee Bennett Jones highlighted the adaptable and friendly environment at Goodwin, which complements my self-directed learning style. Leveraging the approachability of senior colleagues would quickly enable me to emulate their expertise and cultivate meaningful working relationships.
+
+ 
+
+Completion - Application 4 (Rejected)
+
+1. **General Mention of Market-Leading Focus:**
+
+  - **Quote:** "Goodwin’s market-leading focus on technology and life-sciences startups incorporates the exciting venture-based financing deals that first drew me to commercial law."
+
+  - **Inference:** While acknowledging Goodwin’s focus, the statement is generic and lacks specific, personal alignment with Goodwin’s strategic goals. Successful applications demonstrated a more tailored connection.
+
+ 
+
+2. **Experience and Exposure:**
+
+  - **Quote:** "Specifically, the distinguishing integrated practice that trainee George Fagan described would provide me both target and investor-side exposure throughout a company’s maturation."
+
+  - **Inference:** Mentions desired exposure but lacks evidence of relevant practical experience. Successful applications showcased direct, relevant legal experiences that align with Goodwin’s focus areas.
+
+ 
+
+3. **General Appreciation of Firm’s Environment:**
+
+  - **Quote:** "Moreover, incoming trainee Bennett Jones highlighted the adaptable and friendly environment at Goodwin, which complements my self-directed learning style."
+
+  - **Inference:** The appreciation of the firm’s environment is noted, but the statement lacks depth and specifics on how the applicant fits within Goodwin’s culture and structure. Successful applications provided detailed and specific cultural fit examples.
+
+ 
+
+4. **Vague Career Development Plans:**
+
+  - **Quote:** "Leveraging the approachability of senior colleagues would quickly enable me to emulate their expertise and cultivate meaningful working relationships."
+
+  - **Inference:** The statement is vague about career development plans and how the applicant intends to contribute to and grow within Goodwin. Successful applications included clear and detailed career plans.
+
+ 
+
+### Key Patterns Identified
+
+ 
+
+- **Sector Alignment and Expertise:** Successful applications highlight specific knowledge of and alignment with Goodwin’s core sectors (technology, life sciences).
+
+- **Practical Experience:** Directly relevant practical experiences in these sectors are emphasized.
+
+- **Cultural Fit and Firm’s Structure Appreciation:** Acknowledgment of the firm’s structure and culture, particularly lean teams and entrepreneurial environments, is common among successful applications.
+
+- **Commitment to DEI:** Explicit alignment with Goodwin’s DEI initiatives is a recurring theme in successful applications.
+
+- **Specific and Well-Researched Firm Knowledge:** Successful applications demonstrate a well-researched understanding of Goodwin’s achievements, practices, and values.
+
+ 
+
+Prompt-Completion Pair 5:
+
+Prompt - Application 5 (Successful):
+
+Goodwin's comprehensive coverage of the private equity life cycle, from fund structuring to buyouts, resonates with my background in private equity and venture capital. Particularly, Partner Gretchen Scott's insights about Goodwin's tech-focused approach during the insight day and its work with startups and venture capitals mirror my experience at Microsoft's venture arm, where I closely collaborated with cutting-edge tech startups, especially AI-powered SaaS companies. Goodwin's strong private equity practice and tech orientation offer an ideal platform for me to leverage and expand my knowledge in these sectors.
+
+ 
+
+Completion - Application 5 (Successful):
+
+1.. **Alignment with Goodwin’s Private Equity and Tech Focus:**
+
+  - **Quote:** "Goodwin's comprehensive coverage of the private equity life cycle, from fund structuring to buyouts, resonates with my background in private equity and venture capital."
+
+  - **Inference:** Demonstrates a strong alignment with Goodwin’s focus on private equity and tech sectors, mirroring the successful alignment seen in Applications 1 and 2.
+
+ 
+
+2. **Relevant Practical Experience:**
+
+  - **Quote:** "My experience at Microsoft's venture arm, where I closely collaborated with cutting-edge tech startups, especially AI-powered SaaS companies."
+
+  - **Inference:** Showcases directly relevant practical experience in tech startups and venture capital, aligning with Goodwin’s core sectors.
+
+ 
+
+3. **Specific Mention of Firm’s Insights and Practices:**
+
+  - **Quote:** "Partner Gretchen Scott's insights about Goodwin's tech-focused approach during the insight day."
+
+  - **Inference:** Demonstrates a well-researched understanding of the firm’s practices and achievements, similar to the well-researched understanding shown in Applications 1 and 2.
+
+ 
+
+4. **Clear Career Development Plans:**
+
+  - **Quote:** "Goodwin's strong private equity practice and tech orientation offer an ideal platform for me to leverage and expand my knowledge in these sectors."
+
+  - **Inference:** Provides a clear vision of how the applicant plans to grow and contribute within Goodwin, mirroring the detailed career plans observed in successful Applications 1 and 2.
+
+ 
+
+### Key Patterns Identified
+
+ 
+
+- **Sector Alignment and Expertise:** Successful applications highlight specific knowledge of and alignment with Goodwin’s core sectors (technology, life sciences).
+
+- **Practical Experience:** Directly relevant practical experiences in these sectors are emphasized.
+
+- **Cultural Fit and Firm’s Structure Appreciation:** Acknowledgment of the firm’s structure and culture, particularly lean teams and entrepreneurial environments, is common among successful applications.
+
+- **Commitment to DEI:** Explicit alignment with Goodwin’s DEI initiatives is a recurring theme in successful applications.
+
+- **Specific and Well-Researched Firm Knowledge:** Successful applications demonstrate a well-researched understanding of Goodwin’s achievements, practices, and values.
+
+ 
+
+Prompt-Completion Pair 6:
+
+Prompt - Application 6 (Successful):
+
+My primary motivation for applying to Goodwin is due to their unique five industry focus and immense strength in life sciences. I developed a strong interest in life sciences following various work experiences which have given me an insight into the abundant variety which the practice offers. Working alongside illustrious clients such as Moderna across their entire life cycle is an extremely exciting prospect which will give me exposure to a diversity of work. Furthermore, Goodwin’s lean teams attract me as I will be able to make valuable contributions to the firm from the very start of my training contract.
+
+ 
+
+Completion - Application 6 (Successful):
+
+1. **Alignment with Goodwin’s Industry Focus:**
+
+  - **Quote:** "My primary motivation for applying to Goodwin is due to their unique five industry focus and immense strength in life sciences."
+
+  - **Inference:** Demonstrates a strong alignment with Goodwin’s strategic focus, particularly in life sciences, similar to successful applications.
+
+ 
+
+2. **Relevant Practical Experience:**
+
+  - **Quote:** "I developed a strong interest in life sciences following various work experiences which have given me an insight into the abundant variety which the practice offers."
+
+  - **Inference:** Showcases practical experience in life sciences, aligning with Goodwin’s core sectors, as seen in successful applications.
+
+ 
+
+3. **Specific Mention of Firm’s Clients and Practices:**
+
+  - **Quote:** "Working alongside illustrious clients such as Moderna across their entire life cycle is an extremely exciting prospect."
+
+  - **Inference:** Demonstrates a well-researched understanding of Goodwin’s clients and practices, similar to the well-researched understanding shown in applications
+
+ 
+
+4. **Appreciation of Firm’s Structure:**
+
+  - **Quote:** "Goodwin’s lean teams attract me as I will be able to make valuable contributions to the firm from the very start of my training contract."
+
+  - **Inference:** Shows understanding and appreciation of Goodwin’s lean team structure, mirroring the detailed appreciation observed in successful applications.
+
+ 
+
+### Key Patterns Identified
+
+ 
+
+- **Sector Alignment and Expertise:** Successful applications highlight specific knowledge of and alignment with Goodwin’s core sectors (technology, life sciences).
+
+- **Practical Experience:** Directly relevant practical experiences in these sectors are emphasized.
+
+- **Cultural Fit and Firm’s Structure Appreciation:** Acknowledgment of the firm’s structure and culture, particularly lean teams and entrepreneurial environments, is common among successful applications.
+
+- **Commitment to DEI:** Explicit alignment with Goodwin’s DEI initiatives is a recurring theme in successful applications.
+
+- **Specific and Well-Researched Firm Knowledge:** Successful applications demonstrate a well-researched understanding of Goodwin’s achievements, practices, and values.
+
+ 
+
+Prompt-Completion Pair 7:
+
+Prompt - Application 7 (Rejected):
+
+Goodwin’s strength in PE, as evidenced by its Band 1 Chambers and Partners ranking, demonstrates that it provides an ideal environment for me to pursue my career ambitions. This would build on my existing experience and interest developed during my placement sitting in M&A and PE at [US headquartered global law firm]. Goodwin’s close ties with elite PE firms present an exciting opportunity to maximise my exposure to notable buyouts and growth equity deals as a trainee. I am attracted to the firm’s small trainee intake, which enables high levels of responsibility and interaction with more senior lawyers at a uniquely early stage.
+
+ 
+
+Completion - Application 7 (Rejected):
+
+1. **General Mention of Firm’s Strength:**
+
+  - **Quote:** "Goodwin’s strength in PE, as evidenced by its Band 1 Chambers and Partners ranking, demonstrates that it provides an ideal environment for me to pursue my career ambitions."
+
+  - **Inference:** The statement is generic and lacks a personal connection or deep understanding. Successful applications demonstrated a well-researched and personal connection to Goodwin’s achievements.
+
+ 
+
+2. **Relevant Experience in M&A and PE:**
+
+  - **Quote:** "This would build on my existing experience and interest developed during my placement sitting in M&A and PE at [US headquartered global law firm]."
+
+  - **Inference:** Experience is relevant but not directly tied to Goodwin’s specific focus areas like technology and life sciences. Successful applications showcased direct, relevant experience in Goodwin’s core sectors.
+
+ 
+
+3. **Mention of Firm’s Ties with PE Firms:**
+
+  - **Quote:** "Goodwin’s close ties with elite PE firms present an exciting opportunity to maximise my exposure to notable buyouts and growth equity deals as a trainee."
+
+  - **Inference:** While acknowledging Goodwin’s ties, the statement lacks specifics on how the applicant plans to engage or contribute. Successful applications included detailed plans or clear visions of their roles within the firm.
+
+ 
+
+4. **Appreciation of Firm’s Structure:**
+
+  - **Quote:** "I am attracted to the firm’s small trainee intake, which enables high levels of responsibility and interaction with more senior lawyers at a uniquely early stage."
+
+  - **Inference:** Shows an understanding of the firm’s structure but lacks depth in expressing how this aligns with personal career goals. Successful applications provided detailed and specific cultural fit examples.
+
+ 
+
+### Key Patterns Identified
+
+ 
+
+- **Sector Alignment and Expertise:** Successful applications highlight specific knowledge of and alignment with Goodwin’s core sectors (technology, life sciences). This application lacks specific alignment.
+
+- **Practical Experience:** Directly relevant practical experiences in these sectors are emphasized. This application has relevant experience but not directly tied to Goodwin’s focus areas.
+
+- **Cultural Fit and Firm’s Structure Appreciation:** Acknowledgment of the firm’s structure and culture is common among successful applications, but this application lacks depth.
+
+- **Commitment to DEI:** Successful applications show explicit alignment with Goodwin’s DEI initiatives, which is missing here.
+
+- **Specific and Well-Researched Firm Knowledge:** Successful applications demonstrate a well-researched understanding of Goodwin’s achievements, practices, and values, which is not evident in this application.
+
+ 
+
+Prompt-Completion Pair 8:
+
+Prompt - Application 8 (Rejected):
+
+Suffering from the autoimmune condition of psoriasis, I was drawn to Goodwin’s involvement with MiroBio, a company that develops antibody drugs for autoimmune disorders. This is testament to the firm’s venture capital capabilities, which appeals to me, as it would enable me to work alongside pharmaceutical start-ups to produce innovative medicines.
+
+ 
+
+I am drawn to Goodwin’s growth-oriented mindset that has rapidly expanded the London office in its fifteen years. This encourages trainees to be proactive in their development, seeking out opportunities, as I did in lockdown where I leveraged the expanding online retail market to launch my business.
+
+ 
+
+Completion - Application 8 (Rejected):
+
+1. **Personal Connection to Firm’s Client:**
+
+  - **Quote:** "Suffering from the autoimmune condition of psoriasis, I was drawn to Goodwin’s involvement with MiroBio, a company that develops antibody drugs for autoimmune disorders."
+
+  - **Inference:** Demonstrates a personal connection but lacks depth in explaining how this aligns with Goodwin’s broader strategic goals or sectors. Successful applications provided more comprehensive sector alignment.
+
+ 
+
+2. **Acknowledgment of Firm’s Capabilities:**
+
+  - **Quote:** "This is testament to the firm’s venture capital capabilities, which appeals to me, as it would enable me to work alongside pharmaceutical start-ups to produce innovative medicines."
+
+  - **Inference:** Mentions firm’s capabilities but does not connect this to specific, relevant experience. Successful applications showcased direct, relevant practical experience.
+
+ 
+
+3. **Growth-Oriented Mindset:**
+
+  - **Quote:** "I am drawn to Goodwin’s growth-oriented mindset that has rapidly expanded the London office in its fifteen years."
+
+  - **Inference:** Appreciates firm’s growth but lacks specificity on how this aligns with personal career goals or contributions. Successful applications included detailed career development plans.
+
+ 
+
+4. **Entrepreneurial Initiative:**
+
+  - **Quote:** "This encourages trainees to be proactive in their development, seeking out opportunities, as I did in lockdown where I leveraged the expanding online retail market to launch my business."
+
+  - **Inference:** Shows initiative but lacks direct relevance to Goodwin’s key practice areas. Successful applications demonstrated practical experiences directly aligned with Goodwin’s sectors.
+
+ 
+
+### Key Patterns Identified
+
+ 
+
+- **Sector Alignment and Expertise:** Successful applications highlight specific knowledge of and alignment with Goodwin’s core sectors (technology, life sciences). This application lacks comprehensive alignment.
+
+- **Practical Experience:** Directly relevant practical experiences in these sectors are emphasized. This application mentions entrepreneurial initiative but lacks direct sector relevance.
+
+- **Cultural Fit and Firm’s Structure Appreciation:** Successful applications provide detailed and specific cultural fit examples, which are lacking here.
+
+- **Commitment to DEI:** Successful applications show explicit alignment with Goodwin’s DEI initiatives, which is missing here.
+
+- **Specific and Well-Researched Firm Knowledge:** Successful applications demonstrate a well-researched understanding of Goodwin’s achievements, practices, and values, which is not evident in this application.
+
+ 
+
+Prompt-Completion Pair 9:
+
+Prompt - Application 9 (Successful):
+
+I am applying to Goodwin for its pharmaceutical clientele, high-profile work in the life sciences regulatory practice, and distinct culture. Given my predisposition towards the life sciences sector, Goodwin offers unique opportunities with clients such as Moderna. Having studied DNA sequencing and its practical applications, I am keen on learning about biotech deals from a legal perspective by adapting my research and problem-solving skills.
+
+ 
+
+Goodwin presents a working environment that I can excel in. The firm’s commitment to emulating a startup culture, such as Goodwin Labs, ensures ample opportunities for self-improvement through more individual responsibility and client contact.
+
+ 
+
+Completion - Application 9 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "Given my predisposition towards the life sciences sector, Goodwin offers unique opportunities with clients such as Moderna."
+
+  - **Inference:** Strong alignment with Goodwin’s focus on life sciences, similar to successful applications.
+
+ 
+
+2. **Relevant Practical Experience:**
+
+  - **Quote:** "Having studied DNA sequencing and its practical applications, I am keen on learning about biotech deals from a legal perspective by adapting my research and problem-solving skills."
+
+  - **Inference:** Demonstrates practical experience in life sciences, directly relevant to Goodwin’s core sectors.
+
+ 
+
+3. **Well-Researched Understanding of the Firm:**
+
+  - **Quote:** "Goodwin presents a working environment that I can excel in. The firm’s commitment to emulating a startup culture, such as Goodwin Labs, ensures ample opportunities for self-improvement through more individual responsibility and client contact."
+
+  - **Inference:** Shows a deep, well-researched understanding of Goodwin’s culture and initiatives, similar to successful applications.
+
+ 
+
+4. **Cultural Fit and Firm’s Structure Appreciation:**
+
+  - **Quote:** "Goodwin Labs, ensures ample opportunities for self-improvement through more individual responsibility and client contact."
+
+  - **Inference:** Demonstrates appreciation for the firm’s culture of individual responsibility and client contact, aligning with the firm’s entrepreneurial environment, as seen in successful applications.
+
+ 
+
+### Patterns Identified
+
+ 
+
+- **Sector Alignment and Expertise:** Demonstrates deep knowledge and alignment with Goodwin’s core sectors.
+
+- **Practical Experience:** Showcases directly relevant practical experience in life sciences.
+
+- **Well-Researched Understanding:** Provides detailed, specific insights into Goodwin’s practices and culture.
+
+- **Cultural Fit:** Highlights how the firm’s culture and structure align with personal career goals and values.
+
+ 
+
+### Key Points
+
+ 
+
+- Strong alignment with Goodwin’s life sciences sector.
+
+- Practical experience in DNA sequencing and biotech.
+
+- Well-researched understanding of Goodwin’s startup culture and initiatives.
+
+- Appreciation for individual responsibility and client contact within the firm.
+
+ 
+
+Prompt-Completion Pair 10:
+
+Prompt - Application 10 (Successful):
+
+I am attracted to Goodwin for its technology sector focus, aligning with my background in technology consultancy. This experience highlighted the pivotal role of commercial lawyers in providing legal and business advice for complex customer-facing products. A career at Goodwin appeals to me, as it intersects law and technology. The firm's strong emphasis on diversity and inclusion resonates with my active involvement in mentoring programs at Aspiring Solicitors, enhancing my confidence as an aspiring lawyer. My interest in Goodwin is affirmed by the promise of a supportive and inclusive network for my development as a black female commercial lawyer.
+
+ 
+
+Completion - Application 10 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "I am attracted to Goodwin for its technology sector focus, aligning with my background in technology consultancy."
+
+  - **Inference:** Demonstrates specific alignment with Goodwin's core focus on technology, similar to successful applications.
+
+ 
+
+2. **Relevant Practical Experience:**
+
+  - **Quote:** "This experience highlighted the pivotal role of commercial lawyers in providing legal and business advice for complex customer-facing products."
+
+  - **Inference:** Showcases practical experience in technology consultancy, relevant to Goodwin’s focus on technology sectors.
+
+ 
+
+3. **Commitment to DEI:**
+
+  - **Quote:** "The firm's strong emphasis on diversity and inclusion resonates with my active involvement in mentoring programs at Aspiring Solicitors."
+
+  - **Inference:** Highlights a strong commitment to diversity and inclusion, aligning with Goodwin's DEI values, as seen in successful applications.
+
+ 
+
+4. **Well-Researched Understanding of the Firm:**
+
+  - **Quote:** "My interest in Goodwin is affirmed by the promise of a supportive and inclusive network for my development as a black female commercial lawyer."
+
+  - **Inference:** Demonstrates a deep, well-researched understanding of Goodwin’s culture and support system, similar to successful applications.
+
+ 
+
+### Key Patterns Identified
+
+ 
+
+- **Sector Alignment and Expertise:** Specific alignment with Goodwin’s technology focus.
+
+- **Practical Experience:** Relevant experience in technology consultancy.
+
+- **Commitment to DEI:** Strong emphasis on diversity and inclusion.
+
+- **Well-Researched Understanding:** Detailed insights into Goodwin’s culture and support system.
+
+ 
+
+Prompt-Completion Pair 11:
+
+Prompt - Application 11 (Rejected):
+
+Goodwin’s expertise in private equity and unique, forward-looking strategy explains my application to the firm.
+
+Goodwin’s Chambers Band 1 Private Equity (PE) practice attracts me to the firm. Strengths in the life sciences and tech industries displays the diversity of work the firm engages in. The opportunity to oversee the lifecycle of investments in different industries stemming from fund formation to exit interests me.
+
+Goodwin’s unique strategy bolstering the private equity practice to accomplish a dominant presence in tech was demonstrated via laterals from Gibson Dunn and Kirkland in June. This forward-looking strategy indicates immense scope in PE at Goodwin.
+
+ 
+
+Completion - Application 11 (Rejected):
+
+1. **Generic Mention of Firm’s Strengths:**
+
+  - **Quote:** "Goodwin’s expertise in private equity and unique, forward-looking strategy explains my application to the firm."
+
+  - **Inference:** The statement is generic and lacks a personal connection or deep understanding. Successful applications demonstrated a well-researched and personal connection to Goodwin’s achievements.
+
+ 
+
+2. **Superficial Understanding of Firm’s Practices:**
+
+  - **Quote:** "Goodwin’s Chambers Band 1 Private Equity (PE) practice attracts me to the firm."
+
+  - **Inference:** Mentions Goodwin’s ranking but lacks connection to personal experience or specific career goals. Successful applications provided detailed and specific insights into how the firm’s practices align with personal experiences and goals.
+
+ 
+
+3. **Missing Relevant Practical Experience:**
+
+  - **Quote:** "The opportunity to oversee the lifecycle of investments in different industries stemming from fund formation to exit interests me."
+
+  - **Inference:** Expresses interest but does not showcase relevant practical experience in Goodwin’s core sectors (technology, life sciences). Successful applications highlighted directly relevant practical experiences.
+
+ 
+
+4. **Lack of Specific Career Development Plans:**
+
+  - **Quote:** "This forward-looking strategy indicates immense scope in PE at Goodwin."
+
+  - **Inference:** Acknowledges strategy but lacks specifics on how the applicant plans to engage or contribute to Goodwin’s initiatives. Successful applications included detailed plans or clear visions of their roles within the firm.
+
+ 
+
+### Key Patterns Identified
+
+ 
+
+- **Specific and Well-Researched Firm Knowledge:** Successful applications demonstrate a well-researched understanding of Goodwin’s achievements, practices, and values. This application lacks depth and personal connection.
+
+- **Practical Experience:** Successful applications emphasize directly relevant practical experiences in Goodwin’s core sectors (technology, life sciences). This application does not showcase such experience.
+
+- **Detailed Career Development Plans:** Successful applications include detailed plans or clear visions of their roles within the firm. This application lacks specificity in career development plans.
+
+ 
+
+Prompt-Completion Pair 12:
+
+Prompt - Application 12 (Successful):
+
+I am applying to Goodwin because the firm combines a strong private funds practice with an equally strong transactional practice — both of which have Band 2 rankings on Chambers. Goodwin’s transactional practice is exceptionally strong, having recently topped deal count rankings. I intend to practice in both of these areas as a solicitor, and Goodwin provides the perfect opportunity for me to do so.
+
+ 
+
+Moreover, Goodwin attracts me because it specialises in Venture Capital and growth industry work. I am drawn to the forward-facing nature of the firm’s work, having previously worked on Venture Capital deals in the past.
+
+ 
+
+Completion - Application 12 (Successful):
+
+1. **Alignment with Goodwin’s Key Practice Areas:**
+
+  - **Quote:** "The firm combines a strong private funds practice with an equally strong transactional practice — both of which have Band 2 rankings on Chambers."
+
+  - **Inference:** Demonstrates a well-researched understanding and alignment with Goodwin’s core practice areas, similar to successful applications.
+
+ 
+
+2. **Evidence of Well-Researched Firm Knowledge:**
+
+  - **Quote:** "Goodwin’s transactional practice is exceptionally strong, having recently topped deal count rankings."
+
+  - **Inference:** Shows detailed, specific insights into Goodwin’s achievements, mirroring the well-researched understanding seen in successful applications.
+
+ 
+
+3. **Relevant Practical Experience:**
+
+  - **Quote:** "I am drawn to the forward-facing nature of the firm’s work, having previously worked on Venture Capital deals in the past."
+
+  - **Inference:** Highlights directly relevant practical experience in Venture Capital, aligning with Goodwin’s focus on growth industries, as seen in successful applications.
+
+ 
+
+4. **Clear Career Development Plans:**
+
+  - **Quote:** "I intend to practice in both of these areas as a solicitor, and Goodwin provides the perfect opportunity for me to do so."
+
+  - **Inference:** Provides a clear vision of how the applicant plans to grow and contribute within Goodwin, similar to the detailed career plans observed in successful applications.
+
+ 
+
+### Key Points
+
+ 
+
+- **Sector Alignment and Expertise:** Demonstrates alignment with Goodwin’s core practice areas (private funds, transactional practice) and growth industries.
+
+- **Well-Researched Understanding:** Provides specific insights into Goodwin’s achievements and rankings.
+
+- **Relevant Practical Experience:** Highlights experience in Venture Capital deals.
+
+- **Clear Career Development Plans:** Shows a defined plan for career growth within the firm.
+
+ 
+
+Prompt-Completion Pair 13:
+
+Prompt - Application 13 (Successful):
+
+I am applying to Goodwin for the firm’s continued excellence across a wide range of fields with the firm’s reputation for private equity, technology start-ups and the massive number of 225 initial public offerings in 2020 being of particular interest. I am inspired and motivated by the firm’s strategic preparation for the tech start-up boom of the last decade and the subsequent doubling in the size of the firm as a result. While the 75,000 hours of pro bono in the last year demonstrates to me that the firm’s knowledge and resources are also used for the betterment of society.
+
+ 
+
+Completion - Application 13 (Successful):
+
+1. **Alignment with Goodwin’s Key Practice Areas:**
+
+  - **Quote:** "I am applying to Goodwin for the firm’s continued excellence across a wide range of fields with the firm’s reputation for private equity, technology start-ups and the massive number of 225 initial public offerings in 2020 being of particular interest."
+
+  - **Inference:** Demonstrates a well-researched understanding of Goodwin's core practice areas (private equity, technology start-ups), aligning with successful applications.
+
+ 
+
+2. **Evidence of Well-Researched Firm Knowledge:**
+
+  - **Quote:** "I am inspired and motivated by the firm’s strategic preparation for the tech start-up boom of the last decade and the subsequent doubling in the size of the firm as a result."
+
+  - **Inference:** Shows specific insights into Goodwin’s strategic growth and achievements, mirroring the detailed understanding seen in successful applications.
+
+ 
+
+3. **Commitment to DEI and Pro Bono Work:**
+
+  - **Quote:** "While the 75,000 hours of pro bono in the last year demonstrates to me that the firm’s knowledge and resources are also used for the betterment of society."
+
+  - **Inference:** Highlights the firm’s commitment to societal impact and DEI, aligning with the values emphasized in successful applications.
+
+ 
+
+### Key Points
+
+ 
+
+- **Sector Alignment and Expertise:** Demonstrates alignment with Goodwin’s private equity and technology start-up sectors.
+
+- **Well-Researched Understanding:** Provides specific insights into Goodwin’s achievements and strategic growth.
+
+- **Commitment to DEI and Pro Bono Work:** Highlights the firm’s societal impact efforts, aligning with Goodwin’s values.
+
+ 
+
+Prompt-Completion Pair 14:
+
+Prompt - Application 14 (Successful):
+
+I encountered Goodwin through my university career service and was impressed by the firm winning International Law Firm of the Year at the British Legal Awards. Goodwin's expertise in private equity is of particular interest to me, given my previous experience. I am excited by Goodwin's smaller trainee cohorts. This enables trainees to gain unparalleled exposure to multiple practice areas, be core members of a tight-knit team, and have a high level of responsibility on deals
+
+that shape the global landscape, such as GLP's acquisition of Tropicana Entertainment.
+
+ 
+
+Completion - Application 14 (Successful):
+
+1. **Recognition of Firm’s Achievements:**
+
+  - **Quote:** "I was impressed by the firm winning International Law Firm of the Year at the British Legal Awards."
+
+  - **Inference:** Demonstrates a well-researched understanding of Goodwin’s achievements, similar to successful applications.
+
+ 
+
+2. **Sector Alignment and Expertise:**
+
+  - **Quote:** "Goodwin's expertise in private equity is of particular interest to me, given my previous experience."
+
+  - **Inference:** Shows specific alignment with Goodwin’s core practice area, private equity, aligning with successful applications.
+
+ 
+
+3. **Appreciation of Firm’s Structure:**
+
+  - **Quote:** "I am excited by Goodwin's smaller trainee cohorts. This enables trainees to gain unparalleled exposure to multiple practice areas, be core members of a tight-knit team..."
+
+  - **Inference:** Highlights an understanding and appreciation of Goodwin’s structure, similar to successful applications.
+
+ 
+
+4. **Relevant Practical Experience:**
+
+  - **Quote:** "...have a high level of responsibility on deals that shape the global landscape, such as GLP's acquisition of Tropicana Entertainment."
+
+  - **Inference:** Provides specific relevant experience and involvement in significant deals, aligning with Goodwin’s high-stakes work, as seen in successful applications.
+
+ 
+
+### Key Points
+
+ 
+
+- **Recognition of Firm’s Achievements:** Demonstrates a well-researched understanding of Goodwin’s accolades.
+
+- **Sector Alignment:** Specific alignment with Goodwin’s private equity focus.
+
+- **Appreciation of Firm’s Structure:** Highlights benefits of smaller trainee cohorts and exposure to multiple practice areas.
+
+- **Relevant Practical Experience:** Provides specific examples of high-level responsibilities and significant deals.
+
+ 
+
+Prompt-Completion Pair 15:
+
+Prompt - Application 15 (Successful):
+
+Goodwin’s innovative approach to growth attracts me to the firm. The strategy of combining the firm’s expertise in key industries to create opportunities where the disciplines overlap, such as Goodwin’s PropSci practice, strongly aligns with my own work ethic. For example, my interest in data protection and blockchain technology led me to write a research paper on their compatibility. A career at Goodwin will position me to strengthen this approach to problem-solving by exposing me to businesses that operate within such pioneering spaces. Importantly, the prospect of developing this innovative mindset at the early stages of my career excites me.
+
+ 
+
+Completion - Application 15 (Successful):
+
+1. **Recognition of Firm’s Innovative Approach:**
+
+  - **Quote:** "Goodwin’s innovative approach to growth attracts me to the firm."
+
+  - **Inference:** Demonstrates an understanding of Goodwin’s strategic initiatives, aligning with successful applications.
+
+ 
+
+2. **Sector Alignment and Overlapping Disciplines:**
+
+  - **Quote:** "The strategy of combining the firm’s expertise in key industries to create opportunities where the disciplines overlap, such as Goodwin’s PropSci practice, strongly aligns with my own work ethic."
+
+  - **Inference:** Shows specific alignment with Goodwin’s interdisciplinary approach, similar to successful applications.
+
+ 
+
+3. **Relevant Practical Experience:**
+
+  - **Quote:** "My interest in data protection and blockchain technology led me to write a research paper on their compatibility."
+
+  - **Inference:** Provides specific, relevant experience and showcases an innovative mindset, aligning with Goodwin’s focus on pioneering spaces seen in successful applications.
+
+ 
+
+4. **Career Development and Innovative Mindset:**
+
+  - **Quote:** "The prospect of developing this innovative mindset at the early stages of my career excites me."
+
+  - **Inference:** Highlights a clear vision for career growth within Goodwin’s innovative environment, similar to successful applications.
+
+ 
+
+### Key Points
+
+ 
+
+- **Recognition of Firm’s Innovative Approach:** Demonstrates understanding of Goodwin’s strategic initiatives.
+
+- **Sector Alignment and Overlapping Disciplines:** Specific alignment with Goodwin’s interdisciplinary approach.
+
+- **Relevant Practical Experience:** Provides specific, relevant experience in data protection and blockchain technology.
+
+- **Career Development and Innovative Mindset:** Highlights a clear vision for growth within Goodwin’s innovative environment.
+
+ 
+
+Prompt-Completion Pair 16:
+
+Prompt - Application 16 (Successful):
+
+Goodwin’s prominent technology and life sciences practice drives my application. This interest stems from my time at a biotech start-up, where I helped decide how to monetise the company’s intellectual property. This blend of law and science appeals to me, as it requires an appreciation of cutting-edge technology as well as creative legal problem solving. Lucy Charlton’s discussion of this at Goodwin’s Open Day was fascinating. The firm’s breadth of expertise, from private equity to intellectual property, allows it to advise companies throughout their lifecycle. I am attracted by the notion of helping client’s grow from start-up to large cap.
+
+ 
+
+Completion - Application 16 (Successful):
+
+**Sector Alignment and Expertise:**
+
+- **Quote:** "Goodwin’s prominent technology and life sciences practice drives my application."
+
+- **Inference:** Demonstrates specific alignment with Goodwin’s core sectors, similar to successful applications.
+
+ 
+
+**Relevant Practical Experience:**
+
+- **Quote:** "This interest stems from my time at a biotech start-up, where I helped decide how to monetise the company’s intellectual property."
+
+- **Inference:** Provides directly relevant experience in biotech and intellectual property, aligning with Goodwin’s focus areas.
+
+ 
+
+**Commitment to Firm’s Culture and Structure:**
+
+- **Quote:** "Lucy Charlton’s discussion of this at Goodwin’s Open Day was fascinating."
+
+- **Inference:** Shows engagement with the firm’s culture and values, similar to successful applications.
+
+ 
+
+**Career Development and Client Support:**
+
+- **Quote:** "I am attracted by the notion of helping client’s grow from start-up to large cap."
+
+- **Inference:** Highlights a clear vision for career growth and client support within Goodwin’s structure, reflecting the detailed career plans seen in successful applications.
+
+ 
+
+### Key Points
+
+ 
+
+- **Sector Alignment and Expertise:** Demonstrates specific knowledge of and alignment with Goodwin’s core sectors (technology, life sciences).
+
+- **Relevant Practical Experience:** Directly relevant practical experience in biotech and intellectual property.
+
+- **Commitment to Firm’s Culture:** Shows engagement with Goodwin’s culture and values.
+
+- **Career Development and Client Support:** Clear vision for career growth and client support within Goodwin’s structure.
+
+ 
+
+Prompt-Completion Pair 17:
+
+Prompt - Application 17 (Rejected):
+
+ 
+
+It was through a conversation with Arjun at an Aspiring Solicitors law fair which sparked an interest in Goodwin. He spoke on the firm’s pre-eminence in advising clients in the startup scene such as Zapp, which paired with the private equity and antitrust capability on offer attracts me to train here.
+
+ 
+
+The firm’s relatively smaller trainee intake paired with the rapid growth the London office is experiencing makes for a nimble environment to train in, having substantive deal team involvement. The opportunity to nurture a close-knit network at a leading firm therefore is a desirable learning environment to be in.
+
+ 
+
+Completion - Application 17 (Rejected):
+
+ 
+
+1. **Generic Connection to Firm’s Sector Focus:**
+
+  - **Quote:** "The firm’s pre-eminence in advising clients in the startup scene such as Zapp, which paired with the private equity and antitrust capability on offer attracts me to train here."
+
+  - **Inference:** The statement is generic and lacks a specific, well-researched alignment with Goodwin’s strategic focus. Successful applications demonstrated a detailed understanding and specific alignment with Goodwin’s core sectors.
+
+ 
+
+2. **Superficial Mention of Firm’s Structure:**
+
+  - **Quote:** "The firm’s relatively smaller trainee intake paired with the rapid growth the London office is experiencing makes for a nimble environment to train in..."
+
+  - **Inference:** While acknowledging the firm’s structure, the statement lacks depth and specifics on how the applicant fits within Goodwin’s culture and values. Successful applications provided detailed and specific cultural fit examples.
+
+ 
+
+3. **Lack of Relevant Practical Experience:**
+
+  - **Quote:** None provided.
+
+  - **Inference:** The application does not showcase directly relevant practical experience in Goodwin’s core sectors (technology, life sciences). Successful applications highlighted directly relevant practical experiences.
+
+ 
+
+4. **Absence of DEI Commitment:**
+
+  - **Quote:** None provided.
+
+  - **Inference:** The application lacks any mention of Goodwin’s DEI initiatives. Successful applications explicitly aligned with Goodwin’s DEI values.
+
+ 
+
+### Key Points
+
+ 
+
+- **Generic Sector Connection:** Lacks specific, well-researched alignment with Goodwin’s strategic focus.
+
+- **Superficial Structure Mention:** Lacks depth and specifics on cultural fit.
+
+- **No Relevant Experience:** Does not showcase relevant practical experience in Goodwin’s core sectors.
+
+- **Missing DEI Commitment:** No mention of Goodwin’s DEI initiatives.
+
+ 
+
+Prompt-Completion Pair 18:
+
+Prompt - Application 18 (Successful):
+
+I am applying to Goodwin because of its quality work. Whilst completing the M&A virtual internship, I enjoyed the investigative element of due diligence and analysing an array of data to identify potential risks for the client. I am attracted to Goodwin as it has a stellar practice in this area, having topped Refinitiv’s Q3 2023 league tables for global M&A by deal count. Goodwin's ability to lead in M&A deal count shows the firm can weather downturns in the economy, meaning I can build a long-term career at the firm whilst being safeguarded against changes in the economic cycle.
+
+ 
+
+Completion - Application 18 (Successful):
+
+1. **Quality Work and Firm’s Achievements:**
+
+  - **Quote:** "Goodwin as it has a stellar practice in this area, having topped Refinitiv’s Q3 2023 league tables for global M&A by deal count."
+
+  - **Pattern:** Demonstrates well-researched understanding of Goodwin’s achievements, similar to successful applications.
+
+ 
+
+2. **Practical Experience:**
+
+  - **Quote:** "Whilst completing the M&A virtual internship, I enjoyed the investigative element of due diligence and analysing an array of data to identify potential risks for the client."
+
+  - **Pattern:** Relevant practical experience in M&A, aligning with Goodwin’s core practice areas, seen in successful applications.
+
+ 
+
+3. **Long-Term Career Prospects:**
+
+  - **Quote:** "Goodwin's ability to lead in M&A deal count shows the firm can weather downturns in the economy, meaning I can build a long-term career at the firm whilst being safeguarded against changes in the economic cycle."
+
+  - **Pattern:** Clear vision for long-term career growth within Goodwin, similar to successful applications.
+
+ 
+
+### Key Patterns and Examples
+
+ 
+
+- **Well-Researched Understanding and Achievements:**
+
+  - Applications that succeed often demonstrate a deep, well-researched understanding of Goodwin’s achievements and strategic focus.
+
+  - **Example:** Application 1 highlighted Goodwin’s technological innovation focus and diversity achievements.
+
+ 
+
+- **Relevant Practical Experience:**
+
+  - Practical experience directly relevant to Goodwin’s core sectors is crucial.
+
+  - **Example:** Application 2 showcased facilitating a med-tech founder’s Series A round.
+
+ 
+
+- **Clear Career Development Plans:**
+
+  - Successful applications often include detailed plans for career growth within Goodwin.
+
+  - **Example:** Application 5 provided a clear vision for leveraging and expanding knowledge in private equity and tech sectors.
+
+ 
+
+### Analysis Structure
+
+ 
+
+In future analyses:
+
+ 
+
+- **Sector Alignment and Expertise:** Look for specific knowledge of and alignment with Goodwin’s core sectors.
+
+- **Relevant Practical Experience:** Emphasize directly relevant practical experiences in these sectors.
+
+- **Well-Researched Understanding:** Assess the depth and specificity of insights into Goodwin’s practices and achievements.
+
+- **Cultural Fit and Career Plans:** Evaluate how well the applicant’s career goals align with Goodwin’s structure and culture.
+
+ 
+
+This approach will ensure a thorough, specific, and evidence-based evaluation of future applications.
+
+ 
+
+Prompt-Completion Pair 19:
+
+Prompt - Application 19 (Successful):
+
+I am applying to Goodwin because of the firm's track record of success in the areas of law I want to specialise in: private equity and investment funds. In fact, my interest in the firm arose when reading about its role in Frazier Healthcare Partners' $1.525 billion sale of Parata Systems, a pharmacy technology solutions provider. I was taken aback by the scale of the transaction but quickly came to realise that Goodwin has built a leading reputation for such work. I relish the challenges a career at Goodwin would offer and look forward to contributing to the firm's success.
+
+ 
+
+Completion - Application 19 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "I am applying to Goodwin because of the firm's track record of success in the areas of law I want to specialise in: private equity and investment funds."
+
+  - **Pattern:** Demonstrates specific alignment with Goodwin’s core sectors, similar to successful applications.
+
+ 
+
+2. **Well-Researched Firm Knowledge:**
+
+  - **Quote:** "my interest in the firm arose when reading about its role in Frazier Healthcare Partners' $1.525 billion sale of Parata Systems, a pharmacy technology solutions provider."
+
+  - **Pattern:** Shows detailed, well-researched understanding of Goodwin’s high-profile work, aligning with the successful applications.
+
+ 
+
+3. **Recognition of Firm’s Achievements:**
+
+  - **Quote:** "I was taken aback by the scale of the transaction but quickly came to realise that Goodwin has built a leading reputation for such work."
+
+  - **Pattern:** Acknowledges and appreciates firm’s significant achievements, similar to successful applications.
+
+ 
+
+4. **Career Development Vision:**
+
+  - **Quote:** "I relish the challenges a career at Goodwin would offer and look forward to contributing to the firm's success."
+
+  - **Pattern:** Highlights a clear vision for career growth and contribution within the firm, consistent with successful applications.
+
+ 
+
+### Key Points
+
+ 
+
+- **Sector Alignment:** Clear alignment with Goodwin’s private equity and investment funds sectors.
+
+- **Well-Researched Understanding:** Detailed insights into Goodwin’s high-profile transactions.
+
+- **Acknowledgment of Achievements:** Appreciation of Goodwin’s leading reputation in significant transactions.
+
+- **Career Vision:** Clear expression of career aspirations and contributions to the firm's success.
+
+ 
+
+Prompt-Completion Pair 20:
+
+Prompt- Application 20 (Rejected):
+
+The ‘start-up’ energy and upstart nature of your expanding firm proves to be highly attractive, alongside your prominent private equity practice. In seeking to grow, Goodwin constantly finds itself on the precipice of ground-breaking work with tech/life sciences start-ups, which is rather fitting for an emerging law firm. This proves to be highly enticing and I am keen to train in such a closely-knit firm of 200 lawyers with a limited trainee intake, due to the prospect of: greater responsibilities/deal involvement; dynamism within lean and efficient teams; and functional but limited hierarchies to maximise interactions between senior and junior lawyers.
+
+ 
+
+Completion - Application 20 (Rejected):
+
+This answer gets some things right, but uses too many buzzwords.
+
+ 
+
+1) The recruiter would have looked even more favourably upon specific experiences (e.g. experiences with ‘tech/life sciences’ firms) that show the applicant is truly interested in the kinds of mandates Goodwin takes on.
+
+ 
+
+2) Further, the phrases ‘start-up energy’ and ‘upstart nature’ of Goodwin’s ‘expanding firm’ are not concrete reasons for a recruiter to be satisfied of the applicant’s interest in the firm. They are intangible reasons that anyone can claim without tangible justifications (i.e relevant experiences). The statement ‘Goodwin constantly finds itself on the precipice of ground-breaking work with tech/life sciences start-ups’ simply states what Goodwin is good at, but does not adequately address the issue of why the applicant is specifically interested in the firm (again linking back to the previous point about the need for relevant experiences).
+
+ 
+
+3) The application also does not showcase directly relevant practical experience in Goodwin’s core sectors (technology, life sciences etc…).
+
+ 
+
+4) There is also no mention of Goodwin’s DEI initiatives - successful applications explicitly aligned with Goodwin’s DEI values, showing commitment to diversity and inclusion.
+
+ 
+
+5) This is not to say that the applicant has made irrelevant points, indeed the ‘greater responsibilities/deal involvement’, ‘lean and efficient teams’ and ‘functional but limited hierarchies’ may be relevant reasons for joining Goodwin. However, the applicant needs to show interactions with the firm (e.g. Open Days or Insight Events) to justify such ‘cultural reasons’, as these intangible reasons can only be justified through in-person networking with the firm’s representative. If there are none to show, the applicant is better off sticking to practical, concrete examples that align with the firm’s training style (e.g. high-paced environments where the applicant may have had to previously take on greater responsibility).
+
+ 
+
+Prompt-Completion Pair 21:
+
+Prompt - Application 21 (Successful):
+
+I am drawn to Goodwin due to the small trainee intake, high responsibility, and fast-paced environment. The firm’s intake offers focused, specialised training, which will ensure that my contributions as a trainee are significant. The training program resonates with my career goals by offering hands-on involvement in major projects. The London Real Estate team's role in advising Kennedy Wilson on a joint venture targeting a $1 billion property portfolio underscores Goodwin's innovative impact in the global real estate sector. This aligns with my ambition to contribute to industry-defining projects and offers a chance for early career responsibility in high-profile work.
+
+ 
+
+Completion - Application 21 (Successful):
+
+1. **Recognition of Firm’s Structure:**
+
+  - **Quote:** "I am drawn to Goodwin due to the small trainee intake, high responsibility, and fast-paced environment."
+
+  - **Pattern:** Shows appreciation for Goodwin’s structure, similar to successful applications.
+
+ 
+
+2. **Alignment with Career Goals:**
+
+  - **Quote:** "The training program resonates with my career goals by offering hands-on involvement in major projects."
+
+  - **Pattern:** Aligns personal career goals with the firm’s training program, reflecting detailed career plans seen in successful applications.
+
+ 
+
+3. **Specific Example of Firm’s Work:**
+
+  - **Quote:** "The London Real Estate team's role in advising Kennedy Wilson on a joint venture targeting a $1 billion property portfolio underscores Goodwin's innovative impact in the global real estate sector."
+
+  - **Pattern:** Demonstrates well-researched understanding and specific alignment with Goodwin’s work, similar to successful applications.
+
+ 
+
+4. **Early Career Responsibility:**
+
+  - **Quote:** "Offers a chance for early career responsibility in high-profile work."
+
+  - **Pattern:** Highlights the opportunity for significant responsibilities early in the career, aligning with successful applications.
+
+ 
+
+Prompt-Completion Pair 22:
+
+Prompt - Application 22 (Successful):
+
+Applying to Goodwin is an opportunity to gain an in-depth understanding of what drives your success and to be a part of a firm whose values closely align with mine. Being the director of a non-profit organization that provides free application mentoring to Malaysian sixth-form students, long-term success and improvement are goals I work towards. Your 10 Core Principles show that striving for the best in every area of the firm is at the forefront of every decision; hence, it is no surprise that Goodwin was named Editor's Choice Law Firm 2023 by the British Legal Awards.
+
+ 
+
+Completion - Application 22 (Successful):
+
+1. **Alignment with Goodwin’s Values:**
+
+  - **Quote:** "Your 10 Core Principles show that striving for the best in every area of the firm is at the forefront of every decision."
+
+  - **Pattern:** Demonstrates strong alignment with Goodwin’s core values and principles, similar to successful applications.
+
+ 
+
+2. **Recognition of Firm’s Achievements:**
+
+  - **Quote:** "It is no surprise that Goodwin was named Editor's Choice Law Firm 2023 by the British Legal Awards."
+
+  - **Pattern:** Shows well-researched understanding of Goodwin’s accolades, as seen in successful applications.
+
+ 
+
+3. **Commitment to Long-Term Success and Improvement:**
+
+  - **Quote:** "Being the director of a non-profit organization that provides free application mentoring to Malaysian sixth-form students, long-term success and improvement are goals I work towards."
+
+  - **Pattern:** Demonstrates a commitment to long-term success and improvement, aligning with Goodwin’s emphasis on growth and excellence, mirroring successful applications.
+
+ 
+
+4. **Leadership Experience and Societal Impact:**
+
+  - **Quote:** "Being the director of a non-profit organization..."
+
+  - **Pattern:** Highlights leadership experience and a commitment to societal impact, which aligns with Goodwin’s DEI and pro bono values, seen in successful applications.
+
+ 
+
+### Key Points
+
+ 
+
+- **Alignment with Goodwin’s Values:** Demonstrates strong alignment with Goodwin’s core values.
+
+- **Recognition of Firm’s Achievements:** Shows well-researched understanding of Goodwin’s accolades.
+
+- **Commitment to Long-Term Success:** Emphasizes goals for long-term success and improvement.
+
+- **Leadership Experience:** Highlights leadership in non-profit work, aligning with Goodwin’s DEI values.
+
+ 
+
+Prompt-Completion Pair 23:
+
+Prompt - Application 23 (Anonymised) (Successful):
+
+I’m applying to Goodwin for 3 reasons.
+
+ 
+
+First, Goodwin’s key practice areas, such as life sciences, real estate, and private equity, resonate with my interests. I took a science-focused subject combination in high school because I am fascinated by constant innovation in life sciences.
+
+ 
+
+Second, [Trainee X]’s illustration of the firm’s approach to growth – which never comes at the expense of its friendly and entrepreneurial culture – makes Goodwin an attractive place to start my career.
+
+ 
+
+Thirdly, the training opportunities to engage with challenging work, with a small intake, will allow me to quickly master the basics and accelerate my career.
+
+ 
+
+Completion - Application 23 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "Goodwin’s key practice areas, such as life sciences, real estate, and private equity, resonate with my interests."
+
+  - **Pattern:** Demonstrates specific alignment with Goodwin’s core sectors, similar to successful applications.
+
+ 
+
+2. **Relevant Background Experience:**
+
+  - **Quote:** "I took a science-focused subject combination in high school because I am fascinated by constant innovation in life sciences."
+
+  - **Pattern:** Provides relevant background in life sciences, aligning with Goodwin’s focus areas, seen in successful applications.
+
+ 
+
+3. **Firm-Specific Culture and Growth:**
+
+  - **Quote:** "[Trainee X]’s illustration of the firm’s approach to growth – which never comes at the expense of its friendly and entrepreneurial culture."
+
+  - **Pattern:** Highlights understanding and appreciation of Goodwin’s culture and growth strategy, similar to successful applications.
+
+ 
+
+4. **Training Opportunities and Career Development:**
+
+  - **Quote:** "The training opportunities to engage with challenging work, with a small intake, will allow me to quickly master the basics and accelerate my career."
+
+  - **Pattern:** Emphasizes the benefits of Goodwin’s training structure and small intake, aligning with successful applications.
+
+ 
+
+### Key Points
+
+ 
+
+- **Sector Alignment and Expertise:** Specific alignment with Goodwin’s core sectors.
+
+- **Relevant Background Experience:** Provides relevant background in life sciences.
+
+- **Firm-Specific Culture and Growth:** Highlights understanding and appreciation of Goodwin’s culture and growth strategy.
+
+- **Training Opportunities and Career Development:** Emphasizes benefits of Goodwin’s training structure and small intake.
+
+ 
+
+Prompt-Completion Pair 24:
+
+Prompt - Application 24:
+
+Goodwin's strong focus on technology, exemplified by its innovative Proptech practice, is a compelling reason for my application. As an international student taking substantial risks to pursue a legal career 6000 miles from home, the firm's dedication to cutting-edge areas justifies those risks and propels me to contribute to this field. Furthermore, I am fascinated by Goodwin's client-centric approach, strategically locating its offices in areas that align with its strengths. I appreciate this commitment to exceptional legal services, as I learned to adapt my work priorities based on client needs during my internship with Pro Bono SG this summer.
+
+ 
+
+Completion - Application 24 (Rejected):
+
+1. **Generic Sector Connection:**
+
+  - **Quote:** "Goodwin's strong focus on technology, exemplified by its innovative Proptech practice, is a compelling reason for my application."
+
+  - **Pattern:** While it mentions Goodwin’s technology focus, the statement lacks specific examples or detailed understanding of Goodwin’s strategic focus, unlike successful applications that demonstrated detailed sector alignment and expertise.
+
+ 
+
+2. **Superficial Mention of Personal Commitment:**
+
+  - **Quote:** "As an international student taking substantial risks to pursue a legal career 6000 miles from home, the firm's dedication to cutting-edge areas justifies those risks and propels me to contribute to this field."
+
+  - **Pattern:** The mention of personal commitment is generic and lacks connection to how this aligns with Goodwin’s specific practices or culture. Successful applications provided detailed and specific cultural fit examples.
+
+ 
+
+3. **Lack of Relevant Practical Experience:**
+
+  - **Quote:** "I learned to adapt my work priorities based on client needs during my internship with Pro Bono SG this summer."
+
+  - **Pattern:** The practical experience mentioned is general and lacks direct relevance to Goodwin’s core sectors (technology, life sciences). Successful applications highlighted directly relevant practical experiences.
+
+ 
+
+4. **Absence of DEI Commitment:**
+
+  - **Quote:** None provided.
+
+  - **Pattern:** The application lacks any mention of Goodwin’s DEI initiatives. Successful applications explicitly aligned with Goodwin’s DEI values, showing a commitment to diversity and inclusion.
+
+ 
+
+---
+
+ 
+
+### Analysis Summary for Application 24 (Rejected)
+
+ 
+
+- **Generic Sector Connection:** Lacks specific, well-researched alignment with Goodwin’s strategic focus.
+
+- **Superficial Mention of Personal Commitment:** Lacks depth and specifics on cultural fit.
+
+- **No Relevant Experience:** Does not showcase relevant practical experience in Goodwin’s core sectors.
+
+- **Missing DEI Commitment:** No mention of Goodwin’s DEI initiatives.
+
+ 
+
+Prompt-Completion Pair 25:
+
+Prompt - Application 25:
+
+Following my experience as a summer analyst in the financial sector, I realised that I was ultimately most interested in its legal aspects and how the law intertwines with this sector - Goodwins being one of the most highly ranked firm globally in this area. Notwithstanding the firm's expertise in the the corporate and commercial sector, Goodwin's commitment towards Diversity, Equity + Inclusion resonates strongly with me. As a physically disabled individual, I am thoroughly impressed by the firm's commitment in this area which go above and beyond the recruitment process, particularly since it provides learning and giving-back opportunities to clients which allow them to achieve their own equity and inclusion goals.
+
+ 
+
+Completion - Application 25 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "I realised that I was ultimately most interested in its legal aspects and how the law intertwines with this sector - Goodwins being one of the most highly ranked firm globally in this area."
+
+  - **Pattern:** Demonstrates specific alignment with Goodwin’s strengths in the corporate and commercial sector, similar to successful applications.
+
+ 
+
+2. **Commitment to DEI:**
+
+  - **Quote:** "As a physically disabled individual, I am thoroughly impressed by the firm's commitment in this area which go above and beyond the recruitment process..."
+
+  - **Pattern:** Highlights strong alignment with Goodwin's DEI values, a common trait in successful applications.
+
+ 
+
+3. **Recognition of Firm’s Achievements and Initiatives:**
+
+  - **Quote:** "Goodwin's commitment towards Diversity, Equity + Inclusion resonates strongly with me."
+
+  - **Pattern:** Shows well-researched understanding of Goodwin’s DEI initiatives and their impact, similar to successful applications.
+
+ 
+
+4. **Relevant Practical Experience:**
+
+  - **Quote:** "Following my experience as a summer analyst in the financial sector..."
+
+  - **Pattern:** Provides relevant experience in the financial sector, aligning with Goodwin’s core practice areas, similar to successful applications.
+
+ 
+
+---
+
+ 
+
+### Analysis Summary for Application 25 (Success)
+
+ 
+
+- **Sector Alignment and Expertise:** Demonstrates specific alignment with Goodwin’s strengths in the corporate and commercial sector.
+
+- **Commitment to DEI:** Highlights strong alignment with Goodwin’s DEI values.
+
+- **Recognition of Firm’s Achievements:** Shows well-researched understanding of Goodwin’s DEI initiatives.
+
+- **Relevant Practical Experience:** Provides relevant experience in the financial sector.
+
+ 
+
+---
+
+ 
+
+### Patterns Identified:
+
+ 
+
+- **Sector Alignment and Expertise:** Specific alignment with Goodwin’s core sectors and strengths.
+
+- **Commitment to DEI:** Strong emphasis on diversity, equity, and inclusion.
+
+- **Recognition of Firm’s Achievements:** Well-researched understanding of firm’s initiatives and accolades.
+
+- **Relevant Practical Experience:** Directly relevant experience in key practice areas.
+
+ 
+
+Prompt-Completion Pair 26:
+
+Prompt - Application 26:
+
+I have an interest in pharmaceutical and technology transactions after researching how the medical industry will be transformed due to the introduction of AI in the drug discovery process helping to develop personalised medicines.
+
+At Goodwin, I would be able to explore Life Sciences across multiple legal practices, from advising on contentious IP and regulatory issues, to assisting biotech spinouts sell their businesses to pharmaceutical companies.
+
+I would gain exposure to entrepreneurial start-ups, developing my interest in growth equity venture capital and private equity, where other firms cannot offer this variety of legal practices in Technology and Life Sciences.
+
+ 
+
+Completion - Application 26 (Rejected):
+
+1. **Generic Sector Connection:**
+
+  - **Quote:** "I have an interest in pharmaceutical and technology transactions after researching how the medical industry will be transformed due to the introduction of AI in the drug discovery process helping to develop personalised medicines."
+
+  - **Pattern:** The statement is generic and lacks specific examples or detailed understanding of Goodwin’s strategic focus. Successful applications demonstrated detailed sector alignment and expertise.
+
+ 
+
+2. **Lack of Specific Practical Experience:**
+
+  - **Quote:** "I would gain exposure to entrepreneurial start-ups, developing my interest in growth equity venture capital and private equity, where other firms cannot offer this variety of legal practices in Technology and Life Sciences."
+
+  - **Pattern:** The application does not showcase directly relevant practical experience in Goodwin’s core sectors (technology, life sciences). Successful applications highlighted directly relevant practical experiences.
+
+ 
+
+3. **Superficial Mention of Firm’s Practices:**
+
+  - **Quote:** "At Goodwin, I would be able to explore Life Sciences across multiple legal practices, from advising on contentious IP and regulatory issues, to assisting biotech spinouts sell their businesses to pharmaceutical companies."
+
+  - **Pattern:** While it mentions Goodwin’s practices, the statement lacks depth and specifics on how the applicant fits within Goodwin’s culture and values. Successful applications provided detailed and specific cultural fit examples.
+
+ 
+
+4. **Absence of DEI Commitment:**
+
+  - **Pattern:** The application lacks any mention of Goodwin’s DEI initiatives. Successful applications explicitly aligned with Goodwin’s DEI values, showing a commitment to diversity and inclusion.
+
+ 
+
+Prompt-Completion Pair 27:
+
+Prompt - Application 27:
+
+Goodwin attracts me for its unique ability, compared to any other city international law firm, to assist small to medium businesses and entrepreneurs. At Jones Day, I enjoyed helping venture capital and start-ups by completing checklists and commercial due diligence. Goodwin’s uniqueness will enable me to be exposed to a plethora of business processes and developments, becoming so a holistic corporate lawyer. Additionally, Goodwin’s growth through its numerous lateral hires such as Arvin Abraham, would accelerate my professional development through exposure to experts in their field. Lastly, as a black woman, I am impressed by Goodwin's 2023 Compass Award recognition.
+
+ 
+
+Completion - Application 27 (Rejected):
+
+### Analysis Summary for Application 27 (Rejection)
+
+ 
+
+1. **Generic Sector Connection:**
+
+  - **Quote:** "Goodwin attracts me for its unique ability, compared to any other city international law firm, to assist small to medium businesses and entrepreneurs."
+
+  - **Pattern:** The statement is generic and lacks specific examples or detailed understanding of Goodwin’s strategic focus. Successful applications demonstrated detailed sector alignment and expertise.
+
+ 
+
+2. **Lack of Specific Practical Experience:**
+
+  - **Quote:** "At Jones Day, I enjoyed helping venture capital and start-ups by completing checklists and commercial due diligence."
+
+  - **Pattern:** The application does not showcase directly relevant practical experience in Goodwin’s core sectors (technology, life sciences). Successful applications highlighted directly relevant practical experiences.
+
+ 
+
+3. **Superficial Mention of Firm’s Practices:**
+
+  - **Quote:** "Goodwin’s growth through its numerous lateral hires such as Arvin Abraham, would accelerate my professional development through exposure to experts in their field."
+
+  - **Pattern:** While it mentions Goodwin’s practices, the statement lacks depth and specifics on how the applicant fits within Goodwin’s culture and values. Successful applications provided detailed and specific cultural fit examples.
+
+ 
+
+4. **Absence of DEI Commitment:**
+
+  - **Quote:** "Lastly, as a black woman, I am impressed by Goodwin's 2023 Compass Award recognition."
+
+  - **Pattern:** The mention of DEI is present but lacks depth and personal connection. Successful applications explicitly aligned with Goodwin’s DEI values, showing a commitment to diversity and inclusion.
+
+ 
+
+### Key Patterns Identified
+
+ 
+
+- **Generic Sector Connection:** Lacks specific, well-researched alignment with Goodwin’s strategic focus.
+
+- **Lack of Specific Practical Experience:** Does not showcase relevant practical experience in Goodwin’s core sectors.
+
+- **Superficial Mention of Firm’s Practices:** Lacks depth and specifics on cultural fit.
+
+- **Absence of DEI Commitment:** Insufficient depth and personal connection regarding DEI initiatives.
+
+ 
+
+Prompt-Completion Pair 28:
+
+Prompt - Application 28:
+
+I want to become a lawyer at Goodwin because of its high-responsibility training and leading tech, life-science, and private equity practices. I was drawn to Goodwin’s non-hierarchical culture, highlighted by trainees Ayanda and Anjola, when working with the London co-head and collaborating with international offices. At Goodwin’s Open Day, I was drawn to Goodwin’s ambitious growth across its five key-industries, demonstrated by 63% financial growth and lateral hires, including Andrew Henderson. Having worked in tech development, fintech law, and ESG consultancy, Goodwin’s practices and training allow me to bring three skills to the table: proactivity, self-direction, and commitment to excellence.
+
+ 
+
+Completion - Application 28 (Rejected):
+
+1. **Lack of Specific Sector Alignment:**
+
+  - **Quote:** "Having worked in tech development, fintech law, and ESG consultancy, Goodwin’s practices and training allow me to bring three skills to the table: proactivity, self-direction, and commitment to excellence."
+
+  - **Pattern:** The statement is broad and lacks specific examples or detailed understanding of how these experiences align with Goodwin’s strategic sectors (technology, life sciences, private equity). Successful applications provided detailed sector alignment.
+
+ 
+
+2. **Superficial Mention of Firm’s Culture:**
+
+  - **Quote:** "I was drawn to Goodwin’s non-hierarchical culture, highlighted by trainees Ayanda and Anjola, when working with the London co-head and collaborating with international offices."
+
+  - **Pattern:** While it mentions the non-hierarchical culture, the statement lacks depth on how the applicant fits within this culture. Successful applications provided detailed cultural fit examples.
+
+ 
+
+3. **General Practical Experience:**
+
+  - **Quote:** "Having worked in tech development, fintech law, and ESG consultancy..."
+
+  - **Pattern:** The practical experiences mentioned are broad and not directly tied to Goodwin’s core sectors. Successful applications highlighted directly relevant practical experiences.
+
+ 
+
+4. **Absence of DEI Commitment:**
+
+  - **Quote:** None provided.
+
+  - **Pattern:** The application lacks any mention of Goodwin’s DEI initiatives. Successful applications explicitly aligned with Goodwin’s DEI values.
+
+ 
+
+Prompt-Completion Pair 29:
+
+Prompt - Application 29:
+
+I am applying to Goodwin due to the firm’s expertise and exciting clients in technology and life sciences. My interest is evident from my degree in Biology and experience in public relations in health research funding organizations and the NHS. I enjoyed hearing from Ella Donegan at Goodwin’s open day and I am excited to provide legal services to growing businesses.
+
+ 
+
+Goodwin is tapped into the most interesting global and UK companies, with an office in Cambridge contributing to the spin-out environment. I have experience working with scientific researchers and would enjoy working with founders and investors with these backgrounds.
+
+ 
+
+Completion - Application 29 (Rejected):
+
+ 
+
+1. **Generic Sector Alignment:**
+
+  - **Quote:** "I am applying to Goodwin due to the firm’s expertise and exciting clients in technology and life sciences."
+
+  - **Pattern:** The statement is broad and lacks specific examples or detailed understanding of Goodwin’s strategic focus. Successful applications demonstrated detailed sector alignment and expertise.
+
+ 
+
+2. **Superficial Mention of Practical Experience:**
+
+  - **Quote:** "My interest is evident from my degree in Biology and experience in public relations in health research funding organizations and the NHS."
+
+  - **Pattern:** The practical experience mentioned is broad and not directly tied to Goodwin’s core sectors. Successful applications highlighted directly relevant practical experiences.
+
+ 
+
+3. **Lack of Specific Cultural Fit:**
+
+  - **Quote:** "I enjoyed hearing from Ella Donegan at Goodwin’s open day and I am excited to provide legal services to growing businesses."
+
+  - **Pattern:** The mention of the open day lacks depth on how the applicant fits within Goodwin’s culture. Successful applications provided detailed cultural fit examples.
+
+ 
+
+4. **Absence of DEI Commitment:**
+
+  - **Quote:** None provided.
+
+  - **Pattern:** The application lacks any mention of Goodwin’s DEI initiatives. Successful applications explicitly aligned with Goodwin’s DEI values.
+
+ 
+
+Prompt-Completion Pair 30:
+
+Prompt - Application 30:
+
+ 
+
+ 
+
+Goodwin’s combination of market-leading expertise across growing, high-value industry sectors with a collegiate atmosphere, fostered by a small team structure and a commitment to diversity, equity, and inclusion, is highly attractive. As an exceptionally self-motivated individual, the opportunity to take on greater responsibility within leaner and more collaborative teams is an exciting prospect. Moreover, in focussing on booming industries, such as the life sciences and technology, in junction with private equity and wider corporate capabilities, Goodwin not only offers complete solutions to clients, but also provides the opportunity to gain valuable experience in some of the most pivotal sectors.
+
+ 
+
+Completion - Application 30 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "Moreover, in focussing on booming industries, such as the life sciences and technology, in junction with private equity and wider corporate capabilities..."
+
+  - **Pattern:** Demonstrates specific alignment with Goodwin’s core sectors (life sciences, technology, private equity), similar to successful applications.
+
+ 
+
+2. **Well-Researched Understanding of the Firm:**
+
+  - **Quote:** "Goodwin’s combination of market-leading expertise across growing, high-value industry sectors with a collegiate atmosphere..."
+
+  - **Pattern:** Shows a well-researched understanding of Goodwin’s strengths and culture, mirroring successful applications.
+
+ 
+
+3. **Commitment to DEI:**
+
+  - **Quote:** "...fostered by a small team structure and a commitment to diversity, equity, and inclusion..."
+
+  - **Pattern:** Highlights alignment with Goodwin’s DEI values, a key trait in successful applications.
+
+ 
+
+4. **Appreciation for Firm’s Structure:**
+
+  - **Quote:** "...the opportunity to take on greater responsibility within leaner and more collaborative teams is an exciting prospect."
+
+  - **Pattern:** Demonstrates appreciation for Goodwin’s lean team structure and the opportunities it provides, similar to successful applications.
+
+ 
+
+5. **Relevant Practical Experience:**
+
+  - **Pattern:** While not directly quoted, the application implies relevant practical experience through the demonstrated understanding of Goodwin’s sectors and structure, aligning with patterns seen in successful applications.
+
+ 
+
+Prompt-Completion Pair 31:
+
+Prompt - Application 31:
+
+The firm’s personalistic and collaborative culture supporting trainees is attractive. The small trainee intake of 14 underscores the firm’s value of early responsibility and proactivity, which mirrors my experiences at Skadden on their vacation scheme. Goodwin’s explosive growth over the past few years demonstrates the exciting dynamism of the firm’s presence in London. Working in a mental health start-up, being in a fast-paced environment merging business and legal skills makes the opportunities for an unmatched diverse workload at Goodwin uniquely engaging.
+
+ 
+
+ 
+
+Completion - Application 31 (Rejected):
+
+1. **Generic Sector Connection:**
+
+  - **Quote:** "The firm’s personalistic and collaborative culture supporting trainees is attractive."
+
+  - **Pattern:** The statement is broad and lacks specific examples or detailed understanding of how this aligns with Goodwin’s strategic sectors (technology, life sciences, private equity). Successful applications demonstrated detailed sector alignment and expertise.
+
+ 
+
+2. **Superficial Mention of Firm’s Structure:**
+
+  - **Quote:** "The small trainee intake of 14 underscores the firm’s value of early responsibility and proactivity..."
+
+  - **Pattern:** While acknowledging the firm's structure, the statement lacks depth on how the applicant fits within Goodwin’s culture and values. Successful applications provided detailed cultural fit examples.
+
+ 
+
+3. **General Practical Experience:**
+
+  - **Quote:** "Working in a mental health start-up, being in a fast-paced environment merging business and legal skills..."
+
+  - **Pattern:** The practical experience mentioned is broad and not directly tied to Goodwin’s core sectors. Successful applications highlighted directly relevant practical experiences.
+
+ 
+
+4. **Absence of DEI Commitment:**
+
+  - **Quote:** None provided.
+
+  - **Pattern:** The application lacks any mention of Goodwin’s DEI initiatives. Successful applications explicitly aligned with Goodwin’s DEI values, showing a commitment to diversity and inclusion.
+
+ 
+
+Prompt-Completion Pair 32:
+
+Prompt - Application 32:
+
+I am primarily motivated by Goodwin’s pioneering Proptech practice. Winning CMS’s Tech Innovation competition for my product idea, and working on the lifecycle of a transaction using Kira software in the firm’s Real Estate group developed this interest. I am thus excited to provide innovative legal solutions for Proptech’s emerging regulatory challenges across various asset classes by learning from Goodwin’s cross-disciplinary lawyers who are at the forefront of this disruption.
+
+Secondly, as an international student from India, I am motivated by Goodwin’s current position as UK’s Top Law Firm for Racial Diversity in partnership, which promises a meritorious career progression.
+
+ 
+
+ 
+
+Completion - Application 32 (Successful):
+
+1. **Specific Sector Alignment:**
+
+  - **Quote:** "I am primarily motivated by Goodwin’s pioneering Proptech practice."
+
+  - **Pattern:** Demonstrates specific alignment with Goodwin’s Proptech sector, similar to detailed sector alignment seen in successful applications.
+
+ 
+
+2. **Relevant Practical Experience:**
+
+  - **Quote:** "Winning CMS’s Tech Innovation competition for my product idea, and working on the lifecycle of a transaction using Kira software in the firm’s Real Estate group developed this interest."
+
+  - **Pattern:** Showcases directly relevant practical experience, a common trait in successful applications.
+
+ 
+
+3. **Commitment to DEI:**
+
+  - **Quote:** "I am motivated by Goodwin’s current position as UK’s Top Law Firm for Racial Diversity in partnership, which promises a meritorious career progression."
+
+  - **Pattern:** Highlights alignment with Goodwin’s DEI values, a key element in successful applications.
+
+ 
+
+Prompt-Completion Pair 33:
+
+Prompt - Application 33:
+
+Goodwin would be a great place to start a career as a corporate lawyer. I am particularly interested in Goodwin’s strength in biotech and finance. Goodwin’s biotech and real estate practices are highly ranked, and attract terrific clients. Further, joining a rapidly growing London office provides the opportunity to take on more responsibility and be involved in forming new teams. Finally, I am impressed by Goodwin’s strong US practice and its ability to advise on high-value cross-border transactions.
+
+ 
+
+ 
+
+Completion - Application 33 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "I am particularly interested in Goodwin’s strength in biotech and finance."
+
+  - **Pattern:** Demonstrates specific alignment with Goodwin’s core sectors (biotech, finance), similar to successful applications.
+
+ 
+
+2. **Recognition of Firm’s Achievements:**
+
+  - **Quote:** "Goodwin’s biotech and real estate practices are highly ranked, and attract terrific clients."
+
+  - **Pattern:** Shows well-researched understanding of Goodwin’s achievements and client base, mirroring successful applications.
+
+ 
+
+3. **Appreciation for Firm’s Structure:**
+
+  - **Quote:** "...joining a rapidly growing London office provides the opportunity to take on more responsibility and be involved in forming new teams."
+
+  - **Pattern:** Demonstrates appreciation for Goodwin’s growth and the opportunities it provides, similar to successful applications.
+
+ 
+
+4. **Well-Researched Understanding of the Firm:**
+
+  - **Quote:** "Finally, I am impressed by Goodwin’s strong US practice and its ability to advise on high-value cross-border transactions."
+
+  - **Pattern:** Shows a well-researched understanding of Goodwin’s strengths and capabilities, aligning with successful applications.
+
+ 
+
+Prompt-Completion Pair 34:
+
+Prompt - Application 34:
+
+I am drawn to Goodwin’s multi-specialist strength. The firm is ranked Tier 1 on The Legal 500 for transactional practices such as Private Equity and more niche practices such as Biotechnology. As a trainee, this promises extensive experience, refining my legal skills across various client sectors.
+
+ 
+
+Goodwin’s small intake also appeals to me, offering increased responsibility and regular client interaction. This approach aligns with my customer-facing roles, where I excel as the first point of contact for customer’s concerns. The opportunity for early client exposure convinces me that Goodwin is the ideal firm to pursue my long-term career ambitions.
+
+ 
+
+ 
+
+Completion - Application 34 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "The firm is ranked Tier 1 on The Legal 500 for transactional practices such as Private Equity and more niche practices such as Biotechnology."
+
+  - **Pattern:** Demonstrates detailed sector alignment with Goodwin’s strengths in Private Equity and Biotechnology, similar to successful applications.
+
+ 
+
+2. **Appreciation for Firm’s Structure:**
+
+  - **Quote:** "Goodwin’s small intake also appeals to me, offering increased responsibility and regular client interaction."
+
+  - **Pattern:** Shows understanding and appreciation for Goodwin’s small trainee intake and the associated benefits, aligning with successful applications.
+
+ 
+
+3. **Relevant Practical Experience:**
+
+  - **Quote:** "This approach aligns with my customer-facing roles, where I excel as the first point of contact for customer’s concerns."
+
+  - **Pattern:** Highlights relevant practical experience in customer-facing roles, showing readiness for early client exposure, similar to successful applications.
+
+ 
+
+By focusing on detailed sector alignment, appreciation for the firm’s structure, and showcasing relevant practical experience, Application 34 effectively demonstrates the qualities mirrored in successful applications.
+
+ 
+
+Prompt-Completion Pair 35:
+
+Prompt - Application 35:
+
+Goodwin attracts me for two reasons.
+
+ 
+
+First, Goodwin’s strength in technology and private equity stands out. After interning at EdTech start-up Study
+
+Rocket, advising technology start-ups such as WHOOP appeals. After enjoying participating in a mock private equity deal negotiation at Sidley Austin, Goodwin’s sector-focused private equity practice attracts me.
+
+ 
+
+Second, Goodwin’s broad clientele - from start-ups to experienced investors - interests me. Working with start-ups
+
+would offer juniors greater client exposure, which attracts me after I learned the value of building great client
+
+relationships from day one at Quintessentially. Further, experiencing all stages of the corporate lifecycle excites me.
+
+ 
+
+ 
+
+Completion - Application 35 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "Goodwin’s strength in technology and private equity stands out."
+
+  - **Pattern:** Demonstrates specific alignment with Goodwin’s core sectors, similar to successful applications.
+
+ 
+
+2. **Relevant Practical Experience:**
+
+  - **Quote:** "After interning at EdTech start-up Study Rocket, advising technology start-ups such as WHOOP appeals."
+
+  - **Pattern:** Highlights directly relevant practical experience, a common trait in successful applications.
+
+ 
+
+3. **Well-Researched Understanding of the Firm:**
+
+  - **Quote:** "Goodwin’s sector-focused private equity practice attracts me."
+
+  - **Pattern:** Shows a well-researched understanding of Goodwin’s strengths and practices, mirroring successful applications.
+
+ 
+
+4. **Appreciation for Firm’s Structure and Client Exposure:**
+
+  - **Quote:** "Working with start-ups would offer juniors greater client exposure, which attracts me after I learned the value of building great client relationships from day one at Quintessentially."
+
+  - **Pattern:** Demonstrates appreciation for Goodwin’s structure and the opportunities for client exposure, similar to successful applications.
+
+ 
+
+### Summary of Inferred Points for Application 35's Success
+
+ 
+
+- **Sector Alignment and Expertise:** Specific alignment with Goodwin’s technology and private equity sectors.
+
+- **Relevant Practical Experience:** Highlights directly relevant practical experience in technology start-ups and private equity.
+
+- **Well-Researched Understanding of the Firm:** Shows a detailed understanding of Goodwin’s sector-focused practices.
+
+- **Appreciation for Firm’s Structure and Client Exposure:** Emphasizes the value of building client relationships and greater client exposure for juniors.
+
+ 
+
+Prompt-Completion Pair 36:
+
+Prompt - Application 36:
+
+I am drawn to Goodwin due to its focus on PE and technology start-ups. In meetings with Partner John Van de North and Associate Ben Rosales from the SF office, they both emphasised the firm's commitment to supporting the growth of start-ups. This appeals to me due to my experience with the Cornell Blockchain Club. My role on the Accelerator Team is to assist student-run business ideas in the blockchain sphere and connect external start-ups with our resources. I find satisfaction in connecting closely with clients and working with a high degree of responsibility, both of which align with Goodwin’s model.
+
+ 
+
+ 
+
+Completion - Application 36 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "I am drawn to Goodwin due to its focus on PE and technology start-ups."
+
+  - **Pattern:** Demonstrates specific alignment with Goodwin’s core sectors (PE and technology start-ups), as seen in successful applications.
+
+ 
+
+2. **Relevant Practical Experience:**
+
+  - **Quote:** "My role on the Accelerator Team is to assist student-run business ideas in the blockchain sphere and connect external start-ups with our resources."
+
+  - **Pattern:** Highlights directly relevant practical experience in supporting start-ups and technology, similar to successful applications.
+
+ 
+
+3. **Well-Researched Understanding of the Firm:**
+
+  - **Quote:** "In meetings with Partner John Van de North and Associate Ben Rosales from the SF office, they both emphasised the firm's commitment to supporting the growth of start-ups."
+
+  - **Pattern:** Shows a well-researched understanding of Goodwin’s commitment to start-ups, a trait in successful applications.
+
+ 
+
+4. **Appreciation for Firm’s Model and Client Exposure:**
+
+  - **Quote:** "I find satisfaction in connecting closely with clients and working with a high degree of responsibility, both of which align with Goodwin’s model."
+
+  - **Pattern:** Demonstrates appreciation for Goodwin’s client-focused model and the opportunities for responsibility, aligning with successful applications.
+
+ 
+
+Prompt-Completion Pair 37:
+
+Prompt - Application 37:
+
+Goodwin’s expertise in multi-jurisdictional corporate transactions closely resembles my experience and personal interest to date. In particular, the responsibility offered to trainees from the offset is a clear differentiating factor from other firms- enabling exposure from the offset. Having the opportunity to make a tangible difference in a transaction and responsibility as a trainee is a key motivation for my application. In particular, especially with the firm’s comparatively late arrival in London- yet strong and continual growth- having a direct impact on the expansion of the firm’s UK profile and brand further motivates my application.
+
+ 
+
+ 
+
+Completion - Application 37 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "Goodwin’s expertise in multi-jurisdictional corporate transactions closely resembles my experience and personal interest to date."
+
+  - **Pattern:** Demonstrates specific alignment with Goodwin’s core sectors and strengths, similar to successful applications.
+
+ 
+
+2. **Appreciation for Firm’s Structure and Early Responsibility:**
+
+  - **Quote:** "The responsibility offered to trainees from the offset is a clear differentiating factor from other firms- enabling exposure from the offset."
+
+  - **Pattern:** Shows understanding and appreciation of Goodwin’s structure and the early responsibility given to trainees, similar to successful applications.
+
+ 
+
+3. **Well-Researched Understanding of the Firm:**
+
+  - **Quote:** "Having the opportunity to make a tangible difference in a transaction and responsibility as a trainee is a key motivation for my application."
+
+  - **Pattern:** Demonstrates a well-researched understanding of Goodwin’s practices and values, similar to successful applications.
+
+ 
+
+4. **Commitment to Firm’s Growth and Expansion:**
+
+  - **Quote:** "With the firm’s comparatively late arrival in London- yet strong and continual growth- having a direct impact on the expansion of the firm’s UK profile and brand further motivates my application."
+
+  - **Pattern:** Highlights commitment to contributing to Goodwin’s growth and expansion, aligning with successful applications.
+
+ 
+
+Prompt-Completion Pair 38:
+
+Prompt - Application 38:
+
+Above all, my goal is to develop expertise in the law governing private equity transactions; Goodwin is the ideal place to flourish in this area through involvement in deals such as advising Raspberry Pi in its strategic investment from Arm. Furthermore, I am attracted by your firm’s forward-thinking approach to dealmaking. Goodwin’s start-up atmosphere and growth-oriented strategy give the opportunity to take responsibility for and contribute to the firm’s future success. As someone who is actively involved in Web3 and passionate about new technologies, I also find the possibility of acting at an early stage with technology companies highly appealing.
+
+ 
+
+ 
+
+Completion - Application 38 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "Above all, my goal is to develop expertise in the law governing private equity transactions; Goodwin is the ideal place to flourish in this area through involvement in deals such as advising Raspberry Pi in its strategic investment from Arm."
+
+  - **Pattern:** Demonstrates specific alignment with Goodwin’s core sector (private equity), similar to successful applications.
+
+ 
+
+2. **Well-Researched Understanding of the Firm:**
+
+  - **Quote:** "Furthermore, I am attracted by your firm’s forward-thinking approach to dealmaking."
+
+  - **Pattern:** Shows a well-researched understanding of Goodwin’s innovative and growth-oriented strategy, aligning with successful applications.
+
+ 
+
+3. **Appreciation for Firm’s Structure and Responsibility:**
+
+  - **Quote:** "Goodwin’s start-up atmosphere and growth-oriented strategy give the opportunity to take responsibility for and contribute to the firm’s future success."
+
+  - **Pattern:** Demonstrates appreciation for Goodwin’s structure and the opportunities for early responsibility, similar to successful applications.
+
+ 
+
+4. **Relevant Practical Experience and Interest in New Technologies:**
+
+  - **Quote:** "As someone who is actively involved in Web3 and passionate about new technologies, I also find the possibility of acting at an early stage with technology companies highly appealing."
+
+  - **Pattern:** Highlights directly relevant practical experience and interest in new technologies, aligning with successful applications that showcased specific, relevant experiences.
+
+ 
+
+Prompt-Completion Pair 39:
+
+Prompt - Application 39:
+
+I am applying to Goodwin as the firm encapsulates many of my personal interests due to its technology and life sciences focus. While attending the firm’s open day, I was intrigued by the firm’s approach to aiding clientele, with a focus on advising tech start-ups and staying on as their legal advisors throughout the life cycle of their company, aiding significant growth and development. I am excited by the prospect of applying my in-depth understanding of the law to building businesses in rapidly developing markets, particularly in light of the recent focus on AI as an emerging technology.
+
+ 
+
+Completion - Application 39 (Successful):
+
+1. **Sector Alignment and Expertise:**
+
+  - **Quote:** "I am applying to Goodwin as the firm encapsulates many of my personal interests due to its technology and life sciences focus."
+
+  - **Pattern:** Demonstrates specific alignment with Goodwin’s core sectors (technology and life sciences), similar to successful applications.
+
+ 
+
+2. **Well-Researched Understanding of the Firm:**
+
+  - **Quote:** "While attending the firm’s open day, I was intrigued by the firm’s approach to aiding clientele, with a focus on advising tech start-ups and staying on as their legal advisors throughout the life cycle of their company."
+
+  - **Pattern:** Shows a well-researched understanding of Goodwin’s practice in supporting tech start-ups, mirroring successful applications.
+
+ 
+
+3. **Relevant Practical Experience and Interest:**
+
+  - **Quote:** "I am excited by the prospect of applying my in-depth understanding of the law to building businesses in rapidly developing markets, particularly in light of the recent focus on AI as an emerging technology."
+
+  - **Pattern:** Highlights directly relevant practical experience and interest in new technologies, aligning with successful applications that showcased specific, relevant experiences.
+
+ 
+
+### Analysis Summary for Application 39 (Success)
+
+ 
+
+- **Sector Alignment and Expertise:** Specific alignment with Goodwin’s technology and life sciences sectors.
+
+- **Well-Researched Understanding of the Firm:** Detailed understanding of Goodwin’s approach to advising tech start-ups.
+
+- **Relevant Practical Experience and Interest:** Highlights practical experience and interest in new technologies (AI).
+
+ 
+
+Prompt-Completion Pair 40:
+
+Prompt - Application 40:
+
+I'm applying to Goodwin Procter because of its outstanding reputation in the legal industry, particularly in technology and life sciences. The firm's commitment to innovation and client-focused solutions aligns with my career aspirations. Goodwin’s emphasis on diversity, equity, and inclusion, along with its supportive and collaborative culture, resonates with my values. The opportunity to work with top-tier clients and engage in complex, impactful cases excites me. Additionally, Goodwin's comprehensive training and professional development programs will provide me with the skills and experiences needed to excel as a legal professional and contribute meaningfully to the firm.
+
+ 
+
+ 
+
+Completion - Application 40 (Rejection):
+
+1. **Generic Sector Connection:**
+
+  - **Quote:** "I'm applying to Goodwin Procter because of its outstanding reputation in the legal industry, particularly in technology and life sciences."
+
+  - **Pattern:** The statement is broad and lacks specific examples or detailed understanding of Goodwin’s strategic focus. Successful applications demonstrated detailed sector alignment and expertise.
+
+ 
+
+2. **Superficial Mention of Firm’s Practices:**
+
+  - **Quote:** "The opportunity to work with top-tier clients and engage in complex, impactful cases excites me."
+
+  - **Pattern:** While it mentions the firm’s practices, the statement lacks depth and specifics on how the applicant fits within Goodwin’s culture and values. Successful applications provided detailed cultural fit examples.
+
+ 
+
+3. **Absence of Relevant Practical Experience:**
+
+  - **Quote:** None provided.
+
+  - **Pattern:** The application does not showcase directly relevant practical experience in Goodwin’s core sectors (technology, life sciences). Successful applications highlighted directly relevant practical experiences.
+
+ 
+
+4. **Lack of Specific Cultural Fit:**
+
+  - **Quote:** "Goodwin’s emphasis on diversity, equity, and inclusion, along with its supportive and collaborative culture, resonates with my values."
+
+  - **Pattern:** The mention of DEI and culture is present but lacks depth and personal connection. Successful applications explicitly aligned with Goodwin’s DEI values and provided specific cultural fit examples.
+
+ 
+
+Prompt-Completion Pair 41:
+
+Prompt - Application 41:
+
+Firstly, I was attracted to Goodwin because of their expertise and experience in corporate M&A and private equity. At the Open Day, Ravi Chopra explained the sector agnostic characteristic of transactional law. I am keen to engage with the fresh challenges that come from working with different clients across different geographies. Also, at the Aspiring Solicitors Virtual Diversity Law Fair, Amber Bagshaw highlighted how transactional law is heavily associated with business cycles. This means lawyers must provide practical solutions at pace. I would enjoy working under this pressure as it forces me to be resourceful and pragmatic in my thinking.
+
+ 
+
+Completion - Application 41 (Rejection):
+
+1. **Generic Sector Connection:**
+
+  - **Quote:** "Firstly, I was attracted to Goodwin because of their expertise and experience in corporate M&A and private equity."
+
+  - **Pattern:** Lacks specific examples or detailed understanding of Goodwin’s strategic focus. Successful applications demonstrated detailed sector alignment and expertise.
+
+ 
+
+2. **Superficial Mention of Firm’s Practices:**
+
+  - **Quote:** "Ravi Chopra explained the sector agnostic characteristic of transactional law."
+
+  - **Pattern:** Mentions firm’s practices but lacks depth and specifics on how the applicant fits within Goodwin’s culture and values. Successful applications provided detailed cultural fit examples.
+
+ 
+
+3. **Absence of Relevant Practical Experience:**
+
+  - **Quote:** None provided.
+
+  - **Pattern:** Does not showcase directly relevant practical experience in Goodwin’s core sectors (technology, life sciences). Successful applications highlighted directly relevant practical experiences.
+
+ 
+
+4. **Lack of Specific Cultural Fit:**
+
+  - **Quote:** "Amber Bagshaw highlighted how transactional law is heavily associated with business cycles."
+
+  - **Pattern:** The mention lacks depth and personal connection. Successful applications explicitly aligned with Goodwin’s DEI values and provided specific cultural fit examples.
+
+ 
+
+Prompt-Completion Pair 42:
+
+Prompt - Application 42:
+
+During an open day, I was impressed with your strategy to be early on the tech start-up scene. Science and technology have always been passions of mine and I would like to assist those in the field from a legal standpoint. Curtis McCluskey explained how you did so with Luka and their generative AI chatbot Replika, accounting for the unpredictable nature of AI and unclear regulatory environment. The global yet collegiate atmosphere you maintain is also appealing as I lived in Miami for many years and enjoy learning languages including Mandarin.
+
+ 
+
+ 
+
+Completion - Application 42 (Rejection):
+
+1. **Generic Sector Connection:**
+
+  - **Quote:** "Science and technology have always been passions of mine and I would like to assist those in the field from a legal standpoint."
+
+  - **Pattern:** The statement is broad and lacks specific examples or detailed understanding of Goodwin’s strategic focus, similar to rejected applications.
+
+ 
+
+2. **Superficial Mention of Firm’s Practices:**
+
+  - **Quote:** "Curtis McCluskey explained how you did so with Luka and their generative AI chatbot Replika, accounting for the unpredictable nature of AI and unclear regulatory environment."
+
+  - **Pattern:** While mentioning firm’s practices, it lacks depth and specifics on how the applicant fits within Goodwin’s culture and values, similar to rejected applications.
+
+ 
+
+3. **Lack of Relevant Practical Experience:**
+
+  - **Quote:** None provided.
+
+  - **Pattern:** Does not showcase directly relevant practical experience in Goodwin’s core sectors (technology, life sciences), mirroring patterns in rejected applications.
+
+ 
+
+4. **Absence of Specific Cultural Fit:**
+
+  - **Quote:** "The global yet collegiate atmosphere you maintain is also appealing as I lived in Miami for many years and enjoy learning languages including Mandarin."
+
+  - **Pattern:** Lacks a personal connection to Goodwin’s culture and values, unlike successful applications.
+
+ 
+
+**Summary and Patterns Identified:**
+
+ 
+
+1. **Generic Sector Connection**: Lacks detailed understanding of Goodwin’s strategic focus.
+
+2. **Superficial Mention of Firm’s Practices**: Lacks depth and personal fit with Goodwin’s culture.
+
+3. **Lack of Relevant Practical Experience**: Does not showcase practical experience in Goodwin’s core sectors.
+
+4. **Absence of Specific Cultural Fit**: Lacks personal connection to Goodwin’s culture and values.
+
+ 
 
 Some key points to bear in mind:
-1) Use all your experience on inferring the reasons the rejected applications have been rejected and the reasons the successful ones would have been successful. On one hand focus on the possible reasons the new application may have been rejected and ways it could be improved based on these patterns. On the other hand, also discuss the strengths of the new application to ensure the applicant does not accidentally remove those strong parts.
 
-2) Tailor your feedback on the new application to be as data-driven (based on the context) as possible. Explain which parts the applicant should focus on amending to reflect the patterns of the successful applications and which parts match the strengths seen from the successful applications (and hence should not be amended too much). Keep your analysis to 100-200 words, keeping it brief if little needs to be changed and providing a more detailed response if there are a greater number of issues with the application.
+1) Highlight the inferred patterns or specific issues in the rejected applications and positive aspects/successes in the accepted applications. Use all the prompt-completion pairs to do so. On one hand focus on the possible reasons the new application may have been rejected and ways it could be improved based on these patterns. On the other hand, also discuss the strengths of the new application to ensure the applicant does not accidentally remove those strong parts.
 
-[The rest of the key points go here]
+ 
+
+2) Tailor your feedback on the new application to be as data-driven (based on the past applications from the MemoryKey) as possible. Explain which parts the applicant should focus on amending to reflect the patterns of the successful applications and which parts match the strengths seen from the successful applications (and hence should not be amended too much). Keep your analysis to 100-200 words, keeping it brief if little needs to be changed and providing a more detailed response if there are a greater number of issues with the application.
+
+ 
+
+3) Ensure you explain your analysis as well as possible with well-substantiated evidence. Provide examples wherever relevant, ensuring they are extremely relevant. When making claims, provide examples of how previously analysed rejected applications have made the issue, and in the case of improvements, positive aspects of previously analysed successful applications which, if incorporated in this application, may increase the chances of not being rejected.
+
+ 
+
+4) When making suggestions as to how the application could be improved, reference how a successful application did so based on the applications you remember through the memory key, using quotations only where relevant.
+
+ 
+
+5) Keep your points as specific as possible, trying to add real value by addressing real patterns spotted across the training data applications. Ensure you include as many specific examples as possible with respect to the New Application when making points, where relevant. Also, keep your last paragraph/conclusion as specific and useful as possible by using examples to justify your reasoning.
+
+ 
+
+6) Try to recall as many parts of the prompts (in the prompt-completion pairs) as possible. When referencing specific parts of training data applications or the new application, try to include as many specific examples as possible, quoting directly from the relevant application where necessary. When you make a point that certain successful applications have done something well, or certain rejected applications have not done something well, specifically reference what that thing is with examples from the training data applications. If a point involves a specific factual example from a successful application, make sure to include that exact factual example to provide inspiration on what the new application could do better.
+
+ 
+
+7) Given the 100-word limit, identify which parts of the new application require the most change to reflect the most common patterns observed in successful applications. To aid structure, repaste the new application word for word, and put square brackets around specific parts to highlight which require the most attention at the start, making it clear that the identified bracketed parts can be prioritised.
+
+ 
+
+8) Provide your response in a readable way. Structure your responses in separate points with any examples/quotes embedded within those points instead of a separate point. Write in prose and include sub-headings to signpost your points well.
+
+ 
+
+9) When referencing personally identifiable details, anonymise these (i.e names, specific schools etc...). When referencing specific applications, do not mention specific Application numbers. Only reference 'successful' or 'rejected' applications.
+
+ 
 
 Format all points in this structure:
+
+ 
+
 [Outline issue/point]:
+
 [Explain issue/point] with evidence from rejected applications: [Insert quote/example] and improvement suggestion [insert improvement suggestion].
+
+ 
+
 (Repeat for each point)
+
+ 
+
+New Application (to be analysed):
