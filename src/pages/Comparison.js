@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
 import ReactMarkdown from 'react-markdown';
-import Select from 'react-select';
 import { loadStripe } from '@stripe/stripe-js';
 import { createClient } from '@supabase/supabase-js';
 import EmailPopup from './EmailPopup';
+import ApplicationInput from './ApplicationInput';
 import './comparison.css';
 
 // Initialize Stripe
@@ -16,30 +16,9 @@ const supabaseUrl = 'https://atbphpeswwgqvwlbplko.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-function EditableContent({ value, onChange }) {
-  return (
-    <textarea
-      className="editable-content"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      style={{
-        width: '100%',
-        height: '100%',
-        border: 'none',
-        resize: 'none',
-        backgroundColor: 'transparent',
-        color: 'inherit',
-        font: 'inherit',
-        padding: '10px',
-        boxSizing: 'border-box',
-      }}
-    />
-  );
-}
-
 function Comparison() {
   const [leftWidth, setLeftWidth] = useState(50);
-  const [applicationText, setApplicationText] = useState("Enter your application here.");
+  const [applicationText, setApplicationText] = useState("Enter your application here or generate a draft.");
   const [feedback, setFeedback] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFirm, setSelectedFirm] = useState({ value: "Goodwin", label: "Goodwin" });
@@ -48,6 +27,12 @@ function Comparison() {
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [additionalInfo, setAdditionalInfo] = useState({
+    keyReasons: '',
+    relevantExperience: '',
+    relevantInteraction: '',
+    personalInfo: ''
+  });
 
   const firms = [
     { value: "Goodwin", label: "Goodwin" },
@@ -121,14 +106,14 @@ function Comparison() {
     }
   }, []);
 
-  const closePopup = () => {
-    setShowPopup(false);
-  };
-
   useEffect(() => {
     const questions = getQuestions(selectedFirm.value);
     setSelectedQuestion(questions[0]);
   }, [selectedFirm]);
+
+  const closePopup = () => {
+    setShowPopup(false);
+  };
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -246,78 +231,61 @@ function Comparison() {
     }
   };
 
-  const customStyles = {
-    control: (provided) => ({
-      ...provided,
-      backgroundColor: 'rgba(255, 255, 255, 0.8)',
-      border: 'none',
-      borderRadius: '10px',
-      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
-      padding: '5px',
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isSelected ? '#276D8B' : 'white',
-      color: state.isSelected ? 'white' : '#276D8B',
-      '&:hover': {
-        backgroundColor: '#e6f3f7',
-      },
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: '#276D8B',
-    }),
-    menu: (provided) => ({
-      ...provided,
-      borderRadius: '10px',
-      overflow: 'hidden',
-      marginTop: '8px',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-    }),
+  const handleAdditionalInfoChange = (field, value) => {
+    setAdditionalInfo(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleCreateDraft = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/generate-draft', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firm: selectedFirm.value,
+          question: selectedQuestion.value,
+          ...additionalInfo
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate draft');
+      }
+
+      const data = await response.json();
+      setApplicationText(data.draft);
+    } catch (error) {
+      console.error('Error:', error);
+      setFeedback("Error: Unable to generate draft. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="comparison-container">
-    {showPopup && <EmailPopup onClose={closePopup} />}
+      {showPopup && <EmailPopup onClose={closePopup} />}
       <div className="header">
         <h2>Law App Review AI</h2>
       </div>
+      <div className="divider2"></div>
+
       <div className="content" ref={containerRef}>
         <div className="left-column" style={{width: `${leftWidth}%`}}>
-          <div className="button-container">
-            <button className="submit-button" onClick={handleSubmit} disabled={isLoading}>
-              {isLoading ? 'Sending...' : 'Send for Review'}
-            </button>
-          </div>
-          <div className="title-card">
-            <h3>Your Application</h3>
-            <div className="dropdown-container">
-              <Select
-                value={selectedFirm}
-                onChange={(option) => {
-                  setSelectedFirm(option);
-                  const questions = getQuestions(option.value);
-                  setSelectedQuestion(questions[0]);
-                }}
-                options={firms}
-                styles={customStyles}
-                isSearchable={false}
-              />
-              <Select
-                value={selectedQuestion}
-                onChange={setSelectedQuestion}
-                options={getQuestions(selectedFirm.value)}
-                styles={customStyles}
-                isSearchable={false}
-              />
-            </div>
-          </div>
-          <div className="text-content">
-            <EditableContent 
-              value={applicationText} 
-              onChange={(newText) => setApplicationText(newText)} 
-            />
-          </div>
+          <ApplicationInput
+            applicationText={applicationText}
+            setApplicationText={setApplicationText}
+            selectedFirm={selectedFirm}
+            setSelectedFirm={setSelectedFirm}
+            selectedQuestion={selectedQuestion}
+            setSelectedQuestion={setSelectedQuestion}
+            firms={firms}
+            getQuestions={getQuestions}
+            additionalInfo={additionalInfo}
+            onAdditionalInfoChange={handleAdditionalInfoChange}
+          />
         </div>
         <div className="divider" ref={dividerRef} onMouseDown={handleMouseDown}>
           <div className="divider-line top"></div>
@@ -327,6 +295,14 @@ function Comparison() {
           <div className="divider-line bottom"></div>
         </div>
         <div className="right-column" style={{width: `${100 - leftWidth}%`}}>
+          <div className="button-container">
+            <button className="submit-button" onClick={handleSubmit} disabled={isLoading}>
+              {isLoading ? 'Sending...' : 'Send for Review'}
+            </button>
+            <button className="submit-button" onClick={handleCreateDraft} disabled={isLoading}>
+              {isLoading ? 'Generating...' : 'Generate a Draft'}
+            </button>
+          </div>
           <div className="title-card">
             <h3>Your Review</h3>
             <p className="subtext">
