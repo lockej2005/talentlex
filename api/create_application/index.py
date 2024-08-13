@@ -12,27 +12,20 @@ def read_prompt(filename):
 goodwin_draft = read_prompt('goodwin_draft.txt')
 system_prompt = goodwin_draft
 
-def handler(event, context):
-    if event['httpMethod'] == 'OPTIONS':
-        return {
-            'statusCode': 200,
-            'headers': {
-                'Access-Control-Allow-Credentials': 'true',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-                'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-            },
-            'body': ''
-        }
+class Handler(BaseHTTPRequestHandler):
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Credentials', 'true')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT')
+        self.send_header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version')
+        self.end_headers()
 
-    if event['httpMethod'] != 'POST':
-        return {
-            'statusCode': 405,
-            'body': json.dumps({'error': 'Method Not Allowed'})
-        }
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        body = json.loads(post_data.decode('utf-8'))
 
-    try:
-        body = json.loads(event['body'])
         firm = body.get('firm')
         question = body.get('question')
         key_reasons = body.get('keyReasons')
@@ -41,10 +34,8 @@ def handler(event, context):
         personal_info = body.get('personalInfo')
 
         if not firm or not question:
-            return {
-                'statusCode': 400,
-                'body': json.dumps({'error': 'Missing required data'})
-            }
+            self.send_error(400, "Missing required data")
+            return
 
         prompt = f"""
         Generate a draft application for {firm} addressing the following question:
@@ -59,30 +50,29 @@ def handler(event, context):
         Please create a well-structured, professional application that incorporates all the provided information seamlessly.
         """
 
-        completion = client.chat.completions.create(
-            model="ft:gpt-4o-mini-2024-07-18:personal:appdrafterdataset:9vG3pVmA",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt}
-            ]
-        )
+        try:
+            completion = client.chat.completions.create(
+                model="ft:gpt-4o-mini-2024-07-18:personal:appdrafterdataset:9vG3pVmA",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt}
+                ]
+            )
 
-        generated_draft = completion.choices[0].message.content
+            generated_draft = completion.choices[0].message.content
 
-        return {
-            'statusCode': 200,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            'body': json.dumps({
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            response = json.dumps({
                 'success': True,
                 'draft': generated_draft
             })
-        }
+            self.wfile.write(response.encode('utf-8'))
 
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'body': json.dumps({'error': str(e)})
-        }
+        except Exception as e:
+            self.send_error(500, str(e))
+
+def handler(event, context):
+    return Handler.handler(event, context)
