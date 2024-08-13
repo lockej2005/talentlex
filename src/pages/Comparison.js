@@ -238,7 +238,7 @@ function Comparison() {
   const handleCreateDraft = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/generate-draft', {
+      const response = await fetch('/create_application', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
