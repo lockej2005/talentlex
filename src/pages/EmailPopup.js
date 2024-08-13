@@ -36,8 +36,8 @@ function EmailPopup({ onClose }) {
   return (
     <div className="popup-container">
       <div className="popup-content">
-        <h3>Exclusive Access</h3>
-        <p>Enter your email and we'll be in touch with updates from the Founders</p>
+        <h3>Account Beta</h3>
+        <p>Enter your email and we'll send you updates</p>
         <form onSubmit={handleSubmit}>
           <input
             type="email"
