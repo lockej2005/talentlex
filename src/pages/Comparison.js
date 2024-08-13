@@ -200,37 +200,6 @@ function Comparison() {
     }
   };  
 
-  const handleDonation = async () => {
-    try {
-      // Create checkout session
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({}), // You can add any additional data here if needed
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create checkout session');
-      }
-
-      const { sessionId } = await response.json();
-
-      // Redirect to Stripe Checkout
-      const stripe = await stripePromise;
-      const { error } = await stripe.redirectToCheckout({
-        sessionId: sessionId,
-      });
-
-      if (error) {
-        console.error('Error:', error);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-
   const handleAdditionalInfoChange = (field, value) => {
     setAdditionalInfo(prev => ({ ...prev, [field]: value }));
   };
