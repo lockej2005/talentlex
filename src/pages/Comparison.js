@@ -67,9 +67,9 @@ function Comparison() {
   ];  
 
   const sidleyAustinQuestions = [
+    { value: "Why does a career in commercial law and specifically Sidley Austin interest you? (250 words max)", label: "Why does a career in commercial law and specifically Sidley Austin interest you? (250 words max)" },
     { value: "Please list any academic scholarships or prizes (200 words)", label: "Please list any academic scholarships or prizes (200 words)" },
     { value: "Detail your extra curricular activities and interests and positions of responsibility. Please state what you feel you have gained from them and how others have benefited from your involvement. (250 words max)", label: "Detail your extra curricular activities and interests and positions of responsibility. Please state what you feel you have gained from them and how others have benefited from your involvement. (250 words max)" },
-    { value: "Why does a career in commercial law and specifically Sidley Austin interest you? (250 words max)", label: "Why does a career in commercial law and specifically Sidley Austin interest you? (250 words max)" },
     { value: "Describe a current commercial issue that has interested you and explain why it interested you? (250 words max)", label: "Describe a current commercial issue that has interested you and explain why it interested you? (250 words max)" },
     { value: "In your view which personal qualities make a successful lawyer? (250 words max)", label: "In your view which personal qualities make a successful lawyer? (250 words max)" }
   ];

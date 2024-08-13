@@ -9,7 +9,10 @@ def read_prompt(filename):
     with open(os.path.join(os.path.dirname(__file__), filename), 'r') as file:
         return file.read()
 
-goodwin_draft = read_prompt('goodwin_draft.txt')
+# Read only the three specified prompts
+sidley_austin_career_question = read_prompt('sidley_austin_career_question.txt')
+goodwin_why_question = read_prompt('goodwin_why_question.txt')
+default_prompt = read_prompt('default_prompt.txt')
 
 class handler(BaseHTTPRequestHandler):
     def set_CORS_headers(self):
@@ -39,24 +42,34 @@ class handler(BaseHTTPRequestHandler):
             self.send_error(400, "Missing required data")
             return
 
-        prompt = f"""
-        Generate a draft application for {firm} addressing the following question:
-        "{question}"
-
-        Include the following information in your response:
-        - Key reason(s) for applying: {key_reasons}
-        - Relevant experience: {relevant_experience}
-        - Relevant interaction with the firm: {relevant_interaction}
-        - Additional personal information: {personal_info}
-
-        Please create a well-structured, professional application that incorporates all the provided information seamlessly.
-        """
-
         try:
+            # Select the appropriate prompt based on firm and question
+            if firm == "Sidley Austin" and question == "Why does a career in commercial law and specifically Sidley Austin interest you? (250 words max)":
+                system_prompt = sidley_austin_career_question
+            elif firm == "Goodwin" and question == "Why are you applying to Goodwin? (100 words)":
+                system_prompt = goodwin_why_question
+            else:
+                system_prompt = default_prompt
+
+            model = "ft:gpt-4o-mini-2024-07-18:personal:appdrafterdataset:9vG3pVmA"
+
+            prompt = f"""
+            Generate a draft application for {firm} addressing the following question:
+            "{question}"
+
+            Include the following information in your response:
+            - Key reason(s) for applying: {key_reasons}
+            - Relevant experience: {relevant_experience}
+            - Relevant interaction with the firm: {relevant_interaction}
+            - Additional personal information: {personal_info}
+
+            Please create a well-structured, professional application that incorporates all the provided information seamlessly.
+            """
+
             completion = client.chat.completions.create(
-                model="ft:gpt-4o-mini-2024-07-18:personal:appdrafterdataset:9vG3pVmA",
+                model=model,
                 messages=[
-                    {"role": "system", "content": goodwin_draft},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": prompt}
                 ]
             )
