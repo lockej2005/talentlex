@@ -10,36 +10,41 @@ def read_prompt(filename):
         return file.read()
 
 goodwin_draft = read_prompt('goodwin_draft.txt')
-
 system_prompt = goodwin_draft
 
-class handler(BaseHTTPRequestHandler):
-    def set_CORS_headers(self):
-        self.send_header('Access-Control-Allow-Credentials', 'true')
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT')
-        self.send_header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version')
+def handler(event, context):
+    if event['httpMethod'] == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Credentials': 'true',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+                'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+            },
+            'body': ''
+        }
 
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.set_CORS_headers()
-        self.end_headers()
+    if event['httpMethod'] != 'POST':
+        return {
+            'statusCode': 405,
+            'body': json.dumps({'error': 'Method Not Allowed'})
+        }
 
-    def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        data = json.loads(post_data.decode('utf-8'))
-        
-        firm = data.get('firm')
-        question = data.get('question')
-        key_reasons = data.get('keyReasons')
-        relevant_experience = data.get('relevantExperience')
-        relevant_interaction = data.get('relevantInteraction')
-        personal_info = data.get('personalInfo')
-        
+    try:
+        body = json.loads(event['body'])
+        firm = body.get('firm')
+        question = body.get('question')
+        key_reasons = body.get('keyReasons')
+        relevant_experience = body.get('relevantExperience')
+        relevant_interaction = body.get('relevantInteraction')
+        personal_info = body.get('personalInfo')
+
         if not firm or not question:
-            self.send_error(400, "Missing required data")
-            return
+            return {
+                'statusCode': 400,
+                'body': json.dumps({'error': 'Missing required data'})
+            }
 
         prompt = f"""
         Generate a draft application for {firm} addressing the following question:
@@ -54,26 +59,30 @@ class handler(BaseHTTPRequestHandler):
         Please create a well-structured, professional application that incorporates all the provided information seamlessly.
         """
 
-        try:
-            completion = client.chat.completions.create(
-                model="ft:gpt-4o-mini-2024-07-18:personal:appdrafterdataset:9vG3pVmA",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt}
-                ]
-            )
-            
-            generated_draft = completion.choices[0].message.content
+        completion = client.chat.completions.create(
+            model="ft:gpt-4o-mini-2024-07-18:personal:appdrafterdataset:9vG3pVmA",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ]
+        )
 
-            self.send_response(200)
-            self.set_CORS_headers()
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            response = json.dumps({
-                "success": True,
-                "draft": generated_draft
+        generated_draft = completion.choices[0].message.content
+
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                'success': True,
+                'draft': generated_draft
             })
-            self.wfile.write(response.encode('utf-8'))
+        }
 
-        except Exception as e:
-            self.send_error(500, str(e))
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({'error': str(e)})
+        }
