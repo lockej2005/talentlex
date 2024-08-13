@@ -76,6 +76,7 @@ function ApplicationInput({
     <div className="application-container">
       <div className={`title-card ${isExpanded ? 'expanded' : ''}`}>
         <h3>Your Application</h3>
+        <p>Select which firm you're applying to and the relevant question for a review. If you're feeling stuck, expand the input below and jot down some notes in the fields, then click 'generate draft'. Note: generating a draft only works if you select a question.</p>
         <div className="dropdown-container">
           <Select
             value={selectedFirm}

@@ -308,7 +308,7 @@ function Comparison() {
             <p className="subtext">
               {isLoading ? '⏳🙄👀' : 
                feedback ? `Your review took ${responseTime.toFixed(2)} seconds to generate` : 
-               'It\'s kind of empty here.'}
+               'Review will pop up on this side.'}
             </p>
           </div>
           <div className="text-content">
