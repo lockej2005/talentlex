@@ -237,7 +237,6 @@ function Comparison() {
     <div className="comparison-container">
       {showPopup && <EmailPopup onClose={closePopup} />}
       <div className="header">
-        <h2>Law App Review AI</h2>
       </div>
       <div className="divider2"></div>
 

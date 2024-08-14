@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Inika:wght@400;700&family=Inter:wght@100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inika:wght@400;700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+
+* {
+    font-family: "Inter", sans-serif;
+}
+
+.layout {
+    display: flex;
+    height: 100vh;
+    background-color: #E4E4E4;
+
+  }
+  
+  .sidebar {
+    width: 350px;
+    background-color: #f0f0f0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #276D8B;
+    margin-bottom: 20px;
+    font-family: "Inika", serif;
+}
+  
+  nav ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  nav li {
+    padding: 10px 0;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+  nav li:hover {
+    color: #276D8B;
+  }
+  
+  .section-title {
+    font-weight: bold;
+    color: #888;
+    margin-top: 15px;
+    text-decoration: none;
+  }
+  
+  .section-title:hover {
+    color: #888 !important;
+    cursor: default;
+  }
+
+  .seperator {
+    border-bottom: 1px #888;
+  }
+
+  .active {
+    color: #276D8B;
+    font-weight: bold;
+    text-decoration-color: #276D8B;
+
+  }
+  
+  .user-info {
+    margin-top: auto;
+  }
+  
+  .user-type {
+    font-size: 0.9em;
+    color: #888;
+  }
+  
+  .credits {
+    margin-top: 10px;
+  }
+  
+  .get-more-btn {
+    background-color: #276D8B;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin-top: 10px;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 20px;
+    position: relative;
+  }
+  
+  .menu-toggle {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      left: -250px;
+      top: 0;
+      bottom: 0;
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+  
+    .sidebar.open {
+      left: 0;
+    }
+  
+    .menu-toggle {
+      display: block;
+    }
+  
+    .main-content {
+      padding-top: 50px;
+    }
+  }
