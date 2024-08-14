@@ -1,0 +1,76 @@
+/* PolicyPages.css */
+
+.policy-container {
+  max-width: 100%;
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+  display: flex;  
+  flex-direction: column;
+  min-height: 95vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 50px;
+}
+
+.policy-container h1 {
+  color: #111;
+  font-size: 3rem;
+  margin: 0;
+}
+
+.policy-content {
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px;
+  box-sizing: border-box;
+  flex-grow: 1;
+  
+}
+
+.policy-section {
+  padding: 25px;
+  border-radius: 10px;
+  color: rgba(39, 109, 139);  overflow-y: auto;
+  flex-grow: 1;
+  margin: 10px 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.policy-section h2 {
+  color: rgba(39, 109, 139);  font-size: 1.5rem;
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+
+.policy-section p {
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .policy-container {
+      max-width: 100%;
+      height: auto;
+      overflow-y: visible;
+      padding: 20px;
+  }
+
+  .header {
+      padding: 20px 20px;
+      text-align: left;
+  }
+
+  .policy-container h1 {
+      font-size: 2rem; /* Reduced font size for mobile */
+  }
+
+  .policy-section {
+      margin: 10px 0px;
+  }
+}

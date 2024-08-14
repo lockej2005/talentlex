@@ -1,17 +1,59 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { supabase } from './supabaseClient';
 import Layout from './pages/Layout';
 import Comparison from './pages/Comparison';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Scrape from './pages/Scrape';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import AIUsagePolicy from './pages/AIUsagePolicy';
+
+const PrivateRoute = ({ children }) => {
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return session ? children : <Navigate to="/login" />;
+};
 
 function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Comparison />} />
-          {/* Add more routes here as needed */}
-        </Routes>
-      </Layout>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<Comparison />} />
+          <Route path="scrape" element={<Scrape />} />
+          <Route path="privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="ai-usage-policy" element={<AIUsagePolicy />} />
+          {/* Add more private routes here as needed */}
+        </Route>
+      </Routes>
     </Router>
   );
 }
