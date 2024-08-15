@@ -16,6 +16,11 @@ jones_day_prompt = read_prompt('jones_day_prompt.txt')
 sidley_austin_prompt = read_prompt('sidley_austin_prompt.txt')
 dechert_prompt = read_prompt('dechert_prompt.txt')
 
+# Additional Sidley Austin specific prompts
+why_career_sidley_austin_prompt = read_prompt('why_career_sidley_austin_prompt.txt')
+commercial_issue_prompt = read_prompt('commercial_issue_prompt.txt')
+personal_qualities_prompt = read_prompt('personal_qualities_prompt.txt')
+
 class handler(BaseHTTPRequestHandler):
     def set_CORS_headers(self):
         self.send_header('Access-Control-Allow-Credentials', 'true')
@@ -64,7 +69,15 @@ class handler(BaseHTTPRequestHandler):
                 system_prompt = jones_day_prompt
                 model = "gpt-4o"
             elif firm == "Sidley Austin":
-                system_prompt = sidley_austin_prompt
+                # Use specific prompts based on the question
+                if question == "Why does a career in commercial law and specifically Sidley Austin interest you? (250 words max)":
+                    system_prompt = why_career_sidley_austin_prompt
+                elif question == "Describe a current commercial issue that has interested you and explain why it interested you? (250 words max)":
+                    system_prompt = commercial_issue_prompt
+                elif question == "In your view which personal qualities make a successful lawyer? (250 words max)":
+                    system_prompt = personal_qualities_prompt
+                else:
+                    system_prompt = sidley_austin_prompt
                 model = "gpt-4o"
             elif firm == "Dechert":
                 system_prompt = dechert_prompt
