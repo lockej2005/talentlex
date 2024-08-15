@@ -27,6 +27,8 @@ const Scrape = () => {
 
   return (
     <div className="scrape-container">
+      <p>coming soon.............</p>
+      <div className='hide'>
       <h1 className="scrape-title">Scrape Your LinkedIn Account</h1>
       <div className="scrape-input-container">
         <input
@@ -47,6 +49,7 @@ const Scrape = () => {
           <pre>{JSON.stringify(scrapedData, null, 2)}</pre>
         </div>
       )}
+    </div>
     </div>
   );
 };

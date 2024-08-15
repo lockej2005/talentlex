@@ -8,6 +8,7 @@ import Signup from './pages/Signup';
 import Scrape from './pages/Scrape';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import AIUsagePolicy from './pages/AIUsagePolicy';
+import ComparisonDashboard from './pages/ComparisonDashboard';
 
 const PrivateRoute = ({ children }) => {
   const [session, setSession] = useState(null);
@@ -51,6 +52,7 @@ function App() {
           <Route path="scrape" element={<Scrape />} />
           <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="ai-usage-policy" element={<AIUsagePolicy />} />
+          <Route path="/review-arena" element={<ComparisonDashboard />} />
           {/* Add more private routes here as needed */}
         </Route>
       </Routes>

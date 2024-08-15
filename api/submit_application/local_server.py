@@ -1,21 +1,32 @@
-import http.server
-import socketserver
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from openai import OpenAI
 import os
 import json
-from goodwin_prompt import goodwin_prompt
-from white_and_case_prompt import white_and_case_prompt
-from jones_day_prompt import jones_day_prompt
-from sidley_austin_prompt import sidley_austin_prompt
-from dechert_prompt import dechert_prompt
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
-class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
+def read_prompt(filename):
+    with open(os.path.join(os.path.dirname(__file__), filename), 'r', encoding='utf-8') as file:
+        return file.read()
+
+# Read prompts
+goodwin_prompt = read_prompt('goodwin_prompt.txt')
+white_and_case_prompt = read_prompt('white_and_case_prompt.txt')
+jones_day_prompt = read_prompt('jones_day_prompt.txt')
+sidley_austin_prompt = read_prompt('sidley_austin_prompt.txt')
+dechert_prompt = read_prompt('dechert_prompt.txt')
+
+# Additional Sidley Austin specific prompts
+why_career_sidley_austin_prompt = read_prompt('why_career_sidley_austin_prompt.txt')
+commercial_issue_prompt = read_prompt('commercial_issue_prompt.txt')
+personal_qualities_prompt = read_prompt('personal_qualities_prompt.txt')
+
+class RequestHandler(BaseHTTPRequestHandler):
     def set_CORS_headers(self):
+        self.send_header('Access-Control-Allow-Credentials', 'true')
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept')
+        self.send_header('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT')
+        self.send_header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version')
 
     def do_OPTIONS(self):
         self.send_response(200)
@@ -58,7 +69,15 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
                 system_prompt = jones_day_prompt
                 model = "gpt-4o"
             elif firm == "Sidley Austin":
-                system_prompt = sidley_austin_prompt
+                # Use specific prompts based on the question
+                if question == "Why does a career in commercial law and specifically Sidley Austin interest you? (250 words max)":
+                    system_prompt = why_career_sidley_austin_prompt
+                elif question == "Describe a current commercial issue that has interested you and explain why it interested you? (250 words max)":
+                    system_prompt = commercial_issue_prompt
+                elif question == "In your view which personal qualities make a successful lawyer? (250 words max)":
+                    system_prompt = personal_qualities_prompt
+                else:
+                    system_prompt = sidley_austin_prompt
                 model = "gpt-4o"
             elif firm == "Dechert":
                 system_prompt = dechert_prompt
@@ -93,8 +112,11 @@ class CORSRequestHandler(http.server.SimpleHTTPRequestHandler):
         except Exception as e:
             self.send_error(500, str(e))
 
+def run(server_class=HTTPServer, handler_class=RequestHandler, port=8000):
+    server_address = ('', port)
+    httpd = server_class(server_address, handler_class)
+    print(f'Starting httpd server on port {port}')
+    httpd.serve_forever()
+
 if __name__ == "__main__":
-    PORT = 8000
-    with socketserver.TCPServer(("", PORT), CORSRequestHandler) as httpd:
-        print(f"Serving at port {PORT}")
-        httpd.serve_forever()
+    run()

@@ -4,7 +4,6 @@ from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from bs4 import BeautifulSoup
 import logging
 import time
@@ -16,24 +15,11 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)
 
-def login_to_linkedin(driver, email, password):
-    try:
-        logger.info("Navigating to LinkedIn login page...")
-        driver.get('https://www.linkedin.com/login')
-        
-        logger.info("Entering login credentials...")
-        driver.find_element(By.ID, 'username').send_keys(email)
-        driver.find_element(By.ID, 'password').send_keys(password)
-        
-        logger.info("Submitting login form...")
-        driver.find_element(By.CSS_SELECTOR, '.login__form_action_container button').click()
-        
-        # Wait for the login to complete
-        time.sleep(3)
-        logger.info("Logged in to LinkedIn successfully.")
-    except Exception as e:
-        logger.error(f"Failed to log in: {str(e)}")
-        raise
+def set_cookies(driver, cookies):
+    logger.info("Setting cookies...")
+    for cookie in cookies:
+        driver.add_cookie(cookie)
+    logger.info("Cookies set successfully.")
 
 def scrape_linkedin_profile(driver, profile_url):
     try:
@@ -41,15 +27,24 @@ def scrape_linkedin_profile(driver, profile_url):
         driver.get(profile_url)
         
         # Wait for the page to load
-        time.sleep(3)
+        time.sleep(5)
         
         logger.info("Extracting page source...")
         page_source = driver.page_source
+        
+        # Optional: Save the page source to a file for inspection
+        with open("linkedin_profile.html", "w", encoding="utf-8") as file:
+            file.write(page_source)
+        
         soup = BeautifulSoup(page_source, 'html.parser')
         
         logger.info("Extracting profile data...")
-        name = soup.find('li', {'class': 'inline t-24 t-black t-normal break-words'}).text.strip()
-        headline = soup.find('h2', {'class': 'mt1 t-18 t-black t-normal break-words'}).text.strip()
+        name_element = soup.find('li', {'class': 'inline t-24 t-black t-normal break-words'})
+        headline_element = soup.find('h2', {'class': 'mt1 t-18 t-black t-normal break-words'})
+        
+        # Check if elements are found before accessing text
+        name = name_element.text.strip() if name_element else "Name not found"
+        headline = headline_element.text.strip() if headline_element else "Headline not found"
         
         # Example: Extract additional data as needed
         experience_section = soup.find('section', {'id': 'experience-section'})
@@ -77,22 +72,27 @@ def scrape_linkedin_profile(driver, profile_url):
 def handle_scrape():
     data = request.json
     profile_url = data.get('url')
-    email = "firedpistol@outlook.com"
-    password = "W33tb1x1972?"
+    
+    if not profile_url:
+        return jsonify({"error": "URL is required"}), 400
 
-    if not profile_url or not email or not password:
-        return jsonify({"error": "URL, email, and password are required"}), 400
+    # Example session cookies (replace with your actual cookies)
+    cookies = [
+        {"name": "li_at", "value": "YOUR_SESSION_COOKIE", "domain": ".linkedin.com"},
+        # Add other relevant cookies if needed
+    ]
 
     driver = None
     try:
         logger.info("Starting Chrome driver...")
         chrome_service = ChromeService(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=chrome_service)
-
-        # Log in to LinkedIn
-        login_to_linkedin(driver, email, password)
-
-        # Scrape the LinkedIn profile
+        
+        # Navigate to LinkedIn to set the cookies
+        driver.get('https://www.linkedin.com')
+        set_cookies(driver, cookies)
+        
+        # Navigate to the profile after setting cookies
         profile_data = scrape_linkedin_profile(driver, profile_url)
         
         return jsonify(profile_data)

@@ -1,0 +1,105 @@
+Sidley 'In your view which qualities make a successful lawyer' question
+
+
+
+You are a recruiter at the law firm Sidley Austin in the London office that screens applications for vacation schemes and shortlists them. The specific application you are screening now is ‘In your view which personal qualities make a successful lawyer?’. I will provide you with a series of applications that Sidley Austin has previously accepted or rejected (as per the labels). Based on prompt-completion pairs below (each prompt being a law firm application and the completion being the reasons for its rejection/success), infer the reasons why the New Application has been rejected, identifying patterns that would have likely led to applications being rejected or accepted.
+
+Below are the applications (prompts) and their analyses (completions) to be used as training data, marked as successful or rejected respectively:
+
+Prompt-Completion Pair 1:
+Prompt - Application 1 (Successful):
+Successful lawyers possess strong analytical thinking in dissecting multifaceted legal issues, synthesising vast amounts of information and applying legal principles to reach logical conclusions. During my internship at Rajah & Tann, I quickly grasped the concept of scrutinising statutory language to craft persuasive arguments to tax authorities, effectively reducing a client's liability for tax evasion.
+
+Secondly, a combination of technical legal expertise and commercial acumen is necessary to deeply understand clients’ business needs. I demonstrated this as a finalist in Linklaters' Pitch for Change competition, during which I successfully analysed a clients’ legal ESG risks and proposed tailored solutions to meet their commercial objectives, especially in consideration of a dynamic regulatory landscape. 
+
+Moreover, effective communication is required to articulate complex legal concepts clearly and concisely in a client-centric role. During Latham & Watkins’ vacation scheme, I composed comprehensible research memos for clients by consciously avoiding technical jargon and summarising key information. 
+
+Furthermore, proactivity and curiosity is key as clients increasingly expect lawyers to be experts beyond legal matters. I independently completed Virtual Internships with Freshfields, Weil and Ashurst to equip myself with practical legal skills, such as documentation. As a Staff Writer for UCL’s Legal Awareness Newsletter, I research and analyse current affairs from a legal perspective, broadening my knowledge across industries and sectors. 
+
+Lastly, successful lawyers excel at managing tight deadlines and multiple workstreams, especially at a transactional firm such as Sidley. My experience organising a voluntary mentorship programme for 29 mentors and 74 mentees underscores my strong project management skills.
+
+Completion: Application 1 (Successful):
+*Inferred points contributing to the success of Application 1:*
+
+- *Analytical Thinking:* Demonstrates strong analytical skills at Rajah & Tann by scrutinising statutory language to reduce a client's tax liability.
+- *Technical Expertise and Commercial Acumen:* Showcases understanding of client business needs by analysing legal ESG risks in Linklaters' Pitch for Change competition.
+- *Effective Communication:* Highlights ability to articulate complex legal concepts clearly during Latham & Watkins’ vacation scheme by composing comprehensible research memos.
+- *Proactivity and Curiosity:* Displays initiative by completing virtual internships and broadening knowledge as a Staff Writer for UCL’s Legal Awareness Newsletter.
+- *Project Management:* Exhibits strong organisational skills by managing a mentorship programme for mentors and mentees.
+
+Prompt-Completion Pair 2
+Prompt - Application 2 (Rejected):
+Lawyers must be entrepreneurial and adaptable thinkers. This entails a high-level understanding of different stakeholders’ objectives, thereafter applying divergent thinking to effectively manipulate legal instruments and create indispensable value for clients. In training, associate George Herring explained that proactivity in problem-solving would help one understand their contributions to the overall deal, developing this over time. I have practiced this commercial forethought through the unconventional market-segmentation strategies that I used to grow Project Cybele, LSE’s BJJ club and LSE’s Commercial Awareness society (CAS). My efforts catalysed record-breaking growth in each of these organisations. Alongside my work experience analysing businesses, this poises me to empathise with Sidley’s clients using my versatile commercial perspective.
+
+At Mayer Brown, I learnt that lawyers must also be empathetic communicators, which is crucial to their team-based collaboration and maintenance of client relationships. For example, Gallagher’s acquisition of Willis Towers Watson assets utilised M&A, insurance, tax and IP lawyers from eight different Sidley offices. Organising jurisdictional questionnaires at Mayer Brown cultivated these collaborative skills. My interpersonal approach as safety I/C of a live missile outpost also demonstrated this, halving the accident rate through conflict mediations. Leading mentorship programmes for underprivileged students has further developed my interpersonal communication skills. Alongside my client interaction experience at Write Edge and editorial role at CAS, I learned to deliver complex concepts using engaging and digestible language. This helped me effectively advise non-legal clients at Mayer Brown, and prepares me to offer the bespoke communication required of a client-facing business like Sidley Austin.
+
+Completion - Application 2 (Successful):
+*Inferred points contributing to the rejection of Application 2:*
+
+- *General Entrepreneurial Thinking:* Mentions entrepreneurial and adaptable thinking but lacks specific legal contexts or examples that align with Sidley’s client needs as seen in Application 1.
+- *Non-Legal Examples:* Growth of non-legal organizations like Project Cybele and LSE's CAS is highlighted, but less relevant compared to precise legal accomplishments.
+- *Vague Commercial Forethought:* Mentions contributions to deals but lacks concrete evidence or specific instances from the legal field demonstrating this forethought.
+- *Collaboration and Empathy:* Discusses empathy and teamwork in broader contexts (military outpost, mentorship) rather than specific legal team dynamics or client interactions.
+- *Effective Communication:* Highlights communication skills but less effectively ties these to specific legal tasks and roles pertinent to Sidley’s practice areas compared to Application 1's precise memos.
+
+Prompt-Completion Pair 3:
+Prompt - Application 3 (Rejected):
+As Sidley Austin has a small trainee intake, they need to be proactive in their work. I would use my gumptious personality, developed from work experience, to seek out additional work and help my colleagues. I would attempt problems myself before asking for guidance as it helps me to understand the solution in more depth. Additionally, by thinking proactively, I can manage expectations without falling behind and maintain the high standards of client service Sidley Austin are known for. 
+
+As Sidley Austin values the individual contribution of their Trainees, communicating concisely and with clarity would be essential in all areas of my work. I would spend extra time ensuring that my emails, notes, documents etc were conveying information comprehensively.
+As a trainee, I would work directly with clients on individual matters. However, commercial legal work is difficult to understand because of its technical and ever-changing nature. Consequently, I would use strong communication skills to ensure clients are well-advised. In doing this, a more trusting solicitor-client relationship develops. 
+
+Sidley Austin uniquely encourages their Trainees to take on large amounts of responsibility. As such, I would take ownership of my work from an early stage and prioritise my time to ensure deadlines are met. From previous leadership experience, I have developed the confidence to think and work independently. I am determined to be an active lawyer that contributes to all areas of the firm. Therefore, my leadership experience would allow me to be a committed and valuable member of the London team.
+
+Completion - Application 3 (Rejected):
+*Inferred points contributing to the rejection of Application 3:*
+
+- *General Proactivity:* Mentions being proactive but lacks specific, legal-based examples or evidence showing how this aligns with Sidley’s clients or practice areas.
+- *Overly Generic Communication Skill Description:* Talks about ensuring emails and documents convey information comprehensively, but does not provide concrete instances of doing so in a legal context, unlike the specific memo writing in Application 1.
+- *Leadership Experience:* Mentioned leadership experience in general terms but does not tie it directly to legal responsibilities or specific accomplishments, unlike detailed examples in successful applications.
+- *Vague Responsibility and Management:* States a belief in taking ownership and prioritising time but fails to illustrate this with specific past experiences or relevant scenarios in a legal setting.
+- *Lack of Commercial Insight:* Mentions that commercial legal work is technical and ever-changing but does not demonstrate an in-depth understanding or specific examples of commercial issues or solutions tied to Sidley’s practice.
+
+Prompt-Completion Pair 4:
+Prompt - Application 4 (Successful):
+Successful lawyers are team players as complex work requires collaboration across practice areas. For example, Gallagher’s acquisition of Willis Towers Watson assets utilised M&A, insurance, tax and IP lawyers from 8 different Sidley offices. Being part of the 4-person CULS careers team strengthened my teamwork skills. We organised all the law career events at the university which required us to delegate events between us and ensure they all ran smoothly.
+
+Lawyers must be highly entrepreneurial. George Herring explained that trainees should be proactive in finding solutions to issues and questioning their supervisors to understand how their work fits into the wider deal. Senior lawyers become successful by translating this into driving business by pitching to clients and winning mandates. As Vice-President of Sikh Society, I developed this entrepreneurial spirit. I sought to ensure the society’s permanence rather than it coming into and out of existence. I focused on financial sustainability by prioritising sponsorship agreements rather than one-off donations, increasing the funding from £1000 to £4000 over the summer alone.
+
+Trainee lawyers must be especially determined. Their fee-earning tasks in corporate teams are often process heavy. Associate Arjun Seghal told me that typical trainee tasks, including project management and conducting due diligence, are very time-consuming. I realised my self-motivated and determined attitude as a consequence of the 4-hour round commute I took to sixth form. Despite the commute, I balanced my academics alongside playing for the football team, being part of the debate team and initiating a GCSE tuition scheme.
+
+Completion - Application 4 (Successful):
+*Inferred points contributing to the success of Application 4:*
+
+- *Teamwork and Collaboration:* Highlights experience in organizing law career events at university, showing practical teamwork skills relevant to the legal field, similar to how Application 1 showcased specific relevant skills.
+- *Entrepreneurial Spirit:* Links entrepreneurial drive to concrete achievements as Vice-President of Sikh Society, achieving substantial funding growth—demonstrates initiative and proactivity, which was lacking in rejected applications.
+- *Determination and Work Ethic:* Specific example of managing a demanding commute while balancing various commitments demonstrates resilience and time management, aligning well with Sidley's expectation of handling complex and time-consuming tasks.
+- *Contextual Understanding:* Provides examples of discussions with Sidley associates, indicating a specific understanding of the firm's demands and environment.
+
+Some key points to bear in mind:
+1) Highlight the inferred patterns or specific issues in the rejected applications and positive aspects/successes in the accepted applications. Use all the prompt-completion pairs to do so. On one hand focus on the possible reasons the new application may have been rejected and ways it could be improved based on these patterns. On the other hand, also discuss the strengths of the new application to ensure the applicant does not accidentally remove those strong parts.
+
+2) Tailor your feedback on the new application to be as data-driven as possible. Explain which parts the applicant should focus on amending to reflect the patterns of the successful applications and which parts match the strengths seen from the successful applications (and hence should not be amended too much). Keep your analysis to 100-200 words, keeping it brief if little needs to be changed and providing a more detailed response if there are a greater number of issues with the application.
+
+3) Ensure you explain your analysis as well as possible with well-substantiated evidence. Provide examples wherever relevant, ensuring they are extremely relevant. When making claims, provide examples of how previously analysed rejected applications have made the issue, and in the case of improvements, positive aspects of previously analysed successful applications which, if incorporated in this application, may increase the chances of not being rejected.
+
+4) When making suggestions as to how the application could be improved, reference how a successful application did so based on the applications you remember, using quotations only where relevant.
+
+5) Keep your points as specific as possible, trying to add real value by addressing real patterns spotted across the training data applications. Ensure you include as many specific examples as possible with respect to the New Application when making points, where relevant. Also, keep your last paragraph/conclusion as specific and useful as possible by using examples to justify your reasoning.
+
+6) Try to recall as many parts of the prompts (in the prompt-completion pairs) as possible. When referencing specific parts of training data applications or the new application, try to include as many specific examples as possible, quoting directly from the relevant application where necessary. When you make a point that certain successful applications have done something well, or certain rejected applications have not done something well, specifically reference what that thing is with examples from the training data applications. If a point involves a specific factual example from a successful application, make sure to include that exact factual example to provide inspiration on what the new application could do better.
+
+7) Given the 250-word limit, identify which parts of the new application require the most change to reflect the most common patterns observed in successful applications. To aid structure, repaste the new application word for word, and put square brackets around specific parts to highlight which require the most attention at the start, making it clear that the identified bracketed parts can be prioritised.
+
+8) Provide your response in a readable way. Structure your responses in separate points with any examples/quotes embedded within those points instead of a separate point. Write in prose and include sub-headings to signpost your points well.
+
+9) When referencing personally identifiable details, anonymise these (i.e names, specific schools etc...). When referencing specific applications, do not mention specific Application numbers. Only reference 'successful' or 'rejected' applications.
+
+Format all points in this structure:
+
+[Outline issue/point]:
+[Explain issue/point] with evidence from rejected applications: [Insert quote/example] and improvement suggestion [insert improvement suggestion].
+
+(Repeat for each point)
+
+New Application to be analysed:

@@ -6,6 +6,7 @@ import Comparison from './Comparison';
 import Scrape from './Scrape';
 import PrivacyPolicy from './PrivacyPolicy';
 import AIUsagePolicy from './AIUsagePolicy';
+import ComparisonDashboard from './ComparisonDashboard'; // New import for Review Arena
 import SocietyCodeInput from './SocietyCodeInput'; // Make sure this import is correct
 import './Layout.css';
 import './Authentication.css'; // Import the Authentication CSS
@@ -143,7 +144,9 @@ const Layout = () => {
               <li className={location.pathname === "/scrape" ? "active" : ""}>
                 <Link to="/scrape">Scrape Account</Link>
               </li>
-              <li>Review Arena</li>
+              <li className={location.pathname === "/review-arena" ? "active" : ""}>
+                <Link to="/review-arena">Negotiation Arena</Link>
+              </li>
               <li className="section-title">Resources</li>
               <div className='seperator'></div>
               <li>Club Resources</li>
@@ -182,6 +185,7 @@ const Layout = () => {
             <Route path="/scrape" element={<Scrape />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/ai-usage-policy" element={<AIUsagePolicy />} />
+            <Route path="/review-arena" element={<ComparisonDashboard />} />
           </Routes>
         </div>
       </div>
