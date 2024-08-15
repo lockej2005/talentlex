@@ -41,20 +41,46 @@ const SocietyCodeInput = ({ onChange }) => {
 
   const handleChange = (element, index) => {
     const value = element.value.toUpperCase();
-    if (!/^[A-Z0-9]$/.test(value)) return false;
+    if (value === '' || /^[A-Z0-9]$/.test(value)) {
+      setCode(prevCode => {
+        const newCode = [...prevCode];
+        newCode[index] = value;
+        return newCode;
+      });
 
-    setCode([...code.map((d, idx) => (idx === index ? value : d))]);
-
-    // Focus next input
-    if (element.nextSibling) {
-      element.nextSibling.focus();
+      // Focus next input if a character was entered
+      if (value !== '' && element.nextSibling) {
+        element.nextSibling.focus();
+      }
     }
   };
 
   const handleKeyDown = (e, index) => {
-    if (e.key === 'Backspace' && !code[index] && index > 0) {
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      setCode(prevCode => {
+        const newCode = [...prevCode];
+        newCode[index] = '';
+        return newCode;
+      });
+
       // Move focus to the previous input on backspace
+      if (index > 0) {
+        inputs.current[index - 1].focus();
+      }
+    } else if (e.key === 'Delete') {
+      e.preventDefault();
+      setCode(prevCode => {
+        const newCode = [...prevCode];
+        newCode[index] = '';
+        return newCode;
+      });
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      e.preventDefault();
       inputs.current[index - 1].focus();
+    } else if (e.key === 'ArrowRight' && index < 5) {
+      e.preventDefault();
+      inputs.current[index + 1].focus();
     }
   };
 
