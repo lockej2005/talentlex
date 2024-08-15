@@ -161,7 +161,7 @@ function Comparison() {
           applicationText, 
           firm: selectedFirm.value, 
           question: selectedQuestion.value,
-          email,  // Include the email in the submission
+          email,
         }),
       });
   
@@ -181,7 +181,7 @@ function Comparison() {
           question: selectedQuestion.value,
           application_text: applicationText,
           feedback: data.feedback,
-          email,  // Include email here as well
+          email,
           device: userAgent,
           screen_size: screenSize,
           timestamp: new Date().toISOString()
@@ -225,6 +225,26 @@ function Comparison() {
 
       const data = await response.json();
       setApplicationText(data.draft);
+
+      // Log the draft generation to the database
+      const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email='));
+      const email = emailCookie ? emailCookie.split('=')[1] : null;
+
+      const { data: insertData, error } = await supabase
+        .from('draft_generations')
+        .insert({
+          email: email,
+          firm: selectedFirm.value,
+          question: selectedQuestion.value,
+          key_reasons: additionalInfo.keyReasons,
+          relevant_experience: additionalInfo.relevantExperience,
+          relevant_interaction: additionalInfo.relevantInteraction,
+          personal_info: additionalInfo.personalInfo,
+          generated_draft: data.draft
+        });
+
+      if (error) throw error;
+
     } catch (error) {
       console.error('Error:', error);
       setFeedback("Error: Unable to generate draft. Please try again later.");
@@ -237,7 +257,6 @@ function Comparison() {
     <div className="comparison-container">
       {showPopup && <EmailPopup onClose={closePopup} />}
       <div className="header">
-        <h2>Law App Review AI</h2>
       </div>
       <div className="divider2"></div>
 
@@ -249,6 +268,7 @@ function Comparison() {
             selectedFirm={selectedFirm}
             setSelectedFirm={setSelectedFirm}
             selectedQuestion={selectedQuestion}
+            setSelecteselectedQuestion={selectedQuestion}
             setSelectedQuestion={setSelectedQuestion}
             firms={firms}
             getQuestions={getQuestions}

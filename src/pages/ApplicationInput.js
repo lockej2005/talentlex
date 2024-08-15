@@ -1,26 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import './ApplicationInput.css';
 
 function EditableContent({ value, onChange }) {
+  const [wordCount, setWordCount] = useState(0);
+
+  useEffect(() => {
+    const words = value.trim().split(/\s+/);
+    setWordCount(words.length);
+  }, [value]);
+
   return (
-    <textarea
-      className="editable-content"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      style={{
-        width: '100%',
-        height: '100%',
-        border: 'none',
-        resize: 'none',
-        backgroundColor: 'transparent',
-        color: 'inherit',
-        font: 'inherit',
-        padding: '10px',
-        boxSizing: 'border-box',
-      }}
-    />
+    <div className="editable-content-container">
+      <textarea
+        className="editable-content"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          width: '100%',
+          height: '100%',
+          border: 'none',
+          resize: 'none',
+          backgroundColor: 'transparent',
+          color: 'inherit',
+          font: 'inherit',
+          padding: '10px',
+          boxSizing: 'border-box',
+        }}
+      />
+      <div className="word-count">{wordCount} words</div>
+    </div>
   );
 }
 
