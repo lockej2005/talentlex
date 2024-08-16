@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react';
+import React, { useState } from 'react';
 import './ComparisonDashboard.css';
 
 const ComparisonDashboard = () => {
@@ -9,30 +8,6 @@ const ComparisonDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [userOffer, setUserOffer] = useState(null);
   const [lawyerDecision, setLawyerDecision] = useState(null);
-  const [remainingCredits, setRemainingCredits] = useState(null);
-
-  const user = useUser();
-  const supabase = useSupabaseClient();
-
-  useEffect(() => {
-    if (user) {
-      fetchUserCredits();
-    }
-  }, [user]);
-
-  const fetchUserCredits = async () => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('credits')
-      .eq('id', user.id)
-      .single();
-
-    if (error) {
-      console.error('Error fetching user credits:', error);
-    } else {
-      setRemainingCredits(data.credits);
-    }
-  };
 
   const toggleItem = (index) => {
     setOpenItems(prevOpenItems => {
@@ -47,11 +22,6 @@ const ComparisonDashboard = () => {
   };
 
   const handleSubmit = async () => {
-    if (!user) {
-      console.error('User not logged in');
-      return;
-    }
-
     setIsLoading(true);
     setNegotiationResults([]);
     setOpenItems(new Set());
@@ -78,8 +48,7 @@ const ComparisonDashboard = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           scenario: currentScenario, 
-          previous_responses: negotiationResults,
-          user_uuid: user.id
+          previous_responses: negotiationResults
         }),
       });
   
@@ -99,7 +68,6 @@ const ComparisonDashboard = () => {
         return newResults;
       });
 
-      setRemainingCredits(data.credits_remaining);
       setOpenItems(prev => new Set([...prev, index]));
     } catch (error) {
       console.error('Error fetching response:', error);
@@ -123,8 +91,7 @@ const ComparisonDashboard = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           scenario, 
-          conversation_history: negotiationResults,
-          user_uuid: user.id
+          conversation_history: negotiationResults
         }),
       });
 
@@ -134,7 +101,6 @@ const ComparisonDashboard = () => {
 
       const userOfferData = await userOfferResponse.json();
       setUserOffer(userOfferData);
-      setRemainingCredits(userOfferData.credits_remaining);
 
       console.log('User offer data:', userOfferData);
 
@@ -155,8 +121,7 @@ const ComparisonDashboard = () => {
             price: userOfferData.price.toString(),
             terms: typeof userOfferData.terms === 'string' ? userOfferData.terms : JSON.stringify(userOfferData.terms),
             extra: typeof userOfferData.extra === 'string' ? userOfferData.extra : JSON.stringify(userOfferData.extra)
-          },
-          user_uuid: user.id
+          }
         }),
       });
 
@@ -166,7 +131,6 @@ const ComparisonDashboard = () => {
 
       const lawyerDecisionData = await lawyerDecisionResponse.json();
       setLawyerDecision(lawyerDecisionData);
-      setRemainingCredits(lawyerDecisionData.credits_remaining);
 
     } catch (error) {
       console.error('Error getting final decision:', error);
@@ -255,13 +219,13 @@ const ComparisonDashboard = () => {
         <button 
           className="arena-upload-button" 
           onClick={handleSubmit} 
-          disabled={isLoading || !user}
+          disabled={isLoading}
         >
           {isLoading ? 'Processing...' : 'Submit'}
         </button>
       </div>
       <div className="arena-info-bar">
-        Iterations: {Math.floor(negotiationResults.filter(Boolean).length / 2)} | 2 Parties (User's Lawyer and Opposing Lawyer) | Credits Remaining: {remainingCredits}
+        Iterations: {Math.floor(negotiationResults.filter(Boolean).length / 2)} | 2 Parties (User's Lawyer and Opposing Lawyer)
       </div>
       <div className="arena-comparison-container">
         {renderColumn(true)}
