@@ -146,3 +146,25 @@
 .arena-left-column::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
 }
+
+.arena-final-decision {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 15px 0;
+  }
+  
+  .arena-final-decision h3 {
+    margin-top: 0;
+    color: #276D8B;
+  }
+  
+  .arena-final-decision ul {
+    margin: 5px 0;
+    padding-left: 20px;
+  }
+  
+  .arena-final-decision li {
+    margin-bottom: 5px;
+  }
