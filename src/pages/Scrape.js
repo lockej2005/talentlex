@@ -14,7 +14,7 @@ const Scrape = () => {
     setScrapedData(null);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/scrape_linkedin', { url: linkedinUrl });
+      const response = await axios.post('/api/scrape_linkedin', { url: linkedinUrl });
       setScrapedData(response.data);
       console.log('Scraped data:', response.data);
     } catch (err) {
