@@ -1,12 +1,16 @@
 {
+  "version": 2,
   "functions": {
     "api/negotiate/index.py": {
+      "runtime": "python3.9",
       "maxDuration": 30
     },
     "api/create_application/index.py": {
+      "runtime": "python3.9",
       "maxDuration": 30
     },
     "api/submit_application/index.py": {
+      "runtime": "python3.9",
       "maxDuration": 30
     }
   },
@@ -22,10 +26,6 @@
     {
       "source": "/api/submit_application/:path*",
       "destination": "/api/submit_application/index.py"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/src/$1"
     }
   ]
 }
