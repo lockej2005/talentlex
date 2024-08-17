@@ -1,86 +1,72 @@
-# File: api/negotiate/index.py
-
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import List, Dict, Union
+from flask import Flask, request, jsonify
+import logging
 from user_lawyer_agent import UserLawyerAgent, UserDecisionAgent
 from opposing_lawyer_agent import OpposingLawyerAgent, LawyerDecisionAgent
-import logging
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+app = Flask(__name__)
 
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # This allows all origins
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-class AgentRequest(BaseModel):
-    scenario: str
-    previous_responses: List[dict]
-
-class DecisionRequest(BaseModel):
-    scenario: str
-    conversation_history: List[dict]
-    user_offer: Dict[str, Union[str, int, Dict[str, str]]] = None
-
+# Instantiate the agents
 user_agent = UserLawyerAgent()
 opposing_agent = OpposingLawyerAgent()
 user_decision_agent = UserDecisionAgent()
 lawyer_decision_agent = LawyerDecisionAgent()
 
-@app.post("/user-agent")
-async def user_agent_endpoint(request: AgentRequest):
+@app.route("/user-agent", methods=["POST"])
+def user_agent_endpoint():
     try:
-        logger.info(f"Received request for user-agent: {request}")
-        response = await user_agent.generate_response(request.scenario, request.previous_responses)
+        data = request.json
+        logger.info(f"Received request for user-agent: {data}")
+        response = user_agent.generate_response(data['scenario'], data['previous_responses'])
         logger.info(f"Generated response: {response}")
-        return response
+        return jsonify(response)
     except Exception as e:
         logger.error(f"Error in user-agent endpoint: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
-@app.post("/opposition-agent")
-async def opposition_agent_endpoint(request: AgentRequest):
+@app.route("/opposition-agent", methods=["POST"])
+def opposition_agent_endpoint():
     try:
-        logger.info(f"Received request for opposition-agent: {request}")
-        response = await opposing_agent.generate_response(request.scenario, request.previous_responses)
+        data = request.json
+        logger.info(f"Received request for opposition-agent: {data}")
+        response = opposing_agent.generate_response(data['scenario'], data['previous_responses'])
         logger.info(f"Generated response: {response}")
-        return response
+        return jsonify(response)
     except Exception as e:
         logger.error(f"Error in opposition-agent endpoint: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
-@app.post("/user-decision")
-async def user_decision_endpoint(request: DecisionRequest):
+@app.route("/user-decision", methods=["POST"])
+def user_decision_endpoint():
     try:
-        logger.info(f"Received request for user-decision: {request}")
-        response = await user_decision_agent.make_decision(request.scenario, request.conversation_history)
+        data = request.json
+        logger.info(f"Received request for user-decision: {data}")
+        response = user_decision_agent.make_decision(data['scenario'], data['conversation_history'])
         logger.info(f"Generated response: {response}")
-        return response
+        return jsonify(response)
     except Exception as e:
         logger.error(f"Error in user-decision endpoint: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
-@app.post("/lawyer-decision")
-async def lawyer_decision_endpoint(request: DecisionRequest):
+@app.route("/lawyer-decision", methods=["POST"])
+def lawyer_decision_endpoint():
     try:
-        logger.info(f"Received request for lawyer-decision: {request}")
-        response = await lawyer_decision_agent.make_decision(request.scenario, request.conversation_history, request.user_offer)
+        data = request.json
+        logger.info(f"Received request for lawyer-decision: {data}")
+        response = lawyer_decision_agent.make_decision(data['scenario'], data['conversation_history'], data.get('user_offer'))
         logger.info(f"Generated response: {response}")
-        return response
+        return jsonify(response)
     except Exception as e:
         logger.error(f"Error in lawyer-decision endpoint: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
-@app.api_route("/{path_name:path}", methods=["GET", "POST", "PUT", "DELETE"])
-async def catch_all(request: Request, path_name: str):
-    return {"message": f"You've reached the catch-all route. The path is: /{path_name}"}
+@app.route("/<path:path_name>", methods=["GET", "POST", "PUT", "DELETE"])
+def catch_all(path_name):
+    return jsonify({"message": f"You've reached the catch-all route. The path is: /{path_name}"})
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
