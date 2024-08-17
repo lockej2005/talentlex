@@ -1,15 +1,10 @@
 {
-  "functions": {
-    "api/negotiate/index.py": {
-      "maxDuration": 30
-    },
-    "api/create_application/index.py": {
-      "maxDuration": 30
-    },
-    "api/submit_application/index.py": {
-      "maxDuration": 30
+  "builds": [
+    {
+      "src": "Dockerfile",
+      "use": "@vercel/docker"
     }
-  },
+  ],
   "rewrites": [
     {
       "source": "/api/negotiate/:path*",
@@ -22,6 +17,10 @@
     {
       "source": "/api/submit_application/:path*",
       "destination": "/api/submit_application/index.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/src/$1"
     }
   ]
 }
