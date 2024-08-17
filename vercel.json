@@ -1,10 +1,18 @@
 {
-  "builds": [
-    {
-      "src": "Dockerfile",
-      "use": "@vercel/docker"
+  "functions": {
+    "api/negotiate/index.py": {
+      "runtime": "python3.9",
+      "maxDuration": 30
+    },
+    "api/create_application/index.py": {
+      "runtime": "python3.9",
+      "maxDuration": 30
+    },
+    "api/submit_application/index.py": {
+      "runtime": "python3.9",
+      "maxDuration": 30
     }
-  ],
+  },
   "rewrites": [
     {
       "source": "/api/negotiate/:path*",
