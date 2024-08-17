@@ -20,7 +20,7 @@ class UserLawyerAgent:
     def __init__(self):
         self.model = "gpt-4o-mini"
 
-    async def generate_response(self, scenario: str, previous_responses: List[dict]) -> Dict[str, str]:
+    def generate_response(self, scenario: str, previous_responses: List[dict]) -> Dict[str, str]:
         logger.info(f"UserLawyerAgent generating response for scenario: {scenario[:50]}...")
         logger.info(f"Previous responses: {previous_responses}")
         
@@ -54,7 +54,7 @@ class OpposingLawyerAgent:
     def __init__(self):
         self.model = "gpt-4o-mini"
 
-    async def generate_response(self, scenario: str, previous_responses: List[dict]) -> Dict[str, str]:
+    def generate_response(self, scenario: str, previous_responses: List[dict]) -> Dict[str, str]:
         logger.info(f"OpposingLawyerAgent generating response for scenario: {scenario[:50]}...")
         logger.info(f"Previous responses: {previous_responses}")
         
@@ -88,12 +88,12 @@ class UserDecisionAgent:
     def __init__(self):
         self.model = "gpt-4o-mini"
 
-    async def make_decision(self, scenario: str, conversation_history: List[dict]) -> Dict[str, str]:
+    def make_decision(self, scenario: str, conversation_history: List[dict]) -> Dict[str, str]:
         logger.info(f"UserDecisionAgent making decision for scenario: {scenario[:50]}...")
         logger.info(f"Conversation history: {conversation_history}")
         
         messages = [
-            {"role": "system", "content": "You are a decision-making agent for the user. Based on the negotiation history, you need to make a final offer. Respond with a JSON object containing 'offer_details', 'price', 'terms', and 'extra' fields. Have a personality of candid business lawyer who is very outcome focused and factual, don't worry about introductory phrases. e.g.Our party proposes a price of x under these conditions."},
+            {"role": "system", "content": "You are a decision-making agent for the user. Based on the negotiation history, you need to make a final offer. Respond with a JSON object containing 'offer_details', 'price', 'terms', and 'extra' fields. Have a personality of candid business lawyer who is very outcome focused and factual, don't worry about introductory phrases. e.g. Our party proposes a price of x under these conditions."},
             {"role": "user", "content": f"Scenario: {scenario}\n\nConversation History:\n" + "\n".join([f"{'User' if r['side'] == 'user' else 'Opposition'}: {r['content']}" for r in conversation_history])}
         ]
 
@@ -118,7 +118,7 @@ class LawyerDecisionAgent:
     def __init__(self):
         self.model = "gpt-4o-mini"
 
-    async def make_decision(self, scenario: str, conversation_history: List[dict], user_offer: Dict[str, str]) -> Dict[str, str]:
+    def make_decision(self, scenario: str, conversation_history: List[dict], user_offer: Dict[str, str]) -> Dict[str, str]:
         logger.info(f"LawyerDecisionAgent making decision for scenario: {scenario[:50]}...")
         logger.info(f"Conversation history: {conversation_history}")
         logger.info(f"User offer: {user_offer}")
