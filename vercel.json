@@ -1,8 +1,25 @@
 {
-    "functions": {
-      "api/**": {
-        "maxDuration": 30
-      }
+  "functions": {
+    "api/**": {
+      "maxDuration": 30
     }
-  }
-  
+  },
+  "rewrites": [
+    {
+      "source": "/api/negotiate/user-agent",
+      "destination": "/api/negotiate/index.py"
+    },
+    {
+      "source": "/api/negotiate/opposition-agent",
+      "destination": "/api/negotiate/index.py"
+    },
+    {
+      "source": "/api/negotiate/user-decision",
+      "destination": "/api/negotiate/index.py"
+    },
+    {
+      "source": "/api/negotiate/lawyer-decision",
+      "destination": "/api/negotiate/index.py"
+    }
+  ]
+}
