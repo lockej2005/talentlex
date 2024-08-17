@@ -1,13 +1,149 @@
 from flask import Flask, request, jsonify
 import logging
-from user_lawyer_agent import UserLawyerAgent, UserDecisionAgent
-from opposing_lawyer_agent import OpposingLawyerAgent, LawyerDecisionAgent
+import os
+import json
+from openai import OpenAI
+from typing import List, Dict
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Initialize the OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+# Flask app initialization
 app = Flask(__name__)
+
+# Define the agents
+class UserLawyerAgent:
+    def __init__(self):
+        self.model = "gpt-4o-mini"
+
+    async def generate_response(self, scenario: str, previous_responses: List[dict]) -> Dict[str, str]:
+        logger.info(f"UserLawyerAgent generating response for scenario: {scenario[:50]}...")
+        logger.info(f"Previous responses: {previous_responses}")
+        
+        messages = [
+            {"role": "system", "content": "You are a Lawyer representing the user's request given in the scenario. You are speaking straight to the opposition in this negotiation, keep your responses short, concise, factual and straight to the point. Respond with a JSON object containing a 'heading' that summarises the crux of this argument iteration (max 10 words) and 'content' (max 100 words)."},
+            {"role": "user", "content": f"Scenario: {scenario}"}
+        ]
+
+        for response in previous_responses:
+            role = "assistant" if response["side"] == "user" else "user"
+            messages.append({"role": role, "content": response["content"]})
+
+        try:
+            response = client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                max_tokens=300,
+                temperature=0.7,
+                response_format={"type": "json_object"}
+            )
+            
+            result = json.loads(response.choices[0].message.content)
+            logger.info(f"UserLawyerAgent response: {result}")
+            return result
+
+        except Exception as e:
+            logger.error(f"Error in UserLawyerAgent: {str(e)}")
+            return {"heading": "Error", "content": "An error occurred while generating the response."}
+
+class OpposingLawyerAgent:
+    def __init__(self):
+        self.model = "gpt-4o-mini"
+
+    async def generate_response(self, scenario: str, previous_responses: List[dict]) -> Dict[str, str]:
+        logger.info(f"OpposingLawyerAgent generating response for scenario: {scenario[:50]}...")
+        logger.info(f"Previous responses: {previous_responses}")
+        
+        messages = [
+            {"role": "system", "content": "You are a Lawyer opposing the user's request given in the scenario. You are speaking straight to the user's lawyer in this negotiation, keep your responses short, concise, factual and straight to the point. Respond with a JSON object containing a 'heading' that summarises the crux of this argument iteration (max 10 words) and 'content' (max 100 words)."},
+            {"role": "user", "content": f"Scenario: {scenario}"}
+        ]
+
+        for response in previous_responses:
+            role = "assistant" if response["side"] == "opposing" else "user"
+            messages.append({"role": role, "content": response["content"]})
+
+        try:
+            response = client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                max_tokens=300,
+                temperature=0.7,
+                response_format={"type": "json_object"}
+            )
+            
+            result = json.loads(response.choices[0].message.content)
+            logger.info(f"OpposingLawyerAgent response: {result}")
+            return result
+
+        except Exception as e:
+            logger.error(f"Error in OpposingLawyerAgent: {str(e)}")
+            return {"heading": "Error", "content": "An error occurred while generating the response."}
+
+class UserDecisionAgent:
+    def __init__(self):
+        self.model = "gpt-4o-mini"
+
+    async def make_decision(self, scenario: str, conversation_history: List[dict]) -> Dict[str, str]:
+        logger.info(f"UserDecisionAgent making decision for scenario: {scenario[:50]}...")
+        logger.info(f"Conversation history: {conversation_history}")
+        
+        messages = [
+            {"role": "system", "content": "You are a decision-making agent for the user. Based on the negotiation history, you need to make a final offer. Respond with a JSON object containing 'offer_details', 'price', 'terms', and 'extra' fields. Have a personality of candid business lawyer who is very outcome focused and factual, don't worry about introductory phrases. e.g.Our party proposes a price of x under these conditions."},
+            {"role": "user", "content": f"Scenario: {scenario}\n\nConversation History:\n" + "\n".join([f"{'User' if r['side'] == 'user' else 'Opposition'}: {r['content']}" for r in conversation_history])}
+        ]
+
+        try:
+            response = client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                max_tokens=300,
+                temperature=0.7,
+                response_format={"type": "json_object"}
+            )
+            
+            result = json.loads(response.choices[0].message.content)
+            logger.info(f"UserDecisionAgent decision: {result}")
+            return result
+
+        except Exception as e:
+            logger.error(f"Error in UserDecisionAgent: {str(e)}")
+            return {"offer_details": "Error", "price": "N/A", "terms": "N/A", "extra": "An error occurred while generating the decision."}
+
+class LawyerDecisionAgent:
+    def __init__(self):
+        self.model = "gpt-4o-mini"
+
+    async def make_decision(self, scenario: str, conversation_history: List[dict], user_offer: Dict[str, str]) -> Dict[str, str]:
+        logger.info(f"LawyerDecisionAgent making decision for scenario: {scenario[:50]}...")
+        logger.info(f"Conversation history: {conversation_history}")
+        logger.info(f"User offer: {user_offer}")
+        
+        messages = [
+            {"role": "system", "content": "You are a decision-making agent for the opposing lawyer. Based on the negotiation history and the user's final offer, you need to decide whether to accept or reject the offer. Respond with a JSON object containing 'decision' (either 'accepted' or 'rejected') and 'justification' fields."},
+            {"role": "user", "content": f"Scenario: {scenario}\n\nConversation History:\n" + "\n".join([f"{'User' if r['side'] == 'user' else 'Opposition'}: {r['content']}" for r in conversation_history]) + f"\n\nUser's Final Offer:\n{json.dumps(user_offer, indent=2)}"}
+        ]
+
+        try:
+            response = client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                max_tokens=300,
+                temperature=0.7,
+                response_format={"type": "json_object"}
+            )
+            
+            result = json.loads(response.choices[0].message.content)
+            logger.info(f"LawyerDecisionAgent decision: {result}")
+            return result
+
+        except Exception as e:
+            logger.error(f"Error in LawyerDecisionAgent: {str(e)}")
+            return {"decision": "error", "justification": "An error occurred while generating the decision."}
 
 # Instantiate the agents
 user_agent = UserLawyerAgent()
@@ -15,6 +151,7 @@ opposing_agent = OpposingLawyerAgent()
 user_decision_agent = UserDecisionAgent()
 lawyer_decision_agent = LawyerDecisionAgent()
 
+# Flask routes
 @app.route("/user-agent", methods=["POST"])
 def user_agent_endpoint():
     try:
