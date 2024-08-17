@@ -198,7 +198,7 @@ def lawyer_decision_endpoint():
         return jsonify(response)
     except Exception as e:
         logger.error(f"Error in lawyer-decision endpoint: {str(e)}", exc_info=True)
-        return js   onify({"error": str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/<path:path_name>", methods=["GET", "POST", "PUT", "DELETE"])
 def catch_all(path_name):
