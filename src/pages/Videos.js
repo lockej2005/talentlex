@@ -56,7 +56,7 @@ const Videos = () => {
 
   return (
     <div className="videos-container">
-      <h1 className="videos-title">Tutorial Videos</h1>
+      <h1 className="videos-title">Instruction Videos</h1>
       <div className="videos-grid">
         {videos.map((video, index) => (
           <VideoCard key={index} {...video} />
