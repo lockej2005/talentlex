@@ -1,5 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import './ComparisonDashboard.css';
+
+// Initialize Supabase
+const supabaseUrl = 'https://atbphpeswwgqvwlbplko.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const ComparisonDashboard = () => {
   const [scenario, setScenario] = useState('');
@@ -8,6 +14,26 @@ const ComparisonDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [userOffer, setUserOffer] = useState(null);
   const [lawyerDecision, setLawyerDecision] = useState(null);
+  const [user, setUser] = useState(null);
+  const [totalTokens, setTotalTokens] = useState(0);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
+    getCurrentUser();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
 
   const toggleItem = (index) => {
     setOpenItems(prevOpenItems => {
@@ -22,11 +48,19 @@ const ComparisonDashboard = () => {
   };
 
   const handleSubmit = async () => {
+    if (!user) {
+      setError("Please log in to use this feature.");
+      return;
+    }
+
     setIsLoading(true);
     setNegotiationResults([]);
     setOpenItems(new Set());
     setUserOffer(null);
     setLawyerDecision(null);
+    setTotalTokens(0);
+    setError(null);
+
     try {
       let currentScenario = scenario;
       for (let i = 0; i < 5; i++) {
@@ -35,8 +69,13 @@ const ComparisonDashboard = () => {
         currentScenario = `${scenario}\n\nPrevious offers:\n${negotiationResults[negotiationResults.length - 2]?.content || ''}\n${negotiationResults[negotiationResults.length - 1]?.content || ''}`;
       }
       await getFinalDecision();
+
+      // Calculate cost and subtract credits
+      const cost = Math.round(totalTokens * 0.005);
+      await subtractCredits(cost);
     } catch (error) {
       console.error('Error:', error);
+      setError("An error occurred while processing your request.");
     }
     setIsLoading(false);
   };
@@ -69,6 +108,9 @@ const ComparisonDashboard = () => {
       });
 
       setOpenItems(prev => new Set([...prev, index]));
+
+      // Update total tokens
+      setTotalTokens(prev => prev + data.usage.total_tokens);
     } catch (error) {
       console.error('Error fetching response:', error);
       setNegotiationResults(prev => {
@@ -101,6 +143,7 @@ const ComparisonDashboard = () => {
 
       const userOfferData = await userOfferResponse.json();
       setUserOffer(userOfferData);
+      setTotalTokens(prev => prev + userOfferData.usage.total_tokens);
 
       console.log('User offer data:', userOfferData);
 
@@ -131,11 +174,42 @@ const ComparisonDashboard = () => {
 
       const lawyerDecisionData = await lawyerDecisionResponse.json();
       setLawyerDecision(lawyerDecisionData);
+      setTotalTokens(prev => prev + lawyerDecisionData.usage.total_tokens);
 
     } catch (error) {
       console.error('Error getting final decision:', error);
       setUserOffer({ offer_details: 'Error', price: 'N/A', terms: 'N/A', extra: 'Failed to fetch user offer.' });
       setLawyerDecision({ decision: 'error', justification: 'Failed to fetch lawyer decision.' });
+    }
+  };
+
+  const subtractCredits = async (cost) => {
+    try {
+      const { data: userData, error: userError } = await supabase
+        .from('profiles')
+        .select('credits')
+        .eq('id', user.id)
+        .single();
+
+      if (userError) throw userError;
+
+      if (userData.credits < cost) {
+        throw new Error('Insufficient credits');
+      }
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ credits: userData.credits - cost })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      setError(`Credits subtracted: ${cost}. Remaining credits: ${userData.credits - cost}`);
+    } catch (error) {
+      console.error('Error subtracting credits:', error);
+      setError(error.message === 'Insufficient credits' 
+        ? "Error: Insufficient credits to complete this operation." 
+        : "Error: Unable to process credits. Please try again later.");
     }
   };
 
@@ -219,13 +293,14 @@ const ComparisonDashboard = () => {
         <button 
           className="arena-upload-button" 
           onClick={handleSubmit} 
-          disabled={isLoading}
+          disabled={isLoading || !user}
         >
           {isLoading ? 'Processing...' : 'Submit'}
         </button>
       </div>
+      {error && <div className="arena-error">{error}</div>}
       <div className="arena-info-bar">
-        Iterations: {Math.floor(negotiationResults.filter(Boolean).length / 2)} | 2 Parties (User's Lawyer and Opposing Lawyer)
+        Iterations: {Math.floor(negotiationResults.filter(Boolean).length / 2)} | 2 Parties (User's Lawyer and Opposing Lawyer) | Total Tokens: {totalTokens}
       </div>
       <div className="arena-comparison-container">
         {renderColumn(true)}

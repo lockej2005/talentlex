@@ -48,12 +48,20 @@ class handler(BaseHTTPRequestHandler):
             )
 
             result = json.loads(completion.choices[0].message.content)
+            usage = completion.usage
 
             self.send_response(200)
             self.set_CORS_headers()
             self.send_header('Content-type', 'application/json')
             self.end_headers()
-            response = json.dumps(result)
+            response = json.dumps({
+                "result": result,
+                "usage": {
+                    "prompt_tokens": usage.prompt_tokens,
+                    "completion_tokens": usage.completion_tokens,
+                    "total_tokens": usage.total_tokens
+                }
+            })
             self.wfile.write(response.encode('utf-8'))
 
         except Exception as e:
