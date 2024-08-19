@@ -1,2 +1,2 @@
 openai
-supabase-python
+supabase-python==0.0.10
