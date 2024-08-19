@@ -24,6 +24,7 @@ function Comparison() {
   const [selectedFirm, setSelectedFirm] = useState({ value: "Goodwin", label: "Goodwin" });
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [responseTime, setResponseTime] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false); // Add expanded state
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -92,7 +93,7 @@ function Comparison() {
       case 'Sidley Austin':
         return sidleyAustinQuestions
       case 'Dechert':
-            return dechertQuestions;
+        return dechertQuestions;
       default:
         return [{ value: "Coming Soon", label: "Coming Soon" }];
     }
@@ -152,7 +153,7 @@ function Comparison() {
       const email = emailCookie ? emailCookie.split('=')[1] : null;
   
       // Send application to your API
-      const response = await fetch('http://localhost:8000/api/submit_application', {
+      const response = await fetch('/api/submit_application', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -205,9 +206,17 @@ function Comparison() {
   };
 
   const handleCreateDraft = async () => {
+    const areAllFieldsFilled = Object.values(additionalInfo).every((field) => field.trim() !== '');
+
+    if (!areAllFieldsFilled) {
+      setIsExpanded(true); // Expand the additional questions section
+      alert('Please fill out all the additional information fields before generating a draft.');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/create_application', {
+      const response = await fetch('/api/create_application', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -253,6 +262,8 @@ function Comparison() {
             getQuestions={getQuestions}
             additionalInfo={additionalInfo}
             onAdditionalInfoChange={handleAdditionalInfoChange}
+            isExpanded={isExpanded} // Pass expanded state
+            setIsExpanded={setIsExpanded} // Pass setter function
           />
         </div>
         <div className="divider" ref={dividerRef} onMouseDown={handleMouseDown}>

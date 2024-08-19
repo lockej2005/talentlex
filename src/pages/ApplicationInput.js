@@ -34,10 +34,10 @@ function ApplicationInput({
   firms, 
   getQuestions,
   additionalInfo,
-  onAdditionalInfoChange
+  onAdditionalInfoChange,
+  isExpanded, 
+  setIsExpanded // Pass down the expanded state and its setter
 }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   const customStyles = {
     control: (provided) => ({
       ...provided,
