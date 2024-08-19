@@ -97,20 +97,24 @@ const ComparisonDashboard = () => {
   
       const data = await response.json();
       
-      setNegotiationResults(prev => {
-        const newResults = [...prev];
-        newResults[index] = {
-          side: agent === 'user_agent' ? 'user' : 'opposing',
-          heading: data.heading || `${agent.split('_')[0].toUpperCase()} Response`,
-          content: data.content || data.response || 'No content provided',
-        };
-        return newResults;
-      });
+      if (data.result && data.usage) {
+        setNegotiationResults(prev => {
+          const newResults = [...prev];
+          newResults[index] = {
+            side: agent === 'user_agent' ? 'user' : 'opposing',
+            heading: data.result.heading || `${agent.split('_')[0].toUpperCase()} Response`,
+            content: data.result.content || 'No content provided',
+          };
+          return newResults;
+        });
 
-      setOpenItems(prev => new Set([...prev, index]));
+        setOpenItems(prev => new Set([...prev, index]));
 
-      // Update total tokens
-      setTotalTokens(prev => prev + (data.usage?.total_tokens || 0));
+        // Update total tokens
+        setTotalTokens(prev => prev + data.usage.total_tokens);
+      } else {
+        throw new Error('Unexpected response structure');
+      }
     } catch (error) {
       console.error('Error fetching response:', error);
       setNegotiationResults(prev => {
@@ -142,8 +146,12 @@ const ComparisonDashboard = () => {
       }
 
       const userOfferData = await userOfferResponse.json();
-      setUserOffer(userOfferData.offer || userOfferData);
-      setTotalTokens(prev => prev + (userOfferData.usage?.total_tokens || 0));
+      if (userOfferData.result && userOfferData.usage) {
+        setUserOffer(userOfferData.result);
+        setTotalTokens(prev => prev + userOfferData.usage.total_tokens);
+      } else {
+        throw new Error('Unexpected user offer response structure');
+      }
 
       // Get lawyer's decision
       const lawyerDecisionResponse = await fetch('/api/lawyer_descision', {
@@ -152,7 +160,7 @@ const ComparisonDashboard = () => {
         body: JSON.stringify({
           scenario,
           conversation_history: negotiationResults,
-          user_offer: userOfferData.offer || userOfferData
+          user_offer: userOfferData.result
         }),
       });
 
@@ -161,13 +169,17 @@ const ComparisonDashboard = () => {
       }
 
       const lawyerDecisionData = await lawyerDecisionResponse.json();
-      setLawyerDecision(lawyerDecisionData.decision || lawyerDecisionData);
-      setTotalTokens(prev => prev + (lawyerDecisionData.usage?.total_tokens || 0));
+      if (lawyerDecisionData.result && lawyerDecisionData.usage) {
+        setLawyerDecision(lawyerDecisionData.result);
+        setTotalTokens(prev => prev + lawyerDecisionData.usage.total_tokens);
+      } else {
+        throw new Error('Unexpected lawyer decision response structure');
+      }
 
     } catch (error) {
       console.error('Error getting final decision:', error);
-      setUserOffer({ offer_details: 'Error', price: 'N/A', terms: 'N/A', extra: 'Failed to fetch user offer.' });
-      setLawyerDecision({ decision: 'error', justification: 'Failed to fetch lawyer decision.' });
+      setUserOffer({ heading: 'Error', content: 'Failed to fetch user offer.' });
+      setLawyerDecision({ heading: 'Error', content: 'Failed to fetch lawyer decision.' });
     }
   };
 
@@ -222,12 +234,8 @@ const ComparisonDashboard = () => {
     return (
       <div className="arena-final-decision">
         <h3>User's Final Offer:</h3>
-        {Object.entries(userOffer).map(([key, value]) => (
-          <div key={key}>
-            <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>
-            {formatValue(value)}
-          </div>
-        ))}
+        <h4>{userOffer.heading}</h4>
+        <p>{userOffer.content}</p>
       </div>
     );
   };
@@ -238,8 +246,8 @@ const ComparisonDashboard = () => {
     return (
       <div className="arena-final-decision">
         <h3>Lawyer's Decision:</h3>
-        <p><strong>Decision:</strong> {lawyerDecision.decision || lawyerDecision}</p>
-        <p><strong>Justification:</strong> {lawyerDecision.justification || 'No justification provided'}</p>
+        <h4>{lawyerDecision.heading}</h4>
+        <p>{lawyerDecision.content}</p>
       </div>
     );
   };
