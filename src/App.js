@@ -9,6 +9,8 @@ import Scrape from './pages/Scrape';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import AIUsagePolicy from './pages/AIUsagePolicy';
 import ComparisonDashboard from './pages/ComparisonDashboard';
+import Videos from './pages/Videos';
+import SpeakToFounders from './pages/SpeakToFounders';
 
 const PrivateRoute = ({ children }) => {
   const [session, setSession] = useState(null);
@@ -28,7 +30,7 @@ const PrivateRoute = ({ children }) => {
   }, []);
 
   if (loading) {
-    return <div className="loading-spinner"></div>;  // Replaced "Loading..." with the spinner
+    return <div className="loading-spinner"></div>;
   }
 
   return session ? children : <Navigate to="/login" />;
@@ -52,8 +54,10 @@ function App() {
           <Route path="scrape" element={<Scrape />} />
           <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="ai-usage-policy" element={<AIUsagePolicy />} />
-          <Route path="/review-arena" element={<ComparisonDashboard />} />
-          {/* Add more private routes here as needed */}
+          <Route path="review-arena" element={<ComparisonDashboard />} />
+          <Route path="videos" element={<Videos />} />
+          <Route path="speak-to-founders" element={<SpeakToFounders />} /> {/* New route */}
+
         </Route>
       </Routes>
     </Router>

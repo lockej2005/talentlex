@@ -51,7 +51,6 @@ const PrivacyPolicy = () => {
             <li><strong>Data Portability:</strong> You have the right to obtain a copy of your data in a structured, commonly used format.</li>
             <li><strong>Withdraw Consent:</strong> If we've collected and processed your data with your consent, you can withdraw it at any time.</li>
           </ul>
-          <p>To exercise any of these rights, please access your account settings or contact our support team at [Insert Contact Information].</p>
 
           <h2>6. Children's Privacy</h2>
           <p>Our services are not directed to individuals under the age of 13. We do not knowingly collect personal information from children under 13. If you become aware that a child has provided us with personal data, please contact us, and we will take steps to remove such information.</p>

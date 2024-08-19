@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
-import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { supabase } from '../supabaseClient'; // Adjust the import path as needed
 import Comparison from './Comparison';
 import Scrape from './Scrape';
@@ -161,6 +161,14 @@ const Layout = () => {
               <li className={location.pathname === "/review-arena" ? "active" : ""}>
                 <Link to="/review-arena">Negotiation Arena</Link>
               </li>
+              <li className="section-title">Guide</li>
+              <div className='seperator'></div>
+              <li className={location.pathname === "/videos" ? "active" : ""}>
+                <Link to="/videos">Videos</Link>
+              </li>
+              <li className={location.pathname === "/speak-to-founders" ? "active" : ""}>
+                <Link to="/speak-to-founders">Speak to the Founders</Link>
+              </li>
               <li className="section-title">Legal</li>
               <div className='seperator'></div>
               <li className={location.pathname === "/privacy-policy" ? "active" : ""}>
@@ -189,13 +197,7 @@ const Layout = () => {
           <Menu size={24} />
         </button>
         <div className="content-area">
-          <Routes>
-            <Route path="/" element={<Comparison />} />
-            <Route path="/scrape" element={<Scrape />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/ai-usage-policy" element={<AIUsagePolicy />} />
-            <Route path="/review-arena" element={<ComparisonDashboard />} />
-          </Routes>
+        <Outlet /> {/* This will render the nested routes */}
         </div>
       </div>
       {showOverlay && (
