@@ -52,6 +52,7 @@ const PopupSocietyDetails = ({ society, onClose }) => {
 
 const Layout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
   const [userName, setUserName] = useState('');
   const [societyName, setSocietyName] = useState('');
   const [societyDetails, setSocietyDetails] = useState(null);
@@ -110,6 +111,12 @@ const Layout = () => {
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
+    setShowOverlay(!menuOpen);
+  };
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+    setShowOverlay(false);
   };
 
   const handleLogout = async () => {
@@ -191,6 +198,9 @@ const Layout = () => {
           </Routes>
         </div>
       </div>
+      {showOverlay && (
+        <div className="menu-overlay" onClick={closeMenu}></div>
+      )}
       {showJoinPopup && (
         <PopupSocietyJoin 
           onClose={() => setShowJoinPopup(false)}
