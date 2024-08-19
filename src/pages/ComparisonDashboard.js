@@ -178,8 +178,8 @@ const ComparisonDashboard = () => {
 
     } catch (error) {
       console.error('Error getting final decision:', error);
-      setUserOffer({ offer_details: 'Error', price: 'N/A', terms: 'N/A', extra: 'Failed to fetch user offer.' });
-      setLawyerDecision({ decision: 'error', justification: 'Failed to fetch lawyer decision.' });
+      setUserOffer({ error: 'Failed to fetch user offer.' });
+      setLawyerDecision({ error: 'Failed to fetch lawyer decision.' });
     }
   };
 
@@ -217,44 +217,48 @@ const ComparisonDashboard = () => {
     }
   };
 
-  const formatValue = (value) => {
-    if (typeof value === 'object' && value !== null) {
+  const renderJsonStructure = (data, depth = 0) => {
+    if (data === null || data === undefined) return <span>N/A</span>;
+
+    if (typeof data !== 'object') {
+      return <span>{String(data)}</span>;
+    }
+
+    if (Array.isArray(data)) {
       return (
-        <ul>
-          {Object.entries(value).map(([key, val]) => (
-            <li key={key}>
-              <strong>{key}:</strong> {formatValue(val)}
-            </li>
+        <ul style={{ paddingLeft: `${depth * 20}px`, listStyleType: 'none' }}>
+          {data.map((item, index) => (
+            <li key={index}>{renderJsonStructure(item, depth + 1)}</li>
           ))}
         </ul>
       );
     }
-    return String(value);
-  };
 
-  const renderUserOffer = () => {
-    if (!userOffer) return null;
-  
     return (
-      <div className="arena-final-decision">
-        <h3>User's Final Offer:</h3>
-        <p><strong>Offer Details:</strong> {userOffer.offer_details || 'N/A'}</p>
-        <p><strong>Price:</strong> ${userOffer.price || 'N/A'}</p>
-        <p><strong>Terms:</strong></p>
-        {userOffer.terms ? formatValue(userOffer.terms) : 'N/A'}
-        <p><strong>Extra:</strong> {userOffer.extra || 'N/A'}</p>
+      <div style={{ paddingLeft: `${depth * 20}px` }}>
+        {Object.entries(data).map(([key, value]) => (
+          <div key={key}>
+            <strong>{key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}:</strong>{' '}
+            {renderJsonStructure(value, depth + 1)}
+          </div>
+        ))}
       </div>
     );
   };
 
-  const renderLawyerDecision = () => {
-    if (!lawyerDecision) return null;
+  const renderDecision = (title, data) => {
+    if (!data) return null;
   
+    console.log(`${title} data:`, data);  // Add this line for debugging
+
     return (
       <div className="arena-final-decision">
-        <h3>Lawyer's Decision:</h3>
-        <p><strong>Decision:</strong> {lawyerDecision.decision || 'N/A'}</p>
-        <p><strong>Justification:</strong> {lawyerDecision.justification || 'N/A'}</p>
+        <h3>{title}:</h3>
+        {data.error ? (
+          <p>{data.error}</p>
+        ) : (
+          renderJsonStructure(data)
+        )}
       </div>
     );
   };
@@ -309,8 +313,8 @@ const ComparisonDashboard = () => {
         {renderColumn(true)}
         {renderColumn(false)}
       </div>
-      {renderUserOffer()}
-      {renderLawyerDecision()}
+      {renderDecision("User's Final Offer", userOffer)}
+      {renderDecision("Lawyer's Decision", lawyerDecision)}
     </div>
   );
 };
