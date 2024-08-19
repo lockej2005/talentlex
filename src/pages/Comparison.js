@@ -32,6 +32,7 @@ function Comparison() {
     personalInfo: ''
   });
   const [user, setUser] = useState(null);
+  const [totalTokens, setTotalTokens] = useState(0);
 
   const firms = [
     { value: "Goodwin", label: "Goodwin" },
@@ -160,6 +161,7 @@ function Comparison() {
   const handleSubmit = async () => {
     setIsLoading(true);
     const startTime = Date.now();
+    let localTotalTokens = 0;
     try {
       // Get device info
       const userAgent = navigator.userAgent;
@@ -177,7 +179,7 @@ function Comparison() {
           applicationText,
           firm: selectedFirm.value,
           question: selectedQuestion.value,
-          email  // Include the email in the submission
+          email
         }),
       });
   
@@ -189,30 +191,9 @@ function Comparison() {
       console.log(data);
       setFeedback(data.feedback);
   
-      // Calculate cost
-      const totalTokens = data.usage.total_tokens; // Assuming the response contains token usage
-      const cost = Math.round(totalTokens * 0.005);
-      console.log(cost);
-  
-      // Get user's current credits
-      const { data: userData, error: userError } = await supabase
-        .from('profiles')
-        .select('credits')
-        .eq('id', user.id)
-        .single();
-      if (userError) throw userError;
-  
-      if (userData.credits < cost) {
-        throw new Error('Insufficient credits');
-      }
-  
-      // Update user's credits
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ credits: userData.credits - cost })
-        .eq('id', user.id);
-  
-      if (updateError) throw updateError;
+      // Update total tokens
+      localTotalTokens += data.usage.total_tokens;
+      setTotalTokens(localTotalTokens);
   
       // Record data in Supabase
       const { data: insertData, error } = await supabase
@@ -222,7 +203,7 @@ function Comparison() {
           question: selectedQuestion.value,
           application_text: applicationText,
           feedback: data.feedback,
-          email,  // Include email here as well
+          email,
           device: userAgent,
           screen_size: screenSize,
           timestamp: new Date().toISOString()
@@ -231,20 +212,18 @@ function Comparison() {
       if (error) throw error;
   
       const endTime = Date.now();
-      setResponseTime((endTime - startTime) / 1000); // Convert to seconds
+      setResponseTime((endTime - startTime) / 1000);
   
+      // Calculate cost and subtract credits
+      const cost = Math.round(localTotalTokens * 0.005);
+      await subtractCredits(cost);
     } catch (error) {
       console.error("Error:", error);
-      if (error.message === 'Insufficient credits') {
-        setFeedback("Error: Insufficient credits to submit application. Please add more credits to your account.");
-      } else {
-        setFeedback("Error: Unable to process your application. Please try again later.");
-      }
+      setFeedback("Error: Unable to process your application. Please try again later.");
     } finally {
       setIsLoading(false);
     }
   };
-  
 
   const handleAdditionalInfoChange = (field, value) => {
     setAdditionalInfo(prev => ({ ...prev, [field]: value }));
@@ -265,6 +244,7 @@ function Comparison() {
     }
 
     setIsLoading(true);
+    let localTotalTokens = 0;
     try {
       const response = await fetch('/api/create_application', {
         method: 'POST',
@@ -285,102 +265,15 @@ function Comparison() {
       const data = await response.json();
       console.log('Usage:', data.usage);
 
-      // Calculate cost
-      const totalTokens = data.usage.total_tokens;
-      const cost = Math.round(totalTokens * 0.005);
-      console.log(cost);      
-      // Get user's current credits
-      const { data: userData, error: userError } = await supabase
-        .from('profiles')
-        .select('credits')
-        .eq('id', user.id)
-        .single();
-      if (userError) throw userError;
-
-      if (userData.credits < cost) {
-        throw new Error('Insufficient credits');
-      }
-
-      // Update user's credits
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ credits: userData.credits - cost })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
+      // Update total tokens
+      localTotalTokens += data.usage.total_tokens;
+      setTotalTokens(localTotalTokens);
 
       setApplicationText(data.draft);
+
+      // Calculate cost and subtract credits
+      const cost = Math.round(localTotalTokens * 0.005);
+      await subtractCredits(cost);
     } catch (error) {
       console.error('Error:', error);
-      if (error.message === 'Insufficient credits') {
-        setFeedback("Error: Insufficient credits to generate draft. Please add more credits to your account.");
-      } else {
-        setFeedback("Error: Unable to generate draft. Please try again later.");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="comparison-container">
-      {showPopup && <EmailPopup onClose={closePopup} />}
-      <div className="header">
-      </div>
-      <div className="divider2"></div>
-
-      <div className="content" ref={containerRef}>
-        <div className="left-column" style={{width: `${leftWidth}%`}}>
-          <ApplicationInput
-            applicationText={applicationText}
-            setApplicationText={setApplicationText}
-            selectedFirm={selectedFirm}
-            setSelectedFirm={setSelectedFirm}
-            selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
-            firms={firms}
-            getQuestions={getQuestions}
-            additionalInfo={additionalInfo}
-            onAdditionalInfoChange={handleAdditionalInfoChange}
-            isExpanded={isExpanded}
-            setIsExpanded={setIsExpanded}
-          />
-        </div>
-        <div className="divider" ref={dividerRef} onMouseDown={handleMouseDown}>
-          <div className="divider-line top"></div>
-          <div className="divider-handle">
-            <FontAwesomeIcon icon={faArrowsLeftRight} />
-          </div>
-          <div className="divider-line bottom"></div>
-        </div>
-        <div className="right-column" style={{width: `${100 - leftWidth}%`}}>
-          <div className="button-container">
-            <button className="submit-button" onClick={handleSubmit} disabled={isLoading}>
-              {isLoading ? 'Sending...' : 'Send for Review'}
-            </button>
-            <button className="submit-button" onClick={handleCreateDraft} disabled={isLoading}>
-              {isLoading ? 'Generating...' : 'Generate a Draft'}
-            </button>
-          </div>
-          <div className="title-card">
-            <h3>Your Review</h3>
-            <p className="subtext">
-              {isLoading ? '⏳🙄👀' : 
-               feedback ? `Your review took ${responseTime ? responseTime.toFixed(2) : '...'} seconds to generate` : 
-               'Review will pop up on this side.'}
-            </p>
-          </div>
-          <div className="text-content">
-            {feedback ? (
-              <ReactMarkdown>{feedback}</ReactMarkdown>
-            ) : (
-              <p>{isLoading ? 'Generating your review...' : 'Submit your application to receive feedback.'}</p>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default Comparison;
+      setFeedback("Error: Unable to generate draft. Please try again later.");
