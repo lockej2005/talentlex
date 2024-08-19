@@ -75,7 +75,13 @@ class handler(BaseHTTPRequestHandler):
             )
 
             generated_draft = completion.choices[0].message.content
-            usage = completion.usage  # Extract the usage information
+
+            # Extract and format the usage information
+            usage = {
+                "prompt_tokens": completion.usage["prompt_tokens"],
+                "completion_tokens": completion.usage["completion_tokens"],
+                "total_tokens": completion.usage["total_tokens"]
+            }
 
             self.send_response(200)
             self.set_CORS_headers()
@@ -84,7 +90,7 @@ class handler(BaseHTTPRequestHandler):
             response = json.dumps({
                 "success": True,
                 "draft": generated_draft,
-                "usage": usage  # Include the usage data in the response
+                "usage": usage  # Send back a simplified usage object
             })
             self.wfile.write(response.encode('utf-8'))
 

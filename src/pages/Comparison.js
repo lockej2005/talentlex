@@ -34,7 +34,6 @@ function Comparison() {
     relevantInteraction: '',
     personalInfo: ''
   });
-  const [userUUID, setUserUUID] = useState(null);
 
   const firms = [
     { value: "Goodwin", label: "Goodwin" },
@@ -101,16 +100,6 @@ function Comparison() {
   };
 
   useEffect(() => {
-    // Fetch the logged-in user's UUID
-    const fetchUserUUID = async () => {
-      const user = await supabase.auth.getUser();
-      if (user.data && user.data.user) {
-        setUserUUID(user.data.user.id);
-      }
-    };
-
-    fetchUserUUID();
-
     // Check if the email cookie exists
     const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email='));
     if (!emailCookie) {
@@ -173,8 +162,7 @@ function Comparison() {
           applicationText, 
           firm: selectedFirm.value, 
           question: selectedQuestion.value,
-          email,  // Include the email in the submission
-          uuid: userUUID  // Include the user's UUID in the submission
+          email  // Include the email in the submission
         }),
       });
   
@@ -195,7 +183,6 @@ function Comparison() {
           application_text: applicationText,
           feedback: data.feedback,
           email,  // Include email here as well
-          uuid: userUUID, // Include UUID in the submission
           device: userAgent,
           screen_size: screenSize,
           timestamp: new Date().toISOString()
@@ -237,8 +224,7 @@ function Comparison() {
         body: JSON.stringify({
           firm: selectedFirm.value,
           question: selectedQuestion.value,
-          ...additionalInfo,
-          uuid: userUUID  // Include the user's UUID in the submission
+          ...additionalInfo
         }),
       });
 
@@ -247,6 +233,7 @@ function Comparison() {
       }
 
       const data = await response.json();
+      console.log('Usage:', data.usage); // Log the usage in the console
       setApplicationText(data.draft);
     } catch (error) {
       console.error('Error:', error);
