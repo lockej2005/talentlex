@@ -49,9 +49,7 @@ const Signup = () => {
         if (updateError) throw updateError;
       }
 
-      // Show success message and redirect
-      alert('Signup successful! Please check your email to verify your account.');
-      navigate('/login');
+      navigate('/');
     } catch (error) {
       setError(error.message);
     }
