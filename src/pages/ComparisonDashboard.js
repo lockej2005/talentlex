@@ -178,8 +178,8 @@ const ComparisonDashboard = () => {
 
     } catch (error) {
       console.error('Error getting final decision:', error);
-      setUserOffer({ heading: 'Error', content: 'Failed to fetch user offer.' });
-      setLawyerDecision({ heading: 'Error', content: 'Failed to fetch lawyer decision.' });
+      setUserOffer({ offer_details: 'Error', price: 'N/A', terms: 'N/A', extra: 'Failed to fetch user offer.' });
+      setLawyerDecision({ decision: 'error', justification: 'Failed to fetch lawyer decision.' });
     }
   };
 
@@ -234,8 +234,11 @@ const ComparisonDashboard = () => {
     return (
       <div className="arena-final-decision">
         <h3>User's Final Offer:</h3>
-        <h4>{userOffer.heading}</h4>
-        <p>{userOffer.content}</p>
+        <p><strong>Offer Details:</strong> {userOffer.offer_details}</p>
+        <p><strong>Price:</strong> ${userOffer.price}</p>
+        <p><strong>Terms:</strong></p>
+        {formatValue(userOffer.terms)}
+        <p><strong>Extra:</strong> {userOffer.extra}</p>
       </div>
     );
   };
@@ -246,8 +249,8 @@ const ComparisonDashboard = () => {
     return (
       <div className="arena-final-decision">
         <h3>Lawyer's Decision:</h3>
-        <h4>{lawyerDecision.heading}</h4>
-        <p>{lawyerDecision.content}</p>
+        <p><strong>Decision:</strong> {lawyerDecision.decision}</p>
+        <p><strong>Justification:</strong> {lawyerDecision.justification}</p>
       </div>
     );
   };
