@@ -101,8 +101,8 @@ const ComparisonDashboard = () => {
         const newResults = [...prev];
         newResults[index] = {
           side: agent === 'user_agent' ? 'user' : 'opposing',
-          heading: data.heading,
-          content: data.content,
+          heading: data.heading || `${agent.split('_')[0].toUpperCase()} Response`,
+          content: data.content || data.response || 'No content provided',
         };
         return newResults;
       });
@@ -110,7 +110,7 @@ const ComparisonDashboard = () => {
       setOpenItems(prev => new Set([...prev, index]));
 
       // Update total tokens
-      setTotalTokens(prev => prev + data.usage.total_tokens);
+      setTotalTokens(prev => prev + (data.usage?.total_tokens || 0));
     } catch (error) {
       console.error('Error fetching response:', error);
       setNegotiationResults(prev => {
@@ -142,15 +142,8 @@ const ComparisonDashboard = () => {
       }
 
       const userOfferData = await userOfferResponse.json();
-      setUserOffer(userOfferData);
-      setTotalTokens(prev => prev + userOfferData.usage.total_tokens);
-
-      console.log('User offer data:', userOfferData);
-
-      // Ensure userOfferData is not null or undefined
-      if (!userOfferData) {
-        throw new Error('User offer data is null or undefined');
-      }
+      setUserOffer(userOfferData.offer || userOfferData);
+      setTotalTokens(prev => prev + (userOfferData.usage?.total_tokens || 0));
 
       // Get lawyer's decision
       const lawyerDecisionResponse = await fetch('/api/lawyer_descision', {
@@ -159,12 +152,7 @@ const ComparisonDashboard = () => {
         body: JSON.stringify({
           scenario,
           conversation_history: negotiationResults,
-          user_offer: {
-            offer_details: typeof userOfferData.offer_details === 'string' ? userOfferData.offer_details : JSON.stringify(userOfferData.offer_details),
-            price: userOfferData.price.toString(),
-            terms: typeof userOfferData.terms === 'string' ? userOfferData.terms : JSON.stringify(userOfferData.terms),
-            extra: typeof userOfferData.extra === 'string' ? userOfferData.extra : JSON.stringify(userOfferData.extra)
-          }
+          user_offer: userOfferData.offer || userOfferData
         }),
       });
 
@@ -173,8 +161,8 @@ const ComparisonDashboard = () => {
       }
 
       const lawyerDecisionData = await lawyerDecisionResponse.json();
-      setLawyerDecision(lawyerDecisionData);
-      setTotalTokens(prev => prev + lawyerDecisionData.usage.total_tokens);
+      setLawyerDecision(lawyerDecisionData.decision || lawyerDecisionData);
+      setTotalTokens(prev => prev + (lawyerDecisionData.usage?.total_tokens || 0));
 
     } catch (error) {
       console.error('Error getting final decision:', error);
@@ -250,8 +238,8 @@ const ComparisonDashboard = () => {
     return (
       <div className="arena-final-decision">
         <h3>Lawyer's Decision:</h3>
-        <p><strong>Decision:</strong> {lawyerDecision.decision}</p>
-        <p><strong>Justification:</strong> {lawyerDecision.justification}</p>
+        <p><strong>Decision:</strong> {lawyerDecision.decision || lawyerDecision}</p>
+        <p><strong>Justification:</strong> {lawyerDecision.justification || 'No justification provided'}</p>
       </div>
     );
   };
