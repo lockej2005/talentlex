@@ -86,7 +86,7 @@ const ComparisonDashboard = () => {
   const getFinalDecision = async () => {
     try {
       // Get user's final offer
-      const userOfferResponse = await fetch('/api/user_decision', {
+      const userOfferResponse = await fetch('/api/user_descision', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
