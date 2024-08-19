@@ -1,9 +1,16 @@
 from http.server import BaseHTTPRequestHandler
 from openai import OpenAI
+from supabase import create_client, Client
 import os
 import json
 
+# Initialize OpenAI client
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+# Initialize Supabase client
+supabase_url = "https://atbphpeswwgqvwlbplko.supabase.co"
+supabase_key = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(supabase_url, supabase_key)
 
 def read_prompt(filename):
     with open(os.path.join(os.path.dirname(__file__), filename), 'r') as file:
@@ -37,6 +44,7 @@ class handler(BaseHTTPRequestHandler):
         relevant_experience = data.get('relevantExperience')
         relevant_interaction = data.get('relevantInteraction')
         personal_info = data.get('personalInfo')
+        uuid = data.get('uuid')  # Get the user's UUID from the request data
         
         if not firm or not question:
             self.send_error(400, "Missing required data")
@@ -75,6 +83,27 @@ class handler(BaseHTTPRequestHandler):
             )
 
             generated_draft = completion.choices[0].message.content
+            usage = completion.usage["total_tokens"]  # Get the token usage
+            cost_in_credits = usage * 0.4  # Calculate the cost in credits
+
+            # Query Supabase to get the current credits of the user
+            user_data = supabase.from_('profiles').select('credits').eq('id', uuid).single().execute()
+            if user_data.error:
+                self.send_error(500, "Failed to retrieve user data")
+                return
+
+            current_credits = user_data.data['credits']
+            new_credits = current_credits - cost_in_credits
+
+            if new_credits < 0:
+                self.send_error(400, "Insufficient credits")
+                return
+
+            # Update the user's credits in Supabase
+            update_response = supabase.from_('profiles').update({'credits': new_credits}).eq('id', uuid).execute()
+            if update_response.error:
+                self.send_error(500, "Failed to update user credits")
+                return
 
             self.send_response(200)
             self.set_CORS_headers()
@@ -82,7 +111,8 @@ class handler(BaseHTTPRequestHandler):
             self.end_headers()
             response = json.dumps({
                 "success": True,
-                "draft": generated_draft
+                "draft": generated_draft,
+                "remaining_credits": new_credits
             })
             self.wfile.write(response.encode('utf-8'))
 

@@ -24,7 +24,7 @@ function Comparison() {
   const [selectedFirm, setSelectedFirm] = useState({ value: "Goodwin", label: "Goodwin" });
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [responseTime, setResponseTime] = useState(null);
-  const [isExpanded, setIsExpanded] = useState(false); // Add expanded state
+  const [isExpanded, setIsExpanded] = useState(false);
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -34,6 +34,7 @@ function Comparison() {
     relevantInteraction: '',
     personalInfo: ''
   });
+  const [userUUID, setUserUUID] = useState(null);
 
   const firms = [
     { value: "Goodwin", label: "Goodwin" },
@@ -100,6 +101,16 @@ function Comparison() {
   };
 
   useEffect(() => {
+    // Fetch the logged-in user's UUID
+    const fetchUserUUID = async () => {
+      const user = await supabase.auth.getUser();
+      if (user.data && user.data.user) {
+        setUserUUID(user.data.user.id);
+      }
+    };
+
+    fetchUserUUID();
+
     // Check if the email cookie exists
     const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email='));
     if (!emailCookie) {
@@ -163,6 +174,7 @@ function Comparison() {
           firm: selectedFirm.value, 
           question: selectedQuestion.value,
           email,  // Include the email in the submission
+          uuid: userUUID  // Include the user's UUID in the submission
         }),
       });
   
@@ -183,6 +195,7 @@ function Comparison() {
           application_text: applicationText,
           feedback: data.feedback,
           email,  // Include email here as well
+          uuid: userUUID, // Include UUID in the submission
           device: userAgent,
           screen_size: screenSize,
           timestamp: new Date().toISOString()
@@ -224,7 +237,8 @@ function Comparison() {
         body: JSON.stringify({
           firm: selectedFirm.value,
           question: selectedQuestion.value,
-          ...additionalInfo
+          ...additionalInfo,
+          uuid: userUUID  // Include the user's UUID in the submission
         }),
       });
 
