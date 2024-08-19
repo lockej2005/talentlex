@@ -30,8 +30,8 @@ const ComparisonDashboard = () => {
     try {
       let currentScenario = scenario;
       for (let i = 0; i < 5; i++) {
-        await getResponse('user-agent', currentScenario, i * 2);
-        await getResponse('opposition-agent', currentScenario, i * 2 + 1);
+        await getResponse('user_agent', currentScenario, i * 2);
+        await getResponse('opposition_agent', currentScenario, i * 2 + 1);
         currentScenario = `${scenario}\n\nPrevious offers:\n${negotiationResults[negotiationResults.length - 2]?.content || ''}\n${negotiationResults[negotiationResults.length - 1]?.content || ''}`;
       }
       await getFinalDecision();
@@ -86,7 +86,7 @@ const ComparisonDashboard = () => {
   const getFinalDecision = async () => {
     try {
       // Get user's final offer
-      const userOfferResponse = await fetch('/api/user-decision', {
+      const userOfferResponse = await fetch('/api/user_decision', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -110,7 +110,7 @@ const ComparisonDashboard = () => {
       }
 
       // Get lawyer's decision
-      const lawyerDecisionResponse = await fetch('/api/lawyer-decision', {
+      const lawyerDecisionResponse = await fetch('/api/lawyer_decision', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
