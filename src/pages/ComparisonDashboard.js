@@ -61,7 +61,7 @@ const ComparisonDashboard = () => {
       setNegotiationResults(prev => {
         const newResults = [...prev];
         newResults[index] = {
-          side: agent === 'user-agent' ? 'user' : 'opposing',
+          side: agent === 'user_agent' ? 'user' : 'opposing',
           heading: data.heading,
           content: data.content,
         };
@@ -74,7 +74,7 @@ const ComparisonDashboard = () => {
       setNegotiationResults(prev => {
         const newResults = [...prev];
         newResults[index] = {
-          side: agent === 'user-agent' ? 'user' : 'opposing',
+          side: agent === 'user_agent' ? 'user' : 'opposing',
           heading: 'Error',
           content: 'Failed to fetch response.',
         };
