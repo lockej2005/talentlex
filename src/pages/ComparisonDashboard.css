@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.arena-comparison-dashboard {
+  font-family: 'Inter', sans-serif;
+  background-color: #E4E4E4;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.arena-input-area {
+  background-color: #276D8B;
+  color: white;
+  padding: 24px;
+  border-radius: 12px 12px 0 0;
+  position: relative;
+  margin-bottom: 1px;
+}
+
+.arena-input-area textarea {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 16px;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.arena-input-area textarea::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.arena-upload-button {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.arena-upload-button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
+.arena-info-bar {
+  background-color: #D9D9D9;
+  padding: 12px 24px;
+  font-size: 14px;
+  border-radius: 0 0 12px 12px;
+  margin-bottom: 24px;
+}
+
+.arena-comparison-container {
+  display: flex;
+  flex-grow: 1;
+  gap: 24px;
+  overflow: hidden;
+}
+
+.arena-column {
+  width: 50%;
+  padding: 24px;
+  overflow-y: auto;
+  border-radius: 12px;
+}
+
+.arena-left-column {
+  background-color: #276D8B;
+  color: white;
+}
+
+.arena-right-column {
+  background-color: #F0F0F0;
+  color: black;
+}
+
+.arena-item {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.arena-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  cursor: pointer;
+  font-weight: 500;
+  user-select: none;
+}
+
+.arena-expand-button {
+  font-size: 24px;
+  transition: transform 0.3s ease;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arena-item-content {
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.arena-right-column .arena-item {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.arena-right-column .arena-item-content {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar styling */
+.arena-column::-webkit-scrollbar {
+  width: 8px;
+}
+
+.arena-column::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.arena-column::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.arena-left-column::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.arena-final-decision {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 15px 0;
+  }
+  
+  .arena-final-decision h3 {
+    margin-top: 0;
+    color: #276D8B;
+  }
+  
+  .arena-final-decision ul {
+    margin: 5px 0;
+    padding-left: 20px;
+  }
+  
+  .arena-final-decision li {
+    margin-bottom: 5px;
+  }
+
+  .arena-column-heading {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: left;
+    color: #333;
+  }
+  
+  .arena-left-column .arena-column-heading {
+    color: #ffffff; /* or any color you prefer for the user's lawyer */
+  }
+  
+  .arena-right-column .arena-column-heading {
+    color: #111; /* or any color you prefer for the opposition lawyer */
+  }

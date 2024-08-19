@@ -1,16 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Select from 'react-select';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import './ApplicationInput.css';
 
-function EditableContent({ value, onChange }) {
-  const [wordCount, setWordCount] = useState(0);
-
-  useEffect(() => {
-    const words = value.trim().split(/\s+/);
-    setWordCount(words.length);
-  }, [value]);
-
+function EditableContent({ value, onChange, wordCount }) {
   return (
     <div className="editable-content-container">
       <textarea
@@ -44,10 +37,11 @@ function ApplicationInput({
   firms, 
   getQuestions,
   additionalInfo,
-  onAdditionalInfoChange
+  onAdditionalInfoChange,
+  isExpanded, 
+  setIsExpanded,
+  wordCount
 }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   const customStyles = {
     control: (provided) => ({
       ...provided,
@@ -147,6 +141,7 @@ function ApplicationInput({
         <EditableContent 
           value={applicationText} 
           onChange={(newText) => setApplicationText(newText)} 
+          wordCount={wordCount}
         />
       </div>
     </div>

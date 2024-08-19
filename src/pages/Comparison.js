@@ -2,14 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
 import ReactMarkdown from 'react-markdown';
-import { loadStripe } from '@stripe/stripe-js';
 import { createClient } from '@supabase/supabase-js';
 import EmailPopup from './EmailPopup';
 import ApplicationInput from './ApplicationInput';
 import './comparison.css';
-
-// Initialize Stripe
-const stripePromise = loadStripe('pk_live_51P4eASP1v3Dm1cKPvctekur3arCo5DAO0Bdgk9cHm1V4i3MPJWnFTS94UsfF45bUUlilPdShd2TdpLNht3IZBhXI00lZTdbwPr');
 
 // Initialize Supabase
 const supabaseUrl = 'https://atbphpeswwgqvwlbplko.supabase.co';
@@ -24,6 +20,7 @@ function Comparison() {
   const [selectedFirm, setSelectedFirm] = useState({ value: "Goodwin", label: "Goodwin" });
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [responseTime, setResponseTime] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -33,6 +30,9 @@ function Comparison() {
     relevantInteraction: '',
     personalInfo: ''
   });
+  const [user, setUser] = useState(null);
+  const [totalTokens, setTotalTokens] = useState(0);
+  const [wordCount, setWordCount] = useState(0);
 
   const firms = [
     { value: "Goodwin", label: "Goodwin" },
@@ -92,24 +92,45 @@ function Comparison() {
       case 'Sidley Austin':
         return sidleyAustinQuestions
       case 'Dechert':
-            return dechertQuestions;
+        return dechertQuestions;
       default:
         return [{ value: "Coming Soon", label: "Coming Soon" }];
     }
   };
 
   useEffect(() => {
-    // Check if the email cookie exists
     const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email='));
     if (!emailCookie) {
       setShowPopup(true);
     }
+    
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
+    getCurrentUser();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
     const questions = getQuestions(selectedFirm.value);
     setSelectedQuestion(questions[0]);
   }, [selectedFirm]);
+
+  useEffect(() => {
+    const calculateWordCount = (text) => {
+      return text.trim().split(/\s+/).filter(word => word !== '').length;
+    };
+    setWordCount(calculateWordCount(applicationText));
+  }, [applicationText]);
 
   const closePopup = () => {
     setShowPopup(false);
@@ -144,24 +165,23 @@ function Comparison() {
   const handleSubmit = async () => {
     setIsLoading(true);
     const startTime = Date.now();
+    let localTotalTokens = 0;
     try {
-      // Get device info
       const userAgent = navigator.userAgent;
       const screenSize = `${window.screen.width}x${window.screen.height}`;
       const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email='));
       const email = emailCookie ? emailCookie.split('=')[1] : null;
   
-      // Send application to your API
       const response = await fetch('/api/submit_application', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          applicationText, 
-          firm: selectedFirm.value, 
+        body: JSON.stringify({
+          applicationText,
+          firm: selectedFirm.value,
           question: selectedQuestion.value,
-          email,
+          email
         }),
       });
   
@@ -173,7 +193,9 @@ function Comparison() {
       console.log(data);
       setFeedback(data.feedback);
   
-      // Record data in Supabase
+      localTotalTokens += data.usage.total_tokens;
+      setTotalTokens(localTotalTokens);
+  
       const { data: insertData, error } = await supabase
         .from('applications')
         .insert({
@@ -190,22 +212,38 @@ function Comparison() {
       if (error) throw error;
   
       const endTime = Date.now();
-      setResponseTime((endTime - startTime) / 1000); // Convert to seconds
+      setResponseTime((endTime - startTime) / 1000);
   
+      const cost = Math.round(localTotalTokens * 0.005);
+      await subtractCredits(cost);
     } catch (error) {
       console.error("Error:", error);
       setFeedback("Error: Unable to process your application. Please try again later.");
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
 
   const handleAdditionalInfoChange = (field, value) => {
     setAdditionalInfo(prev => ({ ...prev, [field]: value }));
   };
 
   const handleCreateDraft = async () => {
+    const areAllFieldsFilled = Object.values(additionalInfo).every((field) => field.trim() !== '');
+
+    if (!areAllFieldsFilled) {
+      setIsExpanded(true);
+      alert('Please fill out all the additional information fields before generating a draft.');
+      return;
+    }
+
+    if (!user) {
+      alert('User not logged in. Please log in to generate a draft.');
+      return;
+    }
+
     setIsLoading(true);
+    let localTotalTokens = 0;
     try {
       const response = await fetch('/api/create_application', {
         method: 'POST',
@@ -224,32 +262,54 @@ function Comparison() {
       }
 
       const data = await response.json();
+      console.log('Usage:', data.usage);
+
+      localTotalTokens += data.usage.total_tokens;
+      setTotalTokens(localTotalTokens);
+
       setApplicationText(data.draft);
 
-      // Log the draft generation to the database
-      const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email='));
-      const email = emailCookie ? emailCookie.split('=')[1] : null;
-
-      const { data: insertData, error } = await supabase
-        .from('draft_generations')
-        .insert({
-          email: email,
-          firm: selectedFirm.value,
-          question: selectedQuestion.value,
-          key_reasons: additionalInfo.keyReasons,
-          relevant_experience: additionalInfo.relevantExperience,
-          relevant_interaction: additionalInfo.relevantInteraction,
-          personal_info: additionalInfo.personalInfo,
-          generated_draft: data.draft
-        });
-
-      if (error) throw error;
-
+      const cost = Math.round(localTotalTokens * 0.005);
+      await subtractCredits(cost);
     } catch (error) {
       console.error('Error:', error);
       setFeedback("Error: Unable to generate draft. Please try again later.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const subtractCredits = async (cost) => {
+    try {
+      const { data: userData, error: userError } = await supabase
+        .from('profiles')
+        .select('credits')
+        .eq('id', user.id)
+        .single();
+
+      if (userError) throw userError;
+
+      if (userData.credits < cost) {
+        throw new Error('Insufficient credits');
+      }
+
+      const newCreditBalance = userData.credits - cost;
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ credits: newCreditBalance })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      setFeedback(prevFeedback => `${prevFeedback}\n\nCredits used: ${cost}. Remaining credits: ${newCreditBalance}`);
+    } catch (error) {
+      console.error('Error subtracting credits:', error);
+      if (error.message === 'Insufficient credits') {
+        setFeedback(prevFeedback => `${prevFeedback}\n\nError: Insufficient credits to complete this operation.`);
+      } else {
+        setFeedback(prevFeedback => `${prevFeedback}\n\nError: Unable to process credits. Please try again later.`);
+      }
     }
   };
 
@@ -274,6 +334,9 @@ function Comparison() {
             getQuestions={getQuestions}
             additionalInfo={additionalInfo}
             onAdditionalInfoChange={handleAdditionalInfoChange}
+            isExpanded={isExpanded}
+            setIsExpanded={setIsExpanded}
+            wordCount={wordCount}
           />
         </div>
         <div className="divider" ref={dividerRef} onMouseDown={handleMouseDown}>
@@ -285,10 +348,10 @@ function Comparison() {
         </div>
         <div className="right-column" style={{width: `${100 - leftWidth}%`}}>
           <div className="button-container">
-            <button className="submit-button" onClick={handleSubmit} disabled={isLoading}>
+            <button className="submit-button" onClick={handleSubmit} disabled={isLoading || !user}>
               {isLoading ? 'Sending...' : 'Send for Review'}
             </button>
-            <button className="submit-button" onClick={handleCreateDraft} disabled={isLoading}>
+            <button className="submit-button" onClick={handleCreateDraft} disabled={isLoading || !user}>
               {isLoading ? 'Generating...' : 'Generate a Draft'}
             </button>
           </div>
@@ -296,7 +359,7 @@ function Comparison() {
             <h3>Your Review</h3>
             <p className="subtext">
               {isLoading ? '⏳🙄👀' : 
-               feedback ? `Your review took ${responseTime.toFixed(2)} seconds to generate` : 
+               feedback ? `Your review took ${responseTime ? responseTime.toFixed(2) : '...'} seconds to generate` : 
                'Review will pop up on this side.'}
             </p>
           </div>

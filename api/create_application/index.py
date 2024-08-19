@@ -1,12 +1,12 @@
-from http.server import BaseHTTPRequestHandler
-from openai import OpenAI
-import os
 import json
+import os
+from openai import OpenAI
+from http.server import BaseHTTPRequestHandler
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 def read_prompt(filename):
-    with open(os.path.join(os.path.dirname(__file__), filename), 'r') as file:
+    with open(os.path.join(os.path.dirname(__file__), filename), 'r', encoding='utf-8') as file:
         return file.read()
 
 # Read only the three specified prompts
@@ -16,11 +16,10 @@ default_prompt = read_prompt('default_prompt.txt')
 
 class handler(BaseHTTPRequestHandler):
     def set_CORS_headers(self):
-        self.send_header('Access-Control-Allow-Credentials', 'true')
         self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT')
-        self.send_header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version')
-
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        self.send_header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    
     def do_OPTIONS(self):
         self.send_response(200)
         self.set_CORS_headers()
@@ -30,16 +29,20 @@ class handler(BaseHTTPRequestHandler):
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
         data = json.loads(post_data.decode('utf-8'))
-        
+
         firm = data.get('firm')
         question = data.get('question')
         key_reasons = data.get('keyReasons')
         relevant_experience = data.get('relevantExperience')
         relevant_interaction = data.get('relevantInteraction')
         personal_info = data.get('personalInfo')
-        
+
         if not firm or not question:
-            self.send_error(400, "Missing required data")
+            self.send_response(400)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps({"error": "Missing required data"})
+            self.wfile.write(response.encode('utf-8'))
             return
 
         try:
@@ -75,6 +78,7 @@ class handler(BaseHTTPRequestHandler):
             )
 
             generated_draft = completion.choices[0].message.content
+            usage = completion.usage
 
             self.send_response(200)
             self.set_CORS_headers()
@@ -82,9 +86,20 @@ class handler(BaseHTTPRequestHandler):
             self.end_headers()
             response = json.dumps({
                 "success": True,
-                "draft": generated_draft
+                "draft": generated_draft,
+                "usage": {
+                    "prompt_tokens": usage.prompt_tokens,
+                    "completion_tokens": usage.completion_tokens,
+                    "total_tokens": usage.total_tokens
+                }
             })
             self.wfile.write(response.encode('utf-8'))
 
         except Exception as e:
-            self.send_error(500, str(e))
+            self.send_response(500)
+            self.set_CORS_headers()
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps({"error": str(e)})
+            self.wfile.write(response.encode('utf-8'))
+
