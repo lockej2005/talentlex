@@ -101,9 +101,9 @@ class handler(BaseHTTPRequestHandler):
 
             # Extract and format the usage information
             usage = {
-                "prompt_tokens": completion.usage["prompt_tokens"],
-                "completion_tokens": completion.usage["completion_tokens"],
-                "total_tokens": completion.usage["total_tokens"]
+                "prompt_tokens": completion.usage.prompt_tokens,
+                "completion_tokens": completion.usage.completion_tokens,
+                "total_tokens": completion.usage.total_tokens
             }
 
             self.send_response(200)
@@ -119,4 +119,3 @@ class handler(BaseHTTPRequestHandler):
 
         except Exception as e:
             self.send_error(500, str(e))
-
