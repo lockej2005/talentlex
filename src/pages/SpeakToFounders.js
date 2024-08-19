@@ -5,7 +5,7 @@ import './SpeakToFounders.css';
 
 const FounderCard = ({ name, linkedin, twitter, whatsapp, email, bio }) => (
   <div className="founder-card">
-    <h2>{name}</h2>
+    <h2 className='name-bruh'>{name}</h2>
     <p className="founder-bio">{bio}</p>
     <div className="founder-contact">
       <a href={linkedin} target="_blank" rel="noopener noreferrer" className="contact-link">
