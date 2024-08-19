@@ -31,6 +31,7 @@ function Comparison() {
     relevantInteraction: '',
     personalInfo: ''
   });
+  const [wordCount, setWordCount] = useState(0);
   const [user, setUser] = useState(null);
 
   const firms = [
@@ -245,6 +246,10 @@ function Comparison() {
     }
   };
   
+  const handleApplicationTextChange = (text) => {
+    setApplicationText(text);
+    setWordCount(text.trim().split(/\s+/).length);
+  };
 
   const handleAdditionalInfoChange = (field, value) => {
     setAdditionalInfo(prev => ({ ...prev, [field]: value }));
@@ -333,7 +338,7 @@ function Comparison() {
         <div className="left-column" style={{width: `${leftWidth}%`}}>
           <ApplicationInput
             applicationText={applicationText}
-            setApplicationText={setApplicationText}
+            setApplicationText={handleApplicationTextChange}
             selectedFirm={selectedFirm}
             setSelectedFirm={setSelectedFirm}
             selectedQuestion={selectedQuestion}
@@ -344,6 +349,7 @@ function Comparison() {
             onAdditionalInfoChange={handleAdditionalInfoChange}
             isExpanded={isExpanded}
             setIsExpanded={setIsExpanded}
+            wordCount={wordCount}
           />
         </div>
         <div className="divider" ref={dividerRef} onMouseDown={handleMouseDown}>
@@ -379,7 +385,7 @@ function Comparison() {
           </div>
         </div>
       </div>
-    </div>
+    </div>  
   );
 }
 

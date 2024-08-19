@@ -1,26 +1,29 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Select from 'react-select';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import './ApplicationInput.css';
 
-function EditableContent({ value, onChange }) {
+function EditableContent({ value, onChange, wordCount }) {
   return (
-    <textarea
-      className="editable-content"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      style={{
-        width: '100%',
-        height: '100%',
-        border: 'none',
-        resize: 'none',
-        backgroundColor: 'transparent',
-        color: 'inherit',
-        font: 'inherit',
-        padding: '10px',
-        boxSizing: 'border-box',
-      }}
-    />
+    <div className="editable-content-container">
+      <textarea
+        className="editable-content"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          width: '100%',
+          height: '100%',
+          border: 'none',
+          resize: 'none',
+          backgroundColor: 'transparent',
+          color: 'inherit',
+          font: 'inherit',
+          padding: '10px',
+          boxSizing: 'border-box',
+        }}
+      />
+      <div className="word-count">{wordCount} words</div>
+    </div>
   );
 }
 
@@ -36,7 +39,8 @@ function ApplicationInput({
   additionalInfo,
   onAdditionalInfoChange,
   isExpanded, 
-  setIsExpanded // Pass down the expanded state and its setter
+  setIsExpanded,
+  wordCount
 }) {
   const customStyles = {
     control: (provided) => ({
@@ -137,6 +141,7 @@ function ApplicationInput({
         <EditableContent 
           value={applicationText} 
           onChange={(newText) => setApplicationText(newText)} 
+          wordCount={wordCount}
         />
       </div>
     </div>
