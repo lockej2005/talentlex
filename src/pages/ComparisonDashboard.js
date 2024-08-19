@@ -110,7 +110,7 @@ const ComparisonDashboard = () => {
       }
 
       // Get lawyer's decision
-      const lawyerDecisionResponse = await fetch('/api/lawyer_decision', {
+      const lawyerDecisionResponse = await fetch('/api/lawyer_descision', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
