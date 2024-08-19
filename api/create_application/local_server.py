@@ -33,7 +33,7 @@ sidley_austin_career_question = read_prompt('sidley_austin_career_question.txt')
 goodwin_why_question = read_prompt('goodwin_why_question.txt')
 default_prompt = read_prompt('default_prompt.txt')
 
-@app.route('/api/create_application', methods=['POST', 'OPTIONS'])
+@app.route('/create_application', methods=['POST', 'OPTIONS'])
 def generate_draft():
     if request.method == 'OPTIONS':
         logger.info("Handling preflight OPTIONS request")
