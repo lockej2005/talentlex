@@ -315,7 +315,6 @@ function Comparison() {
 
   return (
     <div className="comparison-container">
-      {showPopup && <EmailPopup onClose={closePopup} />}
       <div className="header">
       </div>
       <div className="divider2"></div>
