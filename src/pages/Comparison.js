@@ -152,7 +152,7 @@ function Comparison() {
       const email = emailCookie ? emailCookie.split('=')[1] : null;
   
       // Send application to your API
-      const response = await fetch('/api/submit_application', {
+      const response = await fetch('http://localhost:8000/api/submit_application', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ function Comparison() {
   const handleCreateDraft = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/create_application', {
+      const response = await fetch('http://localhost:8000/api/create_application', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -43,7 +43,7 @@ const ComparisonDashboard = () => {
 
   const getResponse = async (agent, currentScenario, index) => {
     try {
-      const response = await fetch(`/api/negotiate/${agent}`, {
+      const response = await fetch(`/api/${agent}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -86,7 +86,7 @@ const ComparisonDashboard = () => {
   const getFinalDecision = async () => {
     try {
       // Get user's final offer
-      const userOfferResponse = await fetch('/api/negotiate/user-decision', {
+      const userOfferResponse = await fetch('/api/user-decision', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -110,7 +110,7 @@ const ComparisonDashboard = () => {
       }
 
       // Get lawyer's decision
-      const lawyerDecisionResponse = await fetch('/api/negotiate/lawyer-decision', {
+      const lawyerDecisionResponse = await fetch('/api/lawyer-decision', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
