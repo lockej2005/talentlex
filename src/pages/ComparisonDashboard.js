@@ -234,27 +234,27 @@ const ComparisonDashboard = () => {
 
   const renderUserOffer = () => {
     if (!userOffer) return null;
-
+  
     return (
       <div className="arena-final-decision">
         <h3>User's Final Offer:</h3>
-        <p><strong>Offer Details:</strong> {userOffer.offer_details}</p>
-        <p><strong>Price:</strong> ${userOffer.price}</p>
+        <p><strong>Offer Details:</strong> {userOffer.offer_details || 'N/A'}</p>
+        <p><strong>Price:</strong> ${userOffer.price || 'N/A'}</p>
         <p><strong>Terms:</strong></p>
-        {formatValue(userOffer.terms)}
-        <p><strong>Extra:</strong> {userOffer.extra}</p>
+        {userOffer.terms ? formatValue(userOffer.terms) : 'N/A'}
+        <p><strong>Extra:</strong> {userOffer.extra || 'N/A'}</p>
       </div>
     );
   };
 
   const renderLawyerDecision = () => {
     if (!lawyerDecision) return null;
-
+  
     return (
       <div className="arena-final-decision">
         <h3>Lawyer's Decision:</h3>
-        <p><strong>Decision:</strong> {lawyerDecision.decision}</p>
-        <p><strong>Justification:</strong> {lawyerDecision.justification}</p>
+        <p><strong>Decision:</strong> {lawyerDecision.decision || 'N/A'}</p>
+        <p><strong>Justification:</strong> {lawyerDecision.justification || 'N/A'}</p>
       </div>
     );
   };
