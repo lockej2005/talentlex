@@ -186,7 +186,7 @@ const ComparisonDashboard = () => {
   const subtractCreditsAndUpdateUser = async () => {
     try {
       const cost = Math.round(totalTokens * 0.005);
-      
+      console.log(cost)
       const { data: userData, error: userError } = await supabase
         .from('profiles')
         .select('credits')
