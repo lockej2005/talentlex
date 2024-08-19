@@ -8,9 +8,6 @@ import EmailPopup from './EmailPopup';
 import ApplicationInput from './ApplicationInput';
 import './comparison.css';
 
-// Initialize Stripe
-const stripePromise = loadStripe('pk_live_51P4eASP1v3Dm1cKPvctekur3arCo5DAO0Bdgk9cHm1V4i3MPJWnFTS94UsfF45bUUlilPdShd2TdpLNht3IZBhXI00lZTdbwPr');
-
 // Initialize Supabase
 const supabaseUrl = 'https://atbphpeswwgqvwlbplko.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU';
@@ -34,6 +31,7 @@ function Comparison() {
     relevantInteraction: '',
     personalInfo: ''
   });
+  const [user, setUser] = useState(null);
 
   const firms = [
     { value: "Goodwin", label: "Goodwin" },
@@ -105,6 +103,23 @@ function Comparison() {
     if (!emailCookie) {
       setShowPopup(true);
     }
+    
+    // Get the current user
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
+    getCurrentUser();
+
+    // Set up listener for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -158,9 +173,9 @@ function Comparison() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          applicationText, 
-          firm: selectedFirm.value, 
+        body: JSON.stringify({
+          applicationText,
+          firm: selectedFirm.value,
           question: selectedQuestion.value,
           email  // Include the email in the submission
         }),
@@ -173,6 +188,31 @@ function Comparison() {
       const data = await response.json();
       console.log(data);
       setFeedback(data.feedback);
+  
+      // Calculate cost
+      const totalTokens = data.usage.total_tokens; // Assuming the response contains token usage
+      const cost = Math.round(totalTokens * 0.005);
+      console.log(cost);
+  
+      // Get user's current credits
+      const { data: userData, error: userError } = await supabase
+        .from('profiles')
+        .select('credits')
+        .eq('id', user.id)
+        .single();
+      if (userError) throw userError;
+  
+      if (userData.credits < cost) {
+        throw new Error('Insufficient credits');
+      }
+  
+      // Update user's credits
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ credits: userData.credits - cost })
+        .eq('id', user.id);
+  
+      if (updateError) throw updateError;
   
       // Record data in Supabase
       const { data: insertData, error } = await supabase
@@ -195,11 +235,16 @@ function Comparison() {
   
     } catch (error) {
       console.error("Error:", error);
-      setFeedback("Error: Unable to process your application. Please try again later.");
+      if (error.message === 'Insufficient credits') {
+        setFeedback("Error: Insufficient credits to submit application. Please add more credits to your account.");
+      } else {
+        setFeedback("Error: Unable to process your application. Please try again later.");
+      }
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
+  
 
   const handleAdditionalInfoChange = (field, value) => {
     setAdditionalInfo(prev => ({ ...prev, [field]: value }));
@@ -209,8 +254,13 @@ function Comparison() {
     const areAllFieldsFilled = Object.values(additionalInfo).every((field) => field.trim() !== '');
 
     if (!areAllFieldsFilled) {
-      setIsExpanded(true); // Expand the additional questions section
+      setIsExpanded(true);
       alert('Please fill out all the additional information fields before generating a draft.');
+      return;
+    }
+
+    if (!user) {
+      alert('User not logged in. Please log in to generate a draft.');
       return;
     }
 
@@ -233,11 +283,40 @@ function Comparison() {
       }
 
       const data = await response.json();
-      console.log('Usage:', data.usage); // Log the usage in the console
+      console.log('Usage:', data.usage);
+
+      // Calculate cost
+      const totalTokens = data.usage.total_tokens;
+      const cost = Math.round(totalTokens * 0.005);
+      console.log(cost);      
+      // Get user's current credits
+      const { data: userData, error: userError } = await supabase
+        .from('profiles')
+        .select('credits')
+        .eq('id', user.id)
+        .single();
+      if (userError) throw userError;
+
+      if (userData.credits < cost) {
+        throw new Error('Insufficient credits');
+      }
+
+      // Update user's credits
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ credits: userData.credits - cost })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
       setApplicationText(data.draft);
     } catch (error) {
       console.error('Error:', error);
-      setFeedback("Error: Unable to generate draft. Please try again later.");
+      if (error.message === 'Insufficient credits') {
+        setFeedback("Error: Insufficient credits to generate draft. Please add more credits to your account.");
+      } else {
+        setFeedback("Error: Unable to generate draft. Please try again later.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -263,8 +342,8 @@ function Comparison() {
             getQuestions={getQuestions}
             additionalInfo={additionalInfo}
             onAdditionalInfoChange={handleAdditionalInfoChange}
-            isExpanded={isExpanded} // Pass expanded state
-            setIsExpanded={setIsExpanded} // Pass setter function
+            isExpanded={isExpanded}
+            setIsExpanded={setIsExpanded}
           />
         </div>
         <div className="divider" ref={dividerRef} onMouseDown={handleMouseDown}>
@@ -287,7 +366,7 @@ function Comparison() {
             <h3>Your Review</h3>
             <p className="subtext">
               {isLoading ? '⏳🙄👀' : 
-               feedback ? `Your review took ${responseTime.toFixed(2)} seconds to generate` : 
+               feedback ? `Your review took ${responseTime ? responseTime.toFixed(2) : '...'} seconds to generate` : 
                'Review will pop up on this side.'}
             </p>
           </div>

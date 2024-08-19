@@ -26,7 +26,7 @@ const PopupSocietyJoin = ({ onClose, onJoin }) => {
           <p>Ask a member of your Society to give you the unique 6 Digit code to join</p>
           <SocietyCodeInput onChange={setSocietyCode} />
           <button onClick={handleJoin} className="auth-button">Join</button>
-          <button onClick={onClose} className="auth-button" style={{marginTop: '10px', backgroundColor: '#888'}}>Close</button>
+          <button onClick={onClose} className="auth-button" style={{ marginTop: '10px', backgroundColor: '#888' }}>Close</button>
         </div>
       </div>
     </div>
@@ -43,7 +43,7 @@ const PopupSocietyDetails = ({ society, onClose }) => {
           <p><strong>Join Code:</strong> {society.code}</p>
           <p><strong>Owners Email:</strong> {society.email || 'N/A'}</p>
           <p><strong>Plan:</strong> {society.plan || 'N/A'}</p>
-          <button onClick={onClose} className="auth-button" style={{marginTop: '10px', backgroundColor: '#888'}}>Close</button>
+          <button onClick={onClose} className="auth-button" style={{ marginTop: '10px', backgroundColor: '#888' }}>Close</button>
         </div>
       </div>
     </div>
@@ -75,7 +75,7 @@ const Layout = () => {
       } else if (profileData) {
         setUserName(profileData.name || 'User');
         setUserCredits(profileData.credits || 0);
-        
+
         if (profileData.society) {
           const { data: societyData, error: societyError } = await supabase
             .from('societies')
@@ -90,6 +90,16 @@ const Layout = () => {
             setSocietyDetails(societyData);
           }
         }
+
+        // Subscribe to changes in the user's credits
+        supabase
+          .channel('public:profiles')
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` }, payload => {
+            console.log('Change received!', payload);
+            const updatedCredits = payload.new.credits;
+            setUserCredits(updatedCredits);
+          })
+          .subscribe();
       }
     }
   };

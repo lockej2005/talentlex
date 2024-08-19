@@ -96,3 +96,4 @@ class handler(BaseHTTPRequestHandler):
 
         except Exception as e:
             self.send_error(500, str(e))
+

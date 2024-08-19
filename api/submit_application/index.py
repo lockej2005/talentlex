@@ -99,15 +99,24 @@ class handler(BaseHTTPRequestHandler):
 
             ai_feedback = completion.choices[0].message.content
 
+            # Extract and format the usage information
+            usage = {
+                "prompt_tokens": completion.usage["prompt_tokens"],
+                "completion_tokens": completion.usage["completion_tokens"],
+                "total_tokens": completion.usage["total_tokens"]
+            }
+
             self.send_response(200)
             self.set_CORS_headers()
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             response = json.dumps({
                 "success": True,
-                "feedback": ai_feedback
+                "feedback": ai_feedback,
+                "usage": usage  # Send back a simplified usage object
             })
             self.wfile.write(response.encode('utf-8'))
 
         except Exception as e:
             self.send_error(500, str(e))
+
