@@ -33,7 +33,7 @@ const PrivateRoute = ({ children }) => {
     return <div className="loading-spinner"></div>;
   }
 
-  return session ? children : <Navigate to="/login" />;
+  return session ? children : <Navigate to="/signup" />;
 };
 
 function App() {
