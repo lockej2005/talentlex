@@ -103,7 +103,7 @@ const ComparisonDashboard = () => {
           newResults[index] = {
             side: agent === 'user_agent' ? 'user' : 'opposing',
             heading: data.result.heading || `${agent.split('_')[0].toUpperCase()} Response`,
-            content: data.result.content || 'No content provided',
+            content: typeof data.result.content === 'object' ? JSON.stringify(data.result.content) : (data.result.content || 'No content provided'),
           };
           return newResults;
         });
@@ -275,7 +275,7 @@ const ComparisonDashboard = () => {
               </div>
               {openItems.has(globalIndex) && (
                 <div className="arena-item-content">
-                  {result.content}
+                  {typeof result.content === 'object' ? JSON.stringify(result.content) : result.content}
                 </div>
               )}
             </div>
