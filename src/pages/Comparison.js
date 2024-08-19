@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
 import ReactMarkdown from 'react-markdown';
-import { loadStripe } from '@stripe/stripe-js';
 import { createClient } from '@supabase/supabase-js';
 import EmailPopup from './EmailPopup';
 import ApplicationInput from './ApplicationInput';
@@ -31,8 +30,9 @@ function Comparison() {
     relevantInteraction: '',
     personalInfo: ''
   });
-  const [wordCount, setWordCount] = useState(0);
   const [user, setUser] = useState(null);
+  const [totalTokens, setTotalTokens] = useState(0);
+  const [wordCount, setWordCount] = useState(0);
 
   const firms = [
     { value: "Goodwin", label: "Goodwin" },
@@ -99,13 +99,11 @@ function Comparison() {
   };
 
   useEffect(() => {
-    // Check if the email cookie exists
     const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email='));
     if (!emailCookie) {
       setShowPopup(true);
     }
     
-    // Get the current user
     const getCurrentUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
@@ -113,7 +111,6 @@ function Comparison() {
 
     getCurrentUser();
 
-    // Set up listener for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
@@ -127,6 +124,13 @@ function Comparison() {
     const questions = getQuestions(selectedFirm.value);
     setSelectedQuestion(questions[0]);
   }, [selectedFirm]);
+
+  useEffect(() => {
+    const calculateWordCount = (text) => {
+      return text.trim().split(/\s+/).filter(word => word !== '').length;
+    };
+    setWordCount(calculateWordCount(applicationText));
+  }, [applicationText]);
 
   const closePopup = () => {
     setShowPopup(false);
@@ -161,14 +165,13 @@ function Comparison() {
   const handleSubmit = async () => {
     setIsLoading(true);
     const startTime = Date.now();
+    let localTotalTokens = 0;
     try {
-      // Get device info
       const userAgent = navigator.userAgent;
       const screenSize = `${window.screen.width}x${window.screen.height}`;
       const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email='));
       const email = emailCookie ? emailCookie.split('=')[1] : null;
   
-      // Send application to your API
       const response = await fetch('/api/submit_application', {
         method: 'POST',
         headers: {
@@ -178,7 +181,7 @@ function Comparison() {
           applicationText,
           firm: selectedFirm.value,
           question: selectedQuestion.value,
-          email  // Include the email in the submission
+          email
         }),
       });
   
@@ -190,32 +193,9 @@ function Comparison() {
       console.log(data);
       setFeedback(data.feedback);
   
-      // Calculate cost
-      const totalTokens = data.usage.total_tokens; // Assuming the response contains token usage
-      const cost = Math.round(totalTokens * 0.005);
-      console.log(cost);
+      localTotalTokens += data.usage.total_tokens;
+      setTotalTokens(localTotalTokens);
   
-      // Get user's current credits
-      const { data: userData, error: userError } = await supabase
-        .from('profiles')
-        .select('credits')
-        .eq('id', user.id)
-        .single();
-      if (userError) throw userError;
-  
-      if (userData.credits < cost) {
-        throw new Error('Insufficient credits');
-      }
-  
-      // Update user's credits
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ credits: userData.credits - cost })
-        .eq('id', user.id);
-  
-      if (updateError) throw updateError;
-  
-      // Record data in Supabase
       const { data: insertData, error } = await supabase
         .from('applications')
         .insert({
@@ -223,7 +203,7 @@ function Comparison() {
           question: selectedQuestion.value,
           application_text: applicationText,
           feedback: data.feedback,
-          email,  // Include email here as well
+          email,
           device: userAgent,
           screen_size: screenSize,
           timestamp: new Date().toISOString()
@@ -232,23 +212,16 @@ function Comparison() {
       if (error) throw error;
   
       const endTime = Date.now();
-      setResponseTime((endTime - startTime) / 1000); // Convert to seconds
+      setResponseTime((endTime - startTime) / 1000);
   
+      const cost = Math.round(localTotalTokens * 0.005);
+      await subtractCredits(cost);
     } catch (error) {
       console.error("Error:", error);
-      if (error.message === 'Insufficient credits') {
-        setFeedback("Error: Insufficient credits to submit application. Please add more credits to your account.");
-      } else {
-        setFeedback("Error: Unable to process your application. Please try again later.");
-      }
+      setFeedback("Error: Unable to process your application. Please try again later.");
     } finally {
       setIsLoading(false);
     }
-  };
-  
-  const handleApplicationTextChange = (text) => {
-    setApplicationText(text);
-    setWordCount(text.trim().split(/\s+/).length);
   };
 
   const handleAdditionalInfoChange = (field, value) => {
@@ -270,6 +243,7 @@ function Comparison() {
     }
 
     setIsLoading(true);
+    let localTotalTokens = 0;
     try {
       const response = await fetch('/api/create_application', {
         method: 'POST',
@@ -290,40 +264,52 @@ function Comparison() {
       const data = await response.json();
       console.log('Usage:', data.usage);
 
-      // Calculate cost
-      const totalTokens = data.usage.total_tokens;
-      const cost = Math.round(totalTokens * 0.005);
-      console.log(cost);      
-      // Get user's current credits
+      localTotalTokens += data.usage.total_tokens;
+      setTotalTokens(localTotalTokens);
+
+      setApplicationText(data.draft);
+
+      const cost = Math.round(localTotalTokens * 0.005);
+      await subtractCredits(cost);
+    } catch (error) {
+      console.error('Error:', error);
+      setFeedback("Error: Unable to generate draft. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const subtractCredits = async (cost) => {
+    try {
       const { data: userData, error: userError } = await supabase
         .from('profiles')
         .select('credits')
         .eq('id', user.id)
         .single();
+
       if (userError) throw userError;
 
       if (userData.credits < cost) {
         throw new Error('Insufficient credits');
       }
 
-      // Update user's credits
+      const newCreditBalance = userData.credits - cost;
+
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ credits: userData.credits - cost })
+        .update({ credits: newCreditBalance })
         .eq('id', user.id);
 
       if (updateError) throw updateError;
 
-      setApplicationText(data.draft);
+      setFeedback(prevFeedback => `${prevFeedback}\n\nCredits used: ${cost}. Remaining credits: ${newCreditBalance}`);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error subtracting credits:', error);
       if (error.message === 'Insufficient credits') {
-        setFeedback("Error: Insufficient credits to generate draft. Please add more credits to your account.");
+        setFeedback(prevFeedback => `${prevFeedback}\n\nError: Insufficient credits to complete this operation.`);
       } else {
-        setFeedback("Error: Unable to generate draft. Please try again later.");
+        setFeedback(prevFeedback => `${prevFeedback}\n\nError: Unable to process credits. Please try again later.`);
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -338,7 +324,7 @@ function Comparison() {
         <div className="left-column" style={{width: `${leftWidth}%`}}>
           <ApplicationInput
             applicationText={applicationText}
-            setApplicationText={handleApplicationTextChange}
+            setApplicationText={setApplicationText}
             selectedFirm={selectedFirm}
             setSelectedFirm={setSelectedFirm}
             selectedQuestion={selectedQuestion}
@@ -361,10 +347,10 @@ function Comparison() {
         </div>
         <div className="right-column" style={{width: `${100 - leftWidth}%`}}>
           <div className="button-container">
-            <button className="submit-button" onClick={handleSubmit} disabled={isLoading}>
+            <button className="submit-button" onClick={handleSubmit} disabled={isLoading || !user}>
               {isLoading ? 'Sending...' : 'Send for Review'}
             </button>
-            <button className="submit-button" onClick={handleCreateDraft} disabled={isLoading}>
+            <button className="submit-button" onClick={handleCreateDraft} disabled={isLoading || !user}>
               {isLoading ? 'Generating...' : 'Generate a Draft'}
             </button>
           </div>
@@ -385,7 +371,7 @@ function Comparison() {
           </div>
         </div>
       </div>
-    </div>  
+    </div>
   );
 }
 

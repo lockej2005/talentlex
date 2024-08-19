@@ -28,7 +28,7 @@ const PrivateRoute = ({ children }) => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="loading-spinner"></div>;  // Replaced "Loading..." with the spinner
   }
 
   return session ? children : <Navigate to="/login" />;
