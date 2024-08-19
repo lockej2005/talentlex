@@ -168,3 +168,19 @@
   .arena-final-decision li {
     margin-bottom: 5px;
   }
+
+  .arena-column-heading {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: left;
+    color: #333;
+  }
+  
+  .arena-left-column .arena-column-heading {
+    color: #ffffff; /* or any color you prefer for the user's lawyer */
+  }
+  
+  .arena-right-column .arena-column-heading {
+    color: #276D8B; /* or any color you prefer for the opposition lawyer */
+  }

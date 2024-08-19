@@ -265,6 +265,9 @@ const ComparisonDashboard = () => {
 
   const renderColumn = (isLeft) => (
     <div className={`arena-column ${isLeft ? 'arena-left-column' : 'arena-right-column'}`}>
+      <h2 className="arena-column-heading">
+        {isLeft ? "Your Lawyer" : "Opposition Lawyer"}
+      </h2>
       {negotiationResults
         .filter(result => result && result.side === (isLeft ? 'user' : 'opposing'))
         .map((result, index) => {
