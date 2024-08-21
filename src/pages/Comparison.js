@@ -99,11 +99,6 @@ function Comparison() {
   };
 
   useEffect(() => {
-    const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email='));
-    if (!emailCookie) {
-      setShowPopup(true);
-    }
-    
     const getCurrentUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
@@ -163,14 +158,17 @@ function Comparison() {
   }, []);
 
   const handleSubmit = async () => {
+    if (!user) {
+      alert('Please log in to submit your application.');
+      return;
+    }
+
     setIsLoading(true);
     const startTime = Date.now();
     let localTotalTokens = 0;
     try {
       const userAgent = navigator.userAgent;
       const screenSize = `${window.screen.width}x${window.screen.height}`;
-      const emailCookie = document.cookie.split('; ').find(row => row.startsWith('email='));
-      const email = emailCookie ? emailCookie.split('=')[1] : null;
   
       const response = await fetch('/api/submit_application', {
         method: 'POST',
@@ -181,7 +179,7 @@ function Comparison() {
           applicationText,
           firm: selectedFirm.value,
           question: selectedQuestion.value,
-          email
+          email: user.email
         }),
       });
   
@@ -203,7 +201,7 @@ function Comparison() {
           question: selectedQuestion.value,
           application_text: applicationText,
           feedback: data.feedback,
-          email,
+          email: user.email,
           device: userAgent,
           screen_size: screenSize,
           timestamp: new Date().toISOString()
@@ -229,16 +227,16 @@ function Comparison() {
   };
 
   const handleCreateDraft = async () => {
+    if (!user) {
+      alert('Please log in to generate a draft.');
+      return;
+    }
+
     const areAllFieldsFilled = Object.values(additionalInfo).every((field) => field.trim() !== '');
 
     if (!areAllFieldsFilled) {
       setIsExpanded(true);
       alert('Please fill out all the additional information fields before generating a draft.');
-      return;
-    }
-
-    if (!user) {
-      alert('User not logged in. Please log in to generate a draft.');
       return;
     }
 
@@ -271,6 +269,22 @@ function Comparison() {
 
       const cost = Math.round(localTotalTokens * 0.005);
       await subtractCredits(cost);
+
+      // Store draft information in Supabase
+      const { data: insertData, error } = await supabase
+        .from('drafts')
+        .insert({
+          user_id: user.id,
+          email: user.email,
+          firm: selectedFirm.value,
+          question: selectedQuestion.value,
+          draft_text: data.draft,
+          additional_info: additionalInfo,
+          timestamp: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
     } catch (error) {
       console.error('Error:', error);
       setFeedback("Error: Unable to generate draft. Please try again later.");
@@ -327,7 +341,6 @@ function Comparison() {
             selectedFirm={selectedFirm}
             setSelectedFirm={setSelectedFirm}
             selectedQuestion={selectedQuestion}
-            setSelecteselectedQuestion={selectedQuestion}
             setSelectedQuestion={setSelectedQuestion}
             firms={firms}
             getQuestions={getQuestions}
