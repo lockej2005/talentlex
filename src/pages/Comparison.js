@@ -262,7 +262,12 @@ function Comparison() {
       setApplicationText(data.draft);
 
       const cost = Math.round(localTotalTokens * 0.005);
-      await subtractCredits(cost);
+      const creditsSubtracted = await subtractCredits(cost);
+      
+      if (!creditsSubtracted) {
+        // If credits couldn't be subtracted, don't proceed with storing the draft
+        return;
+      }
 
       // Store draft generation information in Supabase
       const { data: insertData, error } = await supabase
@@ -283,7 +288,8 @@ function Comparison() {
     } catch (error) {
       console.error('Error:', error);
       setFeedback("Error: Unable to generate draft. Please try again later.");
-      setIsLoading(false);
+    } finally {
+      setIsLoading(false);  // This ensures isLoading is always set to false, even if there's an error
     }
   };
 
@@ -298,7 +304,8 @@ function Comparison() {
       if (userError) throw userError;
 
       if (userData.credits < cost) {
-        throw new Error('Insufficient credits');
+        setFeedback(prevFeedback => `${prevFeedback}\n\nError: Insufficient credits to complete this operation.`);
+        return false;  // Return false to indicate the operation failed
       }
 
       const newCreditBalance = userData.credits - cost;
@@ -311,13 +318,11 @@ function Comparison() {
       if (updateError) throw updateError;
 
       setFeedback(prevFeedback => `${prevFeedback}\n\nCredits used: ${cost}. Remaining credits: ${newCreditBalance}`);
+      return true;  // Return true to indicate the operation succeeded
     } catch (error) {
       console.error('Error subtracting credits:', error);
-      if (error.message === 'Insufficient credits') {
-        setFeedback(prevFeedback => `${prevFeedback}\n\nError: Insufficient credits to complete this operation.`);
-      } else {
-        setFeedback(prevFeedback => `${prevFeedback}\n\nError: Unable to process credits. Please try again later.`);
-      }
+      setFeedback(prevFeedback => `${prevFeedback}\n\nError: Unable to process credits. Please try again later.`);
+      return false;  // Return false to indicate the operation failed
     }
   };
 
