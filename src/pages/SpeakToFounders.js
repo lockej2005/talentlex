@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Linkedin, Twitter, Mail, Phone, Send } from 'lucide-react';
-import { supabase } from '../supabaseClient'; // Adjust the import path as needed
+import React from 'react';
+import { Linkedin, Twitter, Mail, Phone } from 'lucide-react';
 import './SpeakToFounders.css';
 
 const FounderCard = ({ name, linkedin, twitter, whatsapp, email, bio }) => (
@@ -24,109 +23,7 @@ const FounderCard = ({ name, linkedin, twitter, whatsapp, email, bio }) => (
   </div>
 );
 
-const ChatMessage = ({ message, isUser }) => (
-  <div className={`chat-message ${isUser ? 'user' : 'support'}`}>
-    <p>{message.message}</p>
-    <small>{new Date(message.created_at).toLocaleString()}</small>
-  </div>
-);
-
-const ChatArea = ({ userId }) => {
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const chatBoxRef = useRef(null);
-
-  useEffect(() => {
-    fetchMessages();
-
-    const channel = supabase
-      .channel('messages_channel')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'messages',
-          filter: `user_id=eq.${userId}`
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            fetchMessages(); // Refetch all messages to maintain correct order
-          } else if (payload.eventType === 'DELETE') {
-            setMessages((currentMessages) =>
-              currentMessages.filter((message) => message.id !== payload.old.id)
-            );
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [userId]);
-
-  const fetchMessages = async () => {
-    const { data, error } = await supabase
-      .from('messages')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false }) // Most recent first
-      .limit(50);
-    
-    if (error) console.error('Error fetching messages:', error);
-    else setMessages(data || []);
-  };
-
-  const sendMessage = async (e) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-
-    const { error } = await supabase
-      .from('messages')
-      .insert([
-        { user_id: userId, message: newMessage, sender: 'user' }
-      ]);
-
-    if (error) {
-      console.error('Error sending message:', error);
-    } else {
-      setNewMessage('');
-      fetchMessages(); // Refetch messages to get the updated list with correct ordering
-    }
-  };
-
-  return (
-    <div className="chat-area">
-      <div className="chat-messages" ref={chatBoxRef}>
-        {messages.map(message => (
-          <ChatMessage key={message.id} message={message} isUser={message.sender === 'user'} />
-        ))}
-      </div>
-      <form onSubmit={sendMessage} className="chat-input">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type your message here..."
-        />
-        <button type="submit"><Send size={20} /></button>
-      </form>
-    </div>
-  );
-};
-
 const SpeakToFounders = () => {
-  const [userId, setUserId] = useState(null);
-
-  useEffect(() => {
-    const fetchUserId = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) setUserId(user.id);
-    };
-    fetchUserId();
-  }, []);
-
   const founders = [
     {
       name: "Chaitanya Prakash",
@@ -148,11 +45,8 @@ const SpeakToFounders = () => {
 
   return (
     <div className="speak-to-founders-container">
-          <h2 className="chat-title">Chat with the Founders</h2>
-      <p className="chat-intro">Please let us know if you ran into an error. Send a message here and we will respond in a few hours.</p>
-      {userId && <ChatArea userId={userId} />}
-      <br></br>
-      <div className='seperator2'></div>
+      <h2 className="founders-title">Meet the Founders</h2>
+      <div   className="seperator2"></div>
       <br></br>
       <div className="founders-grid">
         {founders.map((founder, index) => (
