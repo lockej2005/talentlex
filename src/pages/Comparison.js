@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
 import ReactMarkdown from 'react-markdown';
 import { createClient } from '@supabase/supabase-js';
-import EmailPopup from './EmailPopup';
 import ApplicationInput from './ApplicationInput';
 import './comparison.css';
 
@@ -23,7 +22,6 @@ function Comparison() {
   const [isExpanded, setIsExpanded] = useState(false);
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
-  const [showPopup, setShowPopup] = useState(false);
   const [additionalInfo, setAdditionalInfo] = useState({
     keyReasons: '',
     relevantExperience: '',
@@ -90,7 +88,7 @@ function Comparison() {
       case 'White & Case':
         return whiteAndCaseQuestions;
       case 'Sidley Austin':
-        return sidleyAustinQuestions
+        return sidleyAustinQuestions;
       case 'Dechert':
         return dechertQuestions;
       default:
@@ -126,10 +124,6 @@ function Comparison() {
     };
     setWordCount(calculateWordCount(applicationText));
   }, [applicationText]);
-
-  const closePopup = () => {
-    setShowPopup(false);
-  };
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -270,17 +264,18 @@ function Comparison() {
       const cost = Math.round(localTotalTokens * 0.005);
       await subtractCredits(cost);
 
-      // Store draft information in Supabase
+      // Store draft generation information in Supabase
       const { data: insertData, error } = await supabase
-        .from('drafts')
+        .from('draft_generations')
         .insert({
-          user_id: user.id,
           email: user.email,
           firm: selectedFirm.value,
           question: selectedQuestion.value,
-          draft_text: data.draft,
-          additional_info: additionalInfo,
-          timestamp: new Date().toISOString()
+          key_reasons: additionalInfo.keyReasons,
+          relevant_experience: additionalInfo.relevantExperience,
+          relevant_interaction: additionalInfo.relevantInteraction,
+          personal_info: additionalInfo.personalInfo,
+          generated_draft: data.draft
         });
 
       if (error) throw error;
@@ -288,7 +283,6 @@ function Comparison() {
     } catch (error) {
       console.error('Error:', error);
       setFeedback("Error: Unable to generate draft. Please try again later.");
-    } finally {
       setIsLoading(false);
     }
   };
