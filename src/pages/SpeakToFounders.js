@@ -45,7 +45,7 @@ const SpeakToFounders = () => {
 
   return (
     <div className="speak-to-founders-container">
-      <h2 className="founders-title">Meet us</h2>
+      <h2 className="founders-title">Meet the founders</h2>
       <div   className="seperator2"></div>
       <br></br>
       <div className="founders-grid">
