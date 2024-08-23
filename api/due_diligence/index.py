@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(leve
 logger = logging.getLogger(__name__)
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+GOOGLE_API_KEY = "AIzaSyBQ0LtRevr6gkdGKZWDzw8keeUgKJL-0Xg"
 GOOGLE_CSE_ID = "b7adcaafedbb6484a"
 
 client = OpenAI(api_key=OPENAI_API_KEY)
