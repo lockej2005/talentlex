@@ -1,17 +1,11 @@
 # api/due_diligence.py
 
-import os
-import json
-import logging
 from http.client import HTTPSConnection
 from urllib.parse import urlencode
+import json
+import os
 import re
-
 from openai import OpenAI
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
@@ -21,15 +15,13 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 def get_openai_response(messages, model="gpt-3.5-turbo"):
     try:
-        logger.info(f"Sending request to OpenAI API with model: {model}")
         response = client.chat.completions.create(
             model=model,
             messages=messages
         )
-        logger.info("Received response from OpenAI API")
         return response
     except Exception as e:
-        logger.error(f"Error calling OpenAI API: {str(e)}")
+        print(f"Error calling OpenAI API: {str(e)}")
         raise
 
 def generate_search_queries(user_prompt):
@@ -51,15 +43,12 @@ def generate_search_queries(user_prompt):
     ]
 
     try:
-        logger.info("Generating search queries")
         openai_response = get_openai_response(messages)
         content = openai_response.choices[0].message.content
-        logger.info(f"Raw OpenAI response for search queries: {content}")
         queries = json.loads(content)
-        logger.info(f"Generated search queries: {queries['search_queries']}")
         return queries['search_queries']
     except Exception as e:
-        logger.error(f"Error generating search queries: {str(e)}")
+        print(f"Error generating search queries: {str(e)}")
         return []
 
 def google_search(query):
@@ -69,31 +58,26 @@ def google_search(query):
         'cx': GOOGLE_CSE_ID,
         'q': query
     })
-    logger.info(f"Sending Google search request for query: {query}")
     conn.request("GET", f"/customsearch/v1?{params}")
     response = conn.getresponse()
     data = response.read()
     conn.close()
-    logger.info(f"Received Google search response for query: {query}")
     return json.loads(data.decode("utf-8"))
 
 def get_page_content(url):
     try:
-        logger.info(f"Fetching content from URL: {url}")
         conn = HTTPSConnection(url.split("//")[1].split("/")[0])
         conn.request("GET", "/" + "/".join(url.split("/")[3:]))
         response = conn.getresponse()
         data = response.read().decode("utf-8")
         conn.close()
 
-        # Simple HTML parsing (without BeautifulSoup)
         text = re.sub(r'<[^>]+>', '', data)
         text = re.sub(r'\s+', ' ', text).strip()
         
-        logger.info(f"Successfully extracted content from URL: {url}")
         return text[:2000]
     except Exception as e:
-        logger.error(f"Error scraping {url}: {str(e)}")
+        print(f"Error scraping {url}: {str(e)}")
         return ""
 
 def process_prompt(user_prompt):
@@ -103,7 +87,6 @@ def process_prompt(user_prompt):
         scraped_contents = []
         for query in search_queries:
             search_result = google_search(query)
-            logger.info(f"Google API response for query '{query}': {json.dumps(search_result, indent=2)}")
             
             for item in search_result.get('items', []):
                 if len(scraped_contents) >= 6:
@@ -137,11 +120,6 @@ def process_prompt(user_prompt):
 
         Based on the given scenario, user input, and additional context, identify 6 key points a Lawyer could use for due diligence in the given context. For each point, provide a title, a detailed explanation, and cite the specific source (URL) to cite where you got the information from, for liability reasons.
 
-        Before you reply, consider your Belief, Desire, and Intention in the following format:
-        - Belief: Your understanding of the situation, including any assumptions or knowledge.
-        - Desire: Your goals, preferences, and motivations.
-        - Intention: Your committed plan of action based on your beliefs and desires.
-
         Then, provide your response in the following format:
 
         {
@@ -174,7 +152,6 @@ def process_prompt(user_prompt):
 
         openai_response = get_openai_response(messages)
         due_diligence_content = openai_response.choices[0].message.content
-        logger.info(f"Raw OpenAI response for due diligence: {due_diligence_content}")
         due_diligence_points = json.loads(due_diligence_content)
 
         result = {
@@ -184,17 +161,16 @@ def process_prompt(user_prompt):
             "scraped_contents": [{"url": item['url'], "content": item['content']} for item in scraped_contents]
         }
 
-        logger.info("Successfully processed prompt and generated response")
         return result
     except Exception as e:
-        logger.error(f"Error in process_prompt: {str(e)}")
+        print(f"Error in process_prompt: {str(e)}")
         return {"error": "An unexpected error occurred", "details": str(e)}
 
 def handler(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)
-            user_prompt = data.get('prompt')
+            body = json.loads(request.body)
+            user_prompt = body.get('prompt')
             if not user_prompt:
                 return {
                     'statusCode': 400,
@@ -207,7 +183,7 @@ def handler(request):
                 'body': json.dumps(result)
             }
         except Exception as e:
-            logger.error(f"Error processing request: {str(e)}")
+            print(f"Error processing request: {str(e)}")
             return {
                 'statusCode': 500,
                 'body': json.dumps({"error": "An unexpected error occurred", "details": str(e)})
