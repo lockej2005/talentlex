@@ -72,7 +72,8 @@ def google_search(query):
     params = urllib.parse.urlencode({
         'key': GOOGLE_API_KEY,
         'cx': GOOGLE_CSE_ID,
-        'q': query
+        'q': query,
+        'num': 1  # Limit to 1 result
     })
     logger.info(f"Sending Google search request for query: {query}")
     conn.request("GET", f"/customsearch/v1?{params}")
@@ -125,7 +126,7 @@ def process_prompt(user_prompt):
             search_result = google_search(query)
             logger.info(f"Google API response for query '{query}': {json.dumps(search_result, indent=2)}")
             
-            # Fetch content for the first result of each query
+            # Fetch content for the single top result of each query
             if search_result.get('items'):
                 item = search_result['items'][0]
                 url = item['link']

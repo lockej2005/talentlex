@@ -1,0 +1,29 @@
+{
+    "name": "Google Custom Search API Request",
+    "url": "https://www.googleapis.com/customsearch/v1",
+    "method": "GET",
+    "params": [
+      {
+        "name": "key",
+        "value": "AIzaSyAb7L_h01Y101nEUeA8BLw15HYiRxXXZvE"
+      },
+      {
+        "name": "cx",
+        "value": "b7adcaafedbb6484a"
+      },
+      {
+        "name": "q",
+        "value": "due diligence procedures for legal compliance"
+      }
+    ],
+    "headers": [],
+    "authentication": {},
+    "metaSortKey": -1,
+    "isPrivate": false,
+    "settingStoreCookies": true,
+    "settingSendCookies": true,
+    "settingDisableRenderRequestBody": false,
+    "settingEncodeUrl": true,
+    "settingRebuildPath": true,
+    "settingFollowRedirects": "global"
+  }
