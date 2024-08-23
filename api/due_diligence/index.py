@@ -1,5 +1,3 @@
-# api/due_diligence.py
-
 from http.client import HTTPSConnection
 from urllib.parse import urlencode
 import json
@@ -180,6 +178,10 @@ def handler(request):
             result = process_prompt(user_prompt)
             return {
                 'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
                 'body': json.dumps(result)
             }
         except Exception as e:
