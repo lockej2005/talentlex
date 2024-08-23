@@ -6,6 +6,7 @@ import os
 import re
 from openai import OpenAI
 import logging
+import traceback
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -17,7 +18,7 @@ GOOGLE_CSE_ID = "b7adcaafedbb6484a"
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-def get_openai_response(messages, model="gpt-4o-mini"):
+def get_openai_response(messages, model="gpt-4"):
     try:
         logger.info(f"Sending request to OpenAI API with model: {model}")
         response = client.chat.completions.create(
@@ -60,6 +61,10 @@ def generate_search_queries(user_prompt):
         queries = json.loads(content)
         logger.info(f"Generated search queries: {queries['search_queries']}")
         return queries['search_queries']
+    except json.JSONDecodeError as e:
+        logger.error(f"Error parsing JSON from OpenAI response: {str(e)}")
+        logger.error(f"Raw content: {content}")
+        return []
     except Exception as e:
         logger.error(f"Error generating search queries: {str(e)}")
         logger.error(traceback.format_exc())
@@ -119,13 +124,12 @@ def process_prompt(user_prompt):
                 logger.error(f"Error in Google search: {search_result['error']}")
                 continue
             
-            for item in search_result.get('items', []):
-                if len(scraped_contents) >= 6:
-                    break
+            if 'items' in search_result and search_result['items']:
+                item = search_result['items'][0]
                 url = item['link']
                 content = get_page_content(url)
                 scraped_contents.append({"url": url, "content": content})
-            
+
             if len(scraped_contents) >= 6:
                 break
 
