@@ -4,9 +4,10 @@ import json
 import logging
 import traceback
 from openai import OpenAI
-import requests
+import http.client
+import urllib.parse
+from urllib.request import urlopen
 from bs4 import BeautifulSoup
-from urllib.parse import urlencode
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -67,23 +68,29 @@ def generate_search_queries(user_prompt):
         return []
 
 def google_search(query):
-    url = "https://www.googleapis.com/customsearch/v1"
-    params = {
+    conn = http.client.HTTPSConnection("www.googleapis.com")
+    params = urllib.parse.urlencode({
         'key': GOOGLE_API_KEY,
         'cx': GOOGLE_CSE_ID,
         'q': query
-    }
+    })
     logger.info(f"Sending Google search request for query: {query}")
-    response = requests.get(url, params=params)
+    conn.request("GET", f"/customsearch/v1?{params}")
+    response = conn.getresponse()
+    data = response.read()
+    conn.close()
     logger.info(f"Received Google search response for query: {query}")
-    return response.json()
+    return json.loads(data)
 
 def get_page_content(url):
     try:
         logger.info(f"Fetching content from URL: {url}")
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-        response = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(response.text, 'html.parser')
+        req = urllib.request.Request(url, headers=headers)
+        with urlopen(req, timeout=10) as response:
+            html = response.read()
+        
+        soup = BeautifulSoup(html, 'html.parser')
         
         # Remove script and style elements
         for script in soup(["script", "style"]):
