@@ -1,19 +1,21 @@
-from http.client import HTTPSConnection
-from urllib.parse import urlencode
 import json
 import os
+import openai
+from http.server import BaseHTTPRequestHandler
+from urllib.parse import urlencode
+from http.client import HTTPSConnection
 import re
-from openai import OpenAI
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+# Initialize OpenAI client
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+# Google API details
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 GOOGLE_CSE_ID = "b7adcaafedbb6484a"
 
-client = OpenAI(api_key=OPENAI_API_KEY)
-
 def get_openai_response(messages, model="gpt-3.5-turbo"):
     try:
-        response = client.chat.completions.create(
+        response = openai.ChatCompletion.create(
             model=model,
             messages=messages
         )
@@ -42,7 +44,7 @@ def generate_search_queries(user_prompt):
 
     try:
         openai_response = get_openai_response(messages)
-        content = openai_response.choices[0].message.content
+        content = openai_response.choices[0].message['content']
         queries = json.loads(content)
         return queries['search_queries']
     except Exception as e:
@@ -149,7 +151,7 @@ def process_prompt(user_prompt):
         ]
 
         openai_response = get_openai_response(messages)
-        due_diligence_content = openai_response.choices[0].message.content
+        due_diligence_content = openai_response.choices[0].message['content']
         due_diligence_points = json.loads(due_diligence_content)
 
         result = {
@@ -164,46 +166,45 @@ def process_prompt(user_prompt):
         print(f"Error in process_prompt: {str(e)}")
         return {"error": "An unexpected error occurred", "details": str(e)}
 
-def handler(event, context):
-    if event['httpMethod'] == 'OPTIONS':
-        return {
-            'statusCode': 200,
-            'headers': {
-                'Access-Control-Allow-Credentials': 'true',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-                'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-            },
-            'body': ''
-        }
+class handler(BaseHTTPRequestHandler):
+    def set_CORS_headers(self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        self.send_header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     
-    if event['httpMethod'] == 'POST':
-        try:
-            body = json.loads(event['body'])
-            user_prompt = body.get('prompt')
-            if not user_prompt:
-                return {
-                    'statusCode': 400,
-                    'body': json.dumps({"error": "Missing 'prompt' in request body"})
-                }
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.set_CORS_headers()
+        self.end_headers()
 
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        data = json.loads(post_data.decode('utf-8'))
+
+        user_prompt = data.get('prompt')
+        if not user_prompt:
+            self.send_response(400)
+            self.set_CORS_headers()
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps({"error": "Missing 'prompt' in request body"})
+            self.wfile.write(response.encode('utf-8'))
+            return
+
+        try:
             result = process_prompt(user_prompt)
-            return {
-                'statusCode': 200,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json.dumps(result)
-            }
+            self.send_response(200)
+            self.set_CORS_headers()
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps(result)
+            self.wfile.write(response.encode('utf-8'))
+
         except Exception as e:
-            print(f"Error processing request: {str(e)}")
-            return {
-                'statusCode': 500,
-                'body': json.dumps({"error": "An unexpected error occurred", "details": str(e)})
-            }
-    else:
-        return {
-            'statusCode': 405,
-            'body': json.dumps({"error": "Method Not Allowed"})
-        }
+            self.send_response(500)
+            self.set_CORS_headers()
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps({"error": str(e)})
+            self.wfile.write(response.encode('utf-8'))
