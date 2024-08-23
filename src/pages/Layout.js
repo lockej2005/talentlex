@@ -8,12 +8,15 @@ import PrivacyPolicy from './PrivacyPolicy';
 import AIUsagePolicy from './AIUsagePolicy';
 import ComparisonDashboard from './ComparisonDashboard'; // New import for Review Arena
 import SocietyCodeInput from './SocietyCodeInput'; // Make sure this import is correct
+import DueDiligence from './DueDiligence'; // New import for Due Diligence
 import './Layout.css';
+import Videos from './Videos';
 import './Authentication.css'; // Import the Authentication CSS
+import SpeakToFounders from './SpeakToFounders';
 
 const PopupSocietyJoin = ({ onClose, onJoin }) => {
   const [societyCode, setSocietyCode] = useState('');
-
+  
   const handleJoin = () => {
     onJoin(societyCode);
   };
@@ -159,7 +162,10 @@ const Layout = () => {
                 <Link to="/">Application Review</Link>
               </li>
               <li className={location.pathname === "/review-arena" ? "active" : ""}>
-                <Link to="/review-arena">Negotiation Arena</Link>
+                <Link to="/review-arena">Negotiation Simulator</Link>
+              </li>
+              <li className={location.pathname === "/due-diligence" ? "active" : ""}>
+                <Link to="/due-diligence">Due Diligence Tool</Link>
               </li>
               <li className="section-title">Guide</li>
               <div className='seperator'></div>
@@ -197,7 +203,15 @@ const Layout = () => {
           <Menu size={24} />
         </button>
         <div className="content-area">
-        <Outlet /> {/* This will render the nested routes */}
+          <Routes>
+            <Route path="/" element={<Comparison />} />
+            <Route path="/review-arena" element={<ComparisonDashboard />} />
+            <Route path="/due-diligence" element={<DueDiligence />} />
+            <Route path="/videos" element={<Videos />} />
+            <Route path="/speak-to-founders" element={<SpeakToFounders />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/ai-usage-policy" element={<AIUsagePolicy />} />
+          </Routes>
         </div>
       </div>
       {showOverlay && (

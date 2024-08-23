@@ -1,0 +1,144 @@
+.due-diligence-container {
+  padding: 20px;
+  background-color: #F5F5F5;
+  min-height: 100vh;
+}
+
+.input-form {
+  margin-bottom: 40px;
+}
+
+.input-group {
+  display: flex;
+  background-color: #276D8B;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.input-fields {
+  display: flex;
+  flex-direction: column;
+  width: 85%;
+  padding: 15px;
+}
+
+.background-input,
+.facts-input {
+  padding: 15px;
+  border: 1px solid #E4E4E4;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 100%;
+  min-height: 100px;
+  box-sizing: border-box;
+  resize: vertical;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+
+.background-input {
+  margin-bottom: 10px;
+}
+
+.submit-button {
+  width: 15%;
+  background-color: #000000;
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  margin: 15px;
+  transition: background-color 0.3s ease;
+  align-self: stretch;
+}
+
+.submit-button:hover:not(:disabled) {
+  background-color: #333333;
+}
+
+.submit-button:disabled {
+  background-color: #888888;
+  cursor: not-allowed;
+}
+
+.first-response {
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.first-response h2 {
+  color: #276D8B;
+  margin-bottom: 15px;
+}
+
+.info-boxes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+.info-box {
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.info-box-header {
+  background-color: #F0F0F0;
+  padding: 15px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #333333;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.info-box-content {
+  background-color: #276D8B;
+  color: #FFFFFF;
+  padding: 20px;
+  font-size: 14px;
+  height: 100%;
+  line-height: 1.5;
+}
+
+@media (max-width: 1200px) {
+  .info-boxes {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .input-group {
+    flex-direction: column;
+  }
+
+  .input-fields {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .submit-button {
+    width: 100%;
+    padding: 15px;
+    border-radius: 0 0 8px 8px;
+  }
+
+  .info-boxes {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
