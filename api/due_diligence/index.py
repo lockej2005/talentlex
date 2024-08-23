@@ -1,12 +1,13 @@
-# api/process_prompt.py
+# api/due_diligence.py
 
 import os
 import json
 import logging
-from http.server import BaseHTTPRequestHandler
+from http.client import HTTPSConnection
+from urllib.parse import urlencode
+import re
+
 from openai import OpenAI
-import requests
-from bs4 import BeautifulSoup
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -18,7 +19,7 @@ GOOGLE_CSE_ID = "b7adcaafedbb6484a"
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-def get_openai_response(messages, model="gpt-4o-mini"):
+def get_openai_response(messages, model="gpt-3.5-turbo"):
     try:
         logger.info(f"Sending request to OpenAI API with model: {model}")
         response = client.chat.completions.create(
@@ -62,32 +63,32 @@ def generate_search_queries(user_prompt):
         return []
 
 def google_search(query):
-    url = "https://www.googleapis.com/customsearch/v1"
-    params = {
+    conn = HTTPSConnection("www.googleapis.com")
+    params = urlencode({
         'key': GOOGLE_API_KEY,
         'cx': GOOGLE_CSE_ID,
         'q': query
-    }
+    })
     logger.info(f"Sending Google search request for query: {query}")
-    response = requests.get(url, params=params)
+    conn.request("GET", f"/customsearch/v1?{params}")
+    response = conn.getresponse()
+    data = response.read()
+    conn.close()
     logger.info(f"Received Google search response for query: {query}")
-    return response.json()
+    return json.loads(data.decode("utf-8"))
 
 def get_page_content(url):
     try:
         logger.info(f"Fetching content from URL: {url}")
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-        response = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        for script in soup(["script", "style"]):
-            script.decompose()
-        
-        text = soup.get_text(separator=' ', strip=True)
-        
-        lines = (line.strip() for line in text.splitlines())
-        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        text = ' '.join(chunk for chunk in chunks if chunk)
+        conn = HTTPSConnection(url.split("//")[1].split("/")[0])
+        conn.request("GET", "/" + "/".join(url.split("/")[3:]))
+        response = conn.getresponse()
+        data = response.read().decode("utf-8")
+        conn.close()
+
+        # Simple HTML parsing (without BeautifulSoup)
+        text = re.sub(r'<[^>]+>', '', data)
+        text = re.sub(r'\s+', ' ', text).strip()
         
         logger.info(f"Successfully extracted content from URL: {url}")
         return text[:2000]
@@ -118,7 +119,21 @@ def process_prompt(user_prompt):
 
         system_prompt = """You are an AI assistant specialized in due diligence for mergers and acquisitions. Here's the context for your analysis:
 
-        [Your existing system prompt content goes here]
+        Known risks are those uncovered by the Buyer during due diligence or voluntarily disclosed by the Seller. These are typically managed through express indemnities. For example, if Seller is subject to a pending lawsuit from a former partner, Buyer may require Seller's owners to indemnify Buyer against any costs associated with that lawsuit. Such indemnities are often tailored to the specific risks and can last indefinitely.
+
+        Unknown risks are those neither party is aware of at the time of closing and are not uncovered during due diligence. These are typically managed through the Seller's warranties and representations. In the SPA, the Seller will make various representations and warranties about the business, financial condition, intellectual property, and other matters. If the Seller qualifies these warranties through a disclosure letter, the risk may shift back to the Buyer. For example, if a lawsuit is pending but disclosed in the disclosure letter, Buyer may not have recourse for that issue under the warranty regime.
+
+        If, after closing, Buyer discovers that a representation made by Seller's owners is untrue, Buyer could seek recourse for breach of warranty. Such claims are typically subject to an indemnity regime that specifies the extent and duration of the Seller's liability.
+
+        Representations and warranties are usually categorised as general, fundamental, or special. General representations typically cover the business and financial affairs and survive for 12-24 months. Fundamental representations deal with core issues like ownership of shares, authority, and title, often surviving for the maximum period allowed by law. Special representations might cover sensitive areas such as intellectual property, privacy, and cyber security, with survival periods ranging from 2-5 years.
+
+        Liability for breaches of representations and warranties is often capped. General representations might be capped at 10-20% of the purchase price, while fundamental representations might be capped at the full purchase price. Special representations often involve higher caps but less than the full purchase price.
+
+        Buyer claims for indemnification or breach of warranty may also be subject to a deductible (referred to as a "basket"), typically ranging from 0.5-2% of the purchase price. There are "non-tipping" baskets, where the Buyer can only claim amounts exceeding the basket threshold, and "tipping" baskets, where the Buyer can recover from the first pound once the threshold is met. Fraudulent claims are typically uncapped and unlimited in duration.
+
+        Buyers usually want a secure source of funds for indemnity claims, often holding back or escrowing a portion of the purchase price until the expiration of the relevant survival period. Any remaining funds after this period would be released to the Seller.
+
+        Remember, this is an adversarial negotiation. Everyone aims to maximise their benefits and minimise their risks. Buyer wants to limit Seller's exposure to liabilities, while Seller's owners want to maximise the purchase price and limit their exposure.
 
         Based on the given scenario, user input, and additional context, identify 6 key points a Lawyer could use for due diligence in the given context. For each point, provide a title, a detailed explanation, and cite the specific source (URL) to cite where you got the information from, for liability reasons.
 
@@ -175,27 +190,30 @@ def process_prompt(user_prompt):
         logger.error(f"Error in process_prompt: {str(e)}")
         return {"error": "An unexpected error occurred", "details": str(e)}
 
-class Handler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        data = json.loads(post_data.decode('utf-8'))
-        
-        user_prompt = data.get('prompt')
-        if not user_prompt:
-            self.send_error(400, "Missing 'prompt' in request body")
-            return
-
-        result = process_prompt(user_prompt)
-
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-        self.wfile.write(json.dumps(result).encode('utf-8'))
-
-def handler(request, response):
+def handler(request):
     if request.method == 'POST':
-        Handler.do_POST(Handler('', '', ''))
+        try:
+            data = json.loads(request.body)
+            user_prompt = data.get('prompt')
+            if not user_prompt:
+                return {
+                    'statusCode': 400,
+                    'body': json.dumps({"error": "Missing 'prompt' in request body"})
+                }
+
+            result = process_prompt(user_prompt)
+            return {
+                'statusCode': 200,
+                'body': json.dumps(result)
+            }
+        except Exception as e:
+            logger.error(f"Error processing request: {str(e)}")
+            return {
+                'statusCode': 500,
+                'body': json.dumps({"error": "An unexpected error occurred", "details": str(e)})
+            }
     else:
-        response.status = 405
-        response.body = "Method Not Allowed"
+        return {
+            'statusCode': 405,
+            'body': json.dumps({"error": "Method Not Allowed"})
+        }
