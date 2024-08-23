@@ -33,7 +33,7 @@ def log_request_info():
     logger.debug('Headers: %s', request.headers)
     logger.debug('Body: %s', request.get_data())
 
-def get_openai_response(messages, model="gpt-3.5-turbo"):
+def get_openai_response(messages, model="gpt-4o-mini"):
     try:
         logger.info(f"Sending request to OpenAI API with model: {model}")
         response = client.chat.completions.create(
@@ -48,13 +48,16 @@ def get_openai_response(messages, model="gpt-3.5-turbo"):
         raise
 
 def generate_search_queries(user_prompt):
-    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 1-3 search queries that would be useful for finding information to answer the user's question or address their concern. Format your response as a JSON object with the following structure:
+    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 6 separate search queries relevant to due diligence research a lawyer might need to do in relation to the given context. Format your response as a JSON object with the following structure:
 
     {
       "search_queries": [
         "Query 1",
         "Query 2",
-        "Query 3"
+        "Query 3",
+        "Query 4",
+        "Query 5",
+        "Query 6"
       ]
     }
 
@@ -118,7 +121,7 @@ def get_page_content(url):
         logger.error(traceback.format_exc())
         return ""
 
-@app.route('/process_prompt', methods=['POST'])
+@app.route('/due_diligence', methods=['POST'])
 def process_prompt():
     logger.info("Received request to /process_prompt")
     try:
@@ -134,16 +137,12 @@ def process_prompt():
             search_result = google_search(query)
             logger.info(f"Google API response for query '{query}': {json.dumps(search_result, indent=2)}")
             
-            # Fetch content for up to 6 results across all queries
-            for item in search_result.get('items', []):
-                if len(scraped_contents) >= 6:
-                    break
+            # Fetch content for the first result of each query
+            if search_result.get('items'):
+                item = search_result['items'][0]
                 url = item['link']
                 content = get_page_content(url)
                 scraped_contents.append({"url": url, "content": content})
-            
-            if len(scraped_contents) >= 6:
-                break
 
         # Prepare the context for OpenAI
         context = "\n\n".join([f"Content from {item['url']}:\n{item['content']}" for item in scraped_contents])
@@ -167,7 +166,7 @@ def process_prompt():
 
         Remember, this is an adversarial negotiation. Everyone aims to maximise their benefits and minimise their risks. Buyer wants to limit Seller's exposure to liabilities, while Seller's owners want to maximise the purchase price and limit their exposure.
 
-        Based on the given scenario, user input, and additional context, identify 6 key points a Lawyer could use for due diligence in the given context. For each point, provide a title, a detailed explanation, and cite the specific source (URL) to cite where you got the information from, for liability reasons.
+        Based on the given scenario, user input, and additional context, identify 6 key points a Lawyer could use for due diligence in the given context. For each point, provide a title, a detailed explanation, and cite the specific source (URL) to cite where you got the information from, for liability reasons. Try to use a variety of sources for the seperate points and assign a valid link to every source.
 
         Before you reply, consider your Belief, Desire, and Intention in the following format:
         - Belief: Your understanding of the situation, including any assumptions or knowledge.
@@ -214,7 +213,7 @@ def process_prompt():
             "search_queries": search_queries,
             "due_diligence_points": due_diligence_points["due_diligence_points"],
             "helpful_links": due_diligence_points.get("helpful_links", []),
-            "scraped_contents": [{"url": item['url'], "content": item['content']} for item in scraped_contents]
+            "scraped_contents": scraped_contents
         }
 
         logger.info("Successfully processed prompt and generated response")

@@ -161,11 +161,11 @@ const Layout = () => {
               <li className={location.pathname === "/" ? "active" : ""}>
                 <Link to="/">Application Review</Link>
               </li>
-              <li className={location.pathname === "/review-arena" ? "active" : ""}>
-                <Link to="/review-arena">Negotiation Simulator</Link>
-              </li>
               <li className={location.pathname === "/due-diligence" ? "active" : ""}>
                 <Link to="/due-diligence">Due Diligence Tool</Link>
+              </li>
+              <li className={location.pathname === "/review-arena" ? "active" : ""}>
+                <Link to="/review-arena">Negotiation Simulator</Link>
               </li>
               <li className="section-title">Guide</li>
               <div className='seperator'></div>

@@ -8,7 +8,7 @@ from openai import OpenAI
 import logging
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
@@ -17,25 +17,31 @@ GOOGLE_CSE_ID = "b7adcaafedbb6484a"
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-def get_openai_response(messages, model="gpt-3.5-turbo"):
+def get_openai_response(messages, model="gpt-4o-mini"):
     try:
+        logger.info(f"Sending request to OpenAI API with model: {model}")
         response = client.chat.completions.create(
             model=model,
             messages=messages
         )
+        logger.info("Received response from OpenAI API")
         return response
     except Exception as e:
         logger.error(f"Error calling OpenAI API: {str(e)}")
+        logger.error(traceback.format_exc())
         raise
 
 def generate_search_queries(user_prompt):
-    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 1-3 search queries that would be useful for finding information to answer the user's question or address their concern. Format your response as a JSON object with the following structure:
+    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 6 separate search queries relevant to due diligence research a lawyer might need to do in relation to the given context. Format your response as a JSON object with the following structure:
 
     {
       "search_queries": [
         "Query 1",
         "Query 2",
-        "Query 3"
+        "Query 3",
+        "Query 4",
+        "Query 5",
+        "Query 6"
       ]
     }
 
@@ -47,12 +53,16 @@ def generate_search_queries(user_prompt):
     ]
 
     try:
+        logger.info("Generating search queries")
         openai_response = get_openai_response(messages)
         content = openai_response.choices[0].message.content
+        logger.info(f"Raw OpenAI response for search queries: {content}")
         queries = json.loads(content)
+        logger.info(f"Generated search queries: {queries['search_queries']}")
         return queries['search_queries']
     except Exception as e:
         logger.error(f"Error generating search queries: {str(e)}")
+        logger.error(traceback.format_exc())
         return []
 
 def google_search(query):
@@ -90,9 +100,11 @@ def get_page_content(url):
         text = re.sub(r'<[^>]+>', '', data)
         text = re.sub(r'\s+', ' ', text).strip()
         
-        return text[:2000]
+        logger.info(f"Successfully extracted content from URL: {url}")
+        return text[:2000]  # Limit to first 2000 characters
     except Exception as e:
         logger.error(f"Error scraping {url}: {str(e)}")
+        logger.error(traceback.format_exc())
         return ""
 
 def process_prompt(user_prompt):
@@ -172,18 +184,21 @@ def process_prompt(user_prompt):
 
         openai_response = get_openai_response(messages)
         due_diligence_content = openai_response.choices[0].message.content
+        logger.info(f"Raw OpenAI response for due diligence: {due_diligence_content}")
         due_diligence_points = json.loads(due_diligence_content)
 
         result = {
             "search_queries": search_queries,
             "due_diligence_points": due_diligence_points["due_diligence_points"],
             "helpful_links": due_diligence_points.get("helpful_links", []),
-            "scraped_contents": [{"url": item['url'], "content": item['content']} for item in scraped_contents]
+            "scraped_contents": scraped_contents
         }
 
+        logger.info("Successfully processed prompt and generated response")
         return result
     except Exception as e:
         logger.error(f"Error in process_prompt: {str(e)}")
+        logger.error(traceback.format_exc())
         return {"error": "An unexpected error occurred", "details": str(e)}
 
 class handler(BaseHTTPRequestHandler):
