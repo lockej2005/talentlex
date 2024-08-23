@@ -164,34 +164,56 @@ def process_prompt(user_prompt):
         print(f"Error in process_prompt: {str(e)}")
         return {"error": "An unexpected error occurred", "details": str(e)}
 
-def handler(request):
-    if request.method == 'POST':
-        try:
-            body = json.loads(request.body)
-            user_prompt = body.get('prompt')
-            if not user_prompt:
-                return {
-                    'statusCode': 400,
-                    'body': json.dumps({"error": "Missing 'prompt' in request body"})
-                }
+class Handler:
+    def __init__(self, request):
+        self.request = request
 
-            result = process_prompt(user_prompt)
+    def set_CORS_headers(self):
+        return {
+            'Access-Control-Allow-Credentials': 'true',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+            'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+        }
+
+    def handle(self):
+        if self.request['method'] == 'OPTIONS':
             return {
                 'statusCode': 200,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json.dumps(result)
+                'headers': self.set_CORS_headers(),
+                'body': ''
             }
-        except Exception as e:
-            print(f"Error processing request: {str(e)}")
+        
+        if self.request['method'] == 'POST':
+            try:
+                body = json.loads(self.request['body'])
+                user_prompt = body.get('prompt')
+                if not user_prompt:
+                    return {
+                        'statusCode': 400,
+                        'body': json.dumps({"error": "Missing 'prompt' in request body"})
+                    }
+
+                result = process_prompt(user_prompt)
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        **self.set_CORS_headers(),
+                        'Content-Type': 'application/json'
+                    },
+                    'body': json.dumps(result)
+                }
+            except Exception as e:
+                print(f"Error processing request: {str(e)}")
+                return {
+                    'statusCode': 500,
+                    'body': json.dumps({"error": "An unexpected error occurred", "details": str(e)})
+                }
+        else:
             return {
-                'statusCode': 500,
-                'body': json.dumps({"error": "An unexpected error occurred", "details": str(e)})
+                'statusCode': 405,
+                'body': json.dumps({"error": "Method Not Allowed"})
             }
-    else:
-        return {
-            'statusCode': 405,
-            'body': json.dumps({"error": "Method Not Allowed"})
-        }
+
+def handler(request, context):
+    return Handler(request).handle()
