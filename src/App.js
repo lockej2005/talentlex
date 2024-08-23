@@ -11,6 +11,7 @@ import AIUsagePolicy from './pages/AIUsagePolicy';
 import ComparisonDashboard from './pages/ComparisonDashboard';
 import Videos from './pages/Videos';
 import SpeakToFounders from './pages/SpeakToFounders';
+import DueDiligence from './pages/DueDiligence'; // Import the new DueDiligence component
 
 const PrivateRoute = ({ children }) => {
   const [session, setSession] = useState(null);
@@ -56,8 +57,8 @@ function App() {
           <Route path="ai-usage-policy" element={<AIUsagePolicy />} />
           <Route path="review-arena" element={<ComparisonDashboard />} />
           <Route path="videos" element={<Videos />} />
-          <Route path="speak-to-founders" element={<SpeakToFounders />} /> {/* New route */}
-
+          <Route path="speak-to-founders" element={<SpeakToFounders />} />
+          <Route path="due-diligence" element={<DueDiligence />} /> {/* New route for Due Diligence */}
         </Route>
       </Routes>
     </Router>

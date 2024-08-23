@@ -13,7 +13,7 @@ def read_prompt(filename):
 goodwin_prompt = read_prompt('goodwin_prompt.txt')
 white_and_case_prompt = read_prompt('white_and_case_prompt.txt')
 jones_day_prompt = read_prompt('jones_day_prompt.txt')
-sidley_austin_prompt = read_prompt('sidley_austin_prompt.txt')
+sidley_austin_prompt = read_prompt('sidley_austin_prompt.txt')  
 dechert_prompt = read_prompt('dechert_prompt.txt')
 
 # Additional Sidley Austin specific prompts

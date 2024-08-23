@@ -1,0 +1,238 @@
+from http.server import BaseHTTPRequestHandler
+from http.client import HTTPSConnection
+from urllib.parse import urlencode, quote_plus
+import json
+import os
+import re
+from openai import OpenAI
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+GOOGLE_CSE_ID = "b7adcaafedbb6484a"
+
+client = OpenAI(api_key=OPENAI_API_KEY)
+
+def get_openai_response(messages, model="gpt-4o-mini"):
+    try:
+        logger.info(f"Sending request to OpenAI API with model: {model}")
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages
+        )
+        logger.info("Received response from OpenAI API")
+        return response
+    except Exception as e:
+        logger.error(f"Error calling OpenAI API: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise
+
+def generate_search_queries(user_prompt):
+    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 6 separate search queries relevant to due diligence research a lawyer might need to do in relation to the given context. Format your response as a JSON object with the following structure:
+
+    {
+      "search_queries": [
+        "Query 1",
+        "Query 2",
+        "Query 3",
+        "Query 4",
+        "Query 5",
+        "Query 6"
+      ]
+    }
+
+    Ensure that your response is a valid JSON object."""
+
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt}
+    ]
+
+    try:
+        logger.info("Generating search queries")
+        openai_response = get_openai_response(messages)
+        content = openai_response.choices[0].message.content
+        logger.info(f"Raw OpenAI response for search queries: {content}")
+        queries = json.loads(content)
+        logger.info(f"Generated search queries: {queries['search_queries']}")
+        return queries['search_queries']
+    except Exception as e:
+        logger.error(f"Error generating search queries: {str(e)}")
+        logger.error(traceback.format_exc())
+        return []
+
+def google_search(query):
+    try:
+        conn = HTTPSConnection("www.googleapis.com")
+        encoded_query = quote_plus(query)
+        params = urlencode({
+            'key': GOOGLE_API_KEY,
+            'cx': GOOGLE_CSE_ID,
+            'q': encoded_query
+        }, safe='=&')
+        
+        conn.request("GET", f"/customsearch/v1?{params}")
+        response = conn.getresponse()
+        
+        if response.status != 200:
+            logger.error(f"Error: Google API returned status code {response.status}")
+            return {"error": f"Google API error: {response.status} {response.reason}"}
+        
+        data = response.read()
+        conn.close()
+        return json.loads(data.decode("utf-8"))
+    except Exception as e:
+        logger.error(f"Error in google_search: {str(e)}")
+        return {"error": f"Failed to perform Google search: {str(e)}"}
+
+def get_page_content(url):
+    try:
+        conn = HTTPSConnection(url.split("//")[1].split("/")[0])
+        conn.request("GET", "/" + "/".join(url.split("/")[3:]))
+        response = conn.getresponse()
+        data = response.read().decode("utf-8")
+        conn.close()
+
+        text = re.sub(r'<[^>]+>', '', data)
+        text = re.sub(r'\s+', ' ', text).strip()
+        
+        logger.info(f"Successfully extracted content from URL: {url}")
+        return text[:2000]  # Limit to first 2000 characters
+    except Exception as e:
+        logger.error(f"Error scraping {url}: {str(e)}")
+        logger.error(traceback.format_exc())
+        return ""
+
+def process_prompt(user_prompt):
+    try:
+        search_queries = generate_search_queries(user_prompt)
+        logger.info(f"Generated search queries: {search_queries}")
+
+        scraped_contents = []
+        for query in search_queries:
+            search_result = google_search(query)
+            if "error" in search_result:
+                logger.error(f"Error in Google search: {search_result['error']}")
+                continue
+            
+            for item in search_result.get('items', []):
+                if len(scraped_contents) >= 6:
+                    break
+                url = item['link']
+                content = get_page_content(url)
+                scraped_contents.append({"url": url, "content": content})
+            
+            if len(scraped_contents) >= 6:
+                break
+
+        context = "\n\n".join([f"Content from {item['url']}:\n{item['content']}" for item in scraped_contents])
+        logger.info(f"Scraped content from {len(scraped_contents)} sources")
+
+        system_prompt = """You are an AI assistant specialized in due diligence for mergers and acquisitions. Here's the context for your analysis:
+
+        Known risks are those uncovered by the Buyer during due diligence or voluntarily disclosed by the Seller. These are typically managed through express indemnities. For example, if Seller is subject to a pending lawsuit from a former partner, Buyer may require Seller's owners to indemnify Buyer against any costs associated with that lawsuit. Such indemnities are often tailored to the specific risks and can last indefinitely.
+
+        Unknown risks are those neither party is aware of at the time of closing and are not uncovered during due diligence. These are typically managed through the Seller's warranties and representations. In the SPA, the Seller will make various representations and warranties about the business, financial condition, intellectual property, and other matters. If the Seller qualifies these warranties through a disclosure letter, the risk may shift back to the Buyer. For example, if a lawsuit is pending but disclosed in the disclosure letter, Buyer may not have recourse for that issue under the warranty regime.
+
+        If, after closing, Buyer discovers that a representation made by Seller's owners is untrue, Buyer could seek recourse for breach of warranty. Such claims are typically subject to an indemnity regime that specifies the extent and duration of the Seller's liability.
+
+        Representations and warranties are usually categorised as general, fundamental, or special. General representations typically cover the business and financial affairs and survive for 12-24 months. Fundamental representations deal with core issues like ownership of shares, authority, and title, often surviving for the maximum period allowed by law. Special representations might cover sensitive areas such as intellectual property, privacy, and cyber security, with survival periods ranging from 2-5 years.
+
+        Liability for breaches of representations and warranties is often capped. General representations might be capped at 10-20% of the purchase price, while fundamental representations might be capped at the full purchase price. Special representations often involve higher caps but less than the full purchase price.
+
+        Buyer claims for indemnification or breach of warranty may also be subject to a deductible (referred to as a "basket"), typically ranging from 0.5-2% of the purchase price. There are "non-tipping" baskets, where the Buyer can only claim amounts exceeding the basket threshold, and "tipping" baskets, where the Buyer can recover from the first pound once the threshold is met. Fraudulent claims are typically uncapped and unlimited in duration.
+
+        Buyers usually want a secure source of funds for indemnity claims, often holding back or escrowing a portion of the purchase price until the expiration of the relevant survival period. Any remaining funds after this period would be released to the Seller.
+
+        Remember, this is an adversarial negotiation. Everyone aims to maximise their benefits and minimise their risks. Buyer wants to limit Seller's exposure to liabilities, while Seller's owners want to maximise the purchase price and limit their exposure.
+
+        Based on the given scenario, user input, and additional context, identify 6 key points a Lawyer could use for due diligence in the given context. For each point, provide a title, a detailed explanation, and cite the specific source (URL) to cite where you got the information from, for liability reasons.
+
+        Then, provide your response in the following format:
+
+        {
+          "due_diligence_points": [
+            {
+              "title": "Point 1 Title",
+              "explanation": "Detailed explanation of point 1",
+              "source": "URL of the source for this point"
+            },
+            {
+              "title": "Point 2 Title",
+              "explanation": "Detailed explanation of point 2",
+              "source": "URL of the source for this point"
+            },
+            ...
+          ],
+          "helpful_links": [
+            "URL 1",
+            "URL 2",
+            ...
+          ]
+        }
+
+        Ensure that your response is a valid JSON object. Make sure to include specific facts and information from the provided context in your explanations."""
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": f"User Prompt: {user_prompt}\n\nAdditional Context:\n{context}"}
+        ]
+
+        openai_response = get_openai_response(messages)
+        due_diligence_content = openai_response.choices[0].message.content
+        logger.info(f"Raw OpenAI response for due diligence: {due_diligence_content}")
+        due_diligence_points = json.loads(due_diligence_content)
+
+        result = {
+            "search_queries": search_queries,
+            "due_diligence_points": due_diligence_points["due_diligence_points"],
+            "helpful_links": due_diligence_points.get("helpful_links", []),
+            "scraped_contents": scraped_contents
+        }
+
+        logger.info("Successfully processed prompt and generated response")
+        return result
+    except Exception as e:
+        logger.error(f"Error in process_prompt: {str(e)}")
+        logger.error(traceback.format_exc())
+        return {"error": "An unexpected error occurred", "details": str(e)}
+
+class handler(BaseHTTPRequestHandler):
+    def set_CORS_headers(self):
+        self.send_header('Access-Control-Allow-Credentials', 'true')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT')
+        self.send_header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version')
+
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.set_CORS_headers()
+        self.end_headers()
+
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        data = json.loads(post_data.decode('utf-8'))
+        
+        user_prompt = data.get('prompt')
+        
+        if not user_prompt:
+            self.send_error(400, "Missing 'prompt' in request body")
+            return
+
+        try:
+            result = process_prompt(user_prompt)
+            
+            self.send_response(200)
+            self.set_CORS_headers()
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps(result)
+            self.wfile.write(response.encode('utf-8'))
+
+        except Exception as e:
+            self.send_error(500, str(e))
