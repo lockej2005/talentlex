@@ -1,3 +1,4 @@
+from http.server import BaseHTTPRequestHandler
 from http.client import HTTPSConnection
 from urllib.parse import urlencode, quote_plus
 import json
@@ -185,46 +186,38 @@ def process_prompt(user_prompt):
         logger.error(f"Error in process_prompt: {str(e)}")
         return {"error": "An unexpected error occurred", "details": str(e)}
 
-def handler(request):
-    if request.method == 'OPTIONS':
-        return {
-            'statusCode': 200,
-            'headers': {
-                'Access-Control-Allow-Credentials': 'true',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
-                'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-            },
-            'body': ''
-        }
-    
-    if request.method == 'POST':
-        try:
-            body = json.loads(request.body)
-            user_prompt = body.get('prompt')
-            if not user_prompt:
-                return {
-                    'statusCode': 400,
-                    'body': json.dumps({"error": "Missing 'prompt' in request body"})
-                }
+class handler(BaseHTTPRequestHandler):
+    def set_CORS_headers(self):
+        self.send_header('Access-Control-Allow-Credentials', 'true')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT')
+        self.send_header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version')
 
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.set_CORS_headers()
+        self.end_headers()
+
+    def do_POST(self):
+        content_length = int(self.headers['Content-Length'])
+        post_data = self.rfile.read(content_length)
+        data = json.loads(post_data.decode('utf-8'))
+        
+        user_prompt = data.get('prompt')
+        
+        if not user_prompt:
+            self.send_error(400, "Missing 'prompt' in request body")
+            return
+
+        try:
             result = process_prompt(user_prompt)
-            return {
-                'statusCode': 200,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json.dumps(result)
-            }
+            
+            self.send_response(200)
+            self.set_CORS_headers()
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps(result)
+            self.wfile.write(response.encode('utf-8'))
+
         except Exception as e:
-            logger.error(f"Error processing request: {str(e)}")
-            return {
-                'statusCode': 500,
-                'body': json.dumps({"error": "An unexpected error occurred", "details": str(e)})
-            }
-    else:
-        return {
-            'statusCode': 405,
-            'body': json.dumps({"error": "Method Not Allowed"})
-        }
+            self.send_error(500, str(e))
