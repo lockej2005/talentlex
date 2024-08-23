@@ -21,7 +21,7 @@ const DueDiligence = () => {
     setSearchResults(null);
 
     try {
-      const response = await axios.post('http://localhost:5000/due_diligence', {
+      const response = await axios.post('/api/due_diligence', {
         prompt: `Background Information: ${backgroundInfo}\n\nFacts: ${facts}`
       });
 
