@@ -155,7 +155,7 @@ def process_prompt(user_prompt):
 
         Remember, this is an adversarial negotiation. Everyone aims to maximise their benefits and minimise their risks. Buyer wants to limit Seller's exposure to liabilities, while Seller's owners want to maximise the purchase price and limit their exposure.
 
-        Based on the given scenario, user input, and additional context, identify 6 key points a Lawyer could use for due diligence in the given context. For each point, provide a title, a detailed explanation, and cite the specific source (URL) to cite where you got the information from, for liability reasons. Try to use a variety of sources for the separate points and assign a valid link to every source.
+        Based on the given scenario, user input, and additional context, identify 6 key points a Lawyer could use for due diligence in the given context. For each point, provide a title, a detailed explanation, and cite the specific source (URL) to cite where you got the information from, for liability reasons. ONLY USE LINKS GIVEN TO YOU IN THE CONTENT.
 
         Before you reply, consider your Belief, Desire, and Intention in the following format:
         - Belief: Your understanding of the situation, including any assumptions or knowledge.
@@ -202,7 +202,8 @@ def process_prompt(user_prompt):
             "search_queries": search_queries,
             "due_diligence_points": due_diligence_points["due_diligence_points"],
             "helpful_links": due_diligence_points.get("helpful_links", []),
-            "scraped_contents": scraped_contents
+            "scraped_contents": scraped_contents,
+            "content": content
         }
 
         logger.info("Successfully processed prompt and generated response")
