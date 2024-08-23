@@ -122,8 +122,10 @@ def process_prompt(user_prompt):
 
         # Perform Google searches and fetch content
         scraped_contents = []
+        google_search_results = []
         for query in search_queries:
             search_result = google_search(query)
+            google_search_results.append({"query": query, "result": search_result})
             logger.info(f"Google API response for query '{query}': {json.dumps(search_result, indent=2)}")
             
             # Fetch content for the single top result of each query
@@ -199,11 +201,13 @@ def process_prompt(user_prompt):
 
         # Prepare the result
         result = {
+            "user_prompt": user_prompt,
             "search_queries": search_queries,
+            "google_search_results": google_search_results,
+            "scraped_contents": scraped_contents,
+            "context": context,
             "due_diligence_points": due_diligence_points["due_diligence_points"],
             "helpful_links": due_diligence_points.get("helpful_links", []),
-            "scraped_contents": scraped_contents,
-            "context": context  # Include the full context in the response
         }
 
         logger.info("Successfully processed prompt and generated response")
