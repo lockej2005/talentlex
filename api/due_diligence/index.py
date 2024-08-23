@@ -203,7 +203,7 @@ def process_prompt(user_prompt):
             "due_diligence_points": due_diligence_points["due_diligence_points"],
             "helpful_links": due_diligence_points.get("helpful_links", []),
             "scraped_contents": scraped_contents,
-            "content": content
+            "content": context
         }
 
         logger.info("Successfully processed prompt and generated response")
