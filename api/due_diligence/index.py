@@ -1,27 +1,30 @@
+from http.client import HTTPSConnection
+from urllib.parse import urlencode, quote_plus
 import json
 import os
-import openai
-from http.server import BaseHTTPRequestHandler
-from urllib.parse import urlencode
-from http.client import HTTPSConnection
 import re
+from openai import OpenAI
+import logging
 
-# Initialize OpenAI client
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Google API details
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 GOOGLE_CSE_ID = "b7adcaafedbb6484a"
 
+client = OpenAI(api_key=OPENAI_API_KEY)
+
 def get_openai_response(messages, model="gpt-3.5-turbo"):
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model=model,
             messages=messages
         )
         return response
     except Exception as e:
-        print(f"Error calling OpenAI API: {str(e)}")
+        logger.error(f"Error calling OpenAI API: {str(e)}")
         raise
 
 def generate_search_queries(user_prompt):
@@ -44,25 +47,36 @@ def generate_search_queries(user_prompt):
 
     try:
         openai_response = get_openai_response(messages)
-        content = openai_response.choices[0].message['content']
+        content = openai_response.choices[0].message.content
         queries = json.loads(content)
         return queries['search_queries']
     except Exception as e:
-        print(f"Error generating search queries: {str(e)}")
+        logger.error(f"Error generating search queries: {str(e)}")
         return []
 
 def google_search(query):
-    conn = HTTPSConnection("www.googleapis.com")
-    params = urlencode({
-        'key': GOOGLE_API_KEY,
-        'cx': GOOGLE_CSE_ID,
-        'q': query
-    })
-    conn.request("GET", f"/customsearch/v1?{params}")
-    response = conn.getresponse()
-    data = response.read()
-    conn.close()
-    return json.loads(data.decode("utf-8"))
+    try:
+        conn = HTTPSConnection("www.googleapis.com")
+        encoded_query = quote_plus(query)
+        params = urlencode({
+            'key': GOOGLE_API_KEY,
+            'cx': GOOGLE_CSE_ID,
+            'q': encoded_query
+        }, safe='=&')
+        
+        conn.request("GET", f"/customsearch/v1?{params}")
+        response = conn.getresponse()
+        
+        if response.status != 200:
+            logger.error(f"Error: Google API returned status code {response.status}")
+            return {"error": f"Google API error: {response.status} {response.reason}"}
+        
+        data = response.read()
+        conn.close()
+        return json.loads(data.decode("utf-8"))
+    except Exception as e:
+        logger.error(f"Error in google_search: {str(e)}")
+        return {"error": f"Failed to perform Google search: {str(e)}"}
 
 def get_page_content(url):
     try:
@@ -77,16 +91,20 @@ def get_page_content(url):
         
         return text[:2000]
     except Exception as e:
-        print(f"Error scraping {url}: {str(e)}")
+        logger.error(f"Error scraping {url}: {str(e)}")
         return ""
 
 def process_prompt(user_prompt):
     try:
         search_queries = generate_search_queries(user_prompt)
+        logger.info(f"Generated search queries: {search_queries}")
 
         scraped_contents = []
         for query in search_queries:
             search_result = google_search(query)
+            if "error" in search_result:
+                logger.error(f"Error in Google search: {search_result['error']}")
+                continue
             
             for item in search_result.get('items', []):
                 if len(scraped_contents) >= 6:
@@ -99,6 +117,7 @@ def process_prompt(user_prompt):
                 break
 
         context = "\n\n".join([f"Content from {item['url']}:\n{item['content']}" for item in scraped_contents])
+        logger.info(f"Scraped content from {len(scraped_contents)} sources")
 
         system_prompt = """You are an AI assistant specialized in due diligence for mergers and acquisitions. Here's the context for your analysis:
 
@@ -151,7 +170,7 @@ def process_prompt(user_prompt):
         ]
 
         openai_response = get_openai_response(messages)
-        due_diligence_content = openai_response.choices[0].message['content']
+        due_diligence_content = openai_response.choices[0].message.content
         due_diligence_points = json.loads(due_diligence_content)
 
         result = {
@@ -163,48 +182,49 @@ def process_prompt(user_prompt):
 
         return result
     except Exception as e:
-        print(f"Error in process_prompt: {str(e)}")
+        logger.error(f"Error in process_prompt: {str(e)}")
         return {"error": "An unexpected error occurred", "details": str(e)}
 
-class handler(BaseHTTPRequestHandler):
-    def set_CORS_headers(self):
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-        self.send_header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+def handler(request):
+    if request.method == 'OPTIONS':
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Access-Control-Allow-Credentials': 'true',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+                'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+            },
+            'body': ''
+        }
     
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.set_CORS_headers()
-        self.end_headers()
-
-    def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        data = json.loads(post_data.decode('utf-8'))
-
-        user_prompt = data.get('prompt')
-        if not user_prompt:
-            self.send_response(400)
-            self.set_CORS_headers()
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            response = json.dumps({"error": "Missing 'prompt' in request body"})
-            self.wfile.write(response.encode('utf-8'))
-            return
-
+    if request.method == 'POST':
         try:
-            result = process_prompt(user_prompt)
-            self.send_response(200)
-            self.set_CORS_headers()
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            response = json.dumps(result)
-            self.wfile.write(response.encode('utf-8'))
+            body = json.loads(request.body)
+            user_prompt = body.get('prompt')
+            if not user_prompt:
+                return {
+                    'statusCode': 400,
+                    'body': json.dumps({"error": "Missing 'prompt' in request body"})
+                }
 
+            result = process_prompt(user_prompt)
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps(result)
+            }
         except Exception as e:
-            self.send_response(500)
-            self.set_CORS_headers()
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            response = json.dumps({"error": str(e)})
-            self.wfile.write(response.encode('utf-8'))
+            logger.error(f"Error processing request: {str(e)}")
+            return {
+                'statusCode': 500,
+                'body': json.dumps({"error": "An unexpected error occurred", "details": str(e)})
+            }
+    else:
+        return {
+            'statusCode': 405,
+            'body': json.dumps({"error": "Method Not Allowed"})
+        }
