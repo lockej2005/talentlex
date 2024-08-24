@@ -5,7 +5,7 @@ import { createClient } from '@supabase/supabase-js';
 import './DueDiligence.css';
 
 // Initialize Supabase client
-const supabase = createClient('YOUR_SUPABASE_URL', 'YOUR_SUPABASE_ANON_KEY');
+const supabase = createClient('https://atbphpeswwgqvwlbplko.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU');
 
 const DueDiligence = () => {
   const [backgroundInfo, setBackgroundInfo] = useState('');
