@@ -8,7 +8,7 @@ import Signup from './pages/Signup';
 import Scrape from './pages/Scrape';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import AIUsagePolicy from './pages/AIUsagePolicy';
-import ComparisonDashboard from './pages/ComparisonDashboard';
+import NegotiationSimulator from './pages/NegotiationSimulator';
 import Videos from './pages/Videos';
 import SpeakToFounders from './pages/SpeakToFounders';
 import DueDiligence from './pages/DueDiligence'; // Import the new DueDiligence component
@@ -55,7 +55,7 @@ function App() {
           <Route path="scrape" element={<Scrape />} />
           <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="ai-usage-policy" element={<AIUsagePolicy />} />
-          <Route path="review-arena" element={<ComparisonDashboard />} />
+          <Route path="negotiation-simulator" element={<NegotiationSimulator />} />
           <Route path="videos" element={<Videos />} />
           <Route path="speak-to-founders" element={<SpeakToFounders />} />
           <Route path="due-diligence" element={<DueDiligence />} /> {/* New route for Due Diligence */}

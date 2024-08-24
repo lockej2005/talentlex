@@ -3,10 +3,9 @@ import { Menu } from 'lucide-react';
 import { Routes, Route, Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { supabase } from '../supabaseClient'; // Adjust the import path as needed
 import ApplicationReview from './ApplicationReview';
-import Scrape from './Scrape';
 import PrivacyPolicy from './PrivacyPolicy';
 import AIUsagePolicy from './AIUsagePolicy';
-import ComparisonDashboard from './ComparisonDashboard'; // New import for Review Arena
+import NegotiationSimulator from './NegotiationSimulator';
 import SocietyCodeInput from './SocietyCodeInput'; // Make sure this import is correct
 import DueDiligence from './DueDiligence'; // New import for Due Diligence
 import './Layout.css';
@@ -164,8 +163,8 @@ const Layout = () => {
               <li className={location.pathname === "/due-diligence" ? "active" : ""}>
                 <Link to="/due-diligence">Due Diligence Tool</Link>
               </li>
-              <li className={location.pathname === "/review-arena" ? "active" : ""}>
-                <Link to="/review-arena">Negotiation Simulator</Link>
+              <li className={location.pathname === "/negotiation-simulator" ? "active" : ""}>
+                <Link to="/negotiation-simulator">Negotiation Simulator</Link>
               </li>
               <li className="section-title">Guide</li>
               <div className='seperator'></div>
@@ -205,7 +204,7 @@ const Layout = () => {
         <div className="content-area">
           <Routes>
             <Route path="/" element={<ApplicationReview />} />
-            <Route path="/review-arena" element={<ComparisonDashboard />} />
+            <Route path="/negotiation-simulator" element={<NegotiationSimulator />} />
             <Route path="/due-diligence" element={<DueDiligence />} />
             <Route path="/videos" element={<Videos />} />
             <Route path="/speak-to-founders" element={<SpeakToFounders />} />

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import './ComparisonDashboard.css';
+import './NegotiationSimulator.css';
 
 // Initialize Supabase
 const supabaseUrl = 'https://atbphpeswwgqvwlbplko.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-const ComparisonDashboard = () => {
+const NegotiationSimulator = () => {
   const [scenario, setScenario] = useState('');
   const [negotiationResults, setNegotiationResults] = useState([]);
   const [openItems, setOpenItems] = useState(new Set());
@@ -322,4 +322,4 @@ const ComparisonDashboard = () => {
   );
 };
 
-export default ComparisonDashboard;
+export default NegotiationSimulator;
