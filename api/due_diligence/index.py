@@ -37,16 +37,11 @@ def get_openai_response(messages, model="gpt-4o-mini"):
         logger.error(traceback.format_exc())
         raise
 
-def generate_search_queries(user_prompt):
-    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 6 separate search queries relevant to due diligence research a lawyer might need to do in relation to the given context. Format your response as a JSON object with the following structure:
+def generate_search_query(user_prompt):
+    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 1 search query relevant to due diligence research a lawyer might need to do in relation to the given context. Format your response as a JSON object with the following structure:
 
     {
-        "query1": "Query 1",
-        "query2": "Query 2",
-        "query3": "Query 3",
-        "query4": "Query 4",
-        "query5": "Query 5",
-        "query6": "Query 6"
+        "query": "Your generated search query"
     }
 
     Ensure that your response is a valid JSON object."""
@@ -57,29 +52,28 @@ def generate_search_queries(user_prompt):
     ]
 
     try:
-        logger.info("Generating search queries")
+        logger.info("Generating search query")
         openai_response = get_openai_response(messages)
         content = openai_response.choices[0].message.content
-        logger.info(f"Raw OpenAI response for search queries: {content}")
+        logger.info(f"Raw OpenAI response for search query: {content}")
         
         # Try to parse the content as JSON
         try:
-            queries = json.loads(content)
-            search_queries = list(queries.values())
-        except json.JSONDecodeError as json_err:
-            logger.error(f"Failed to parse OpenAI response as JSON: {str(json_err)}")
+            query_json = json.loads(content)
+            search_query = query_json["query"]
+        except (json.JSONDecodeError, KeyError) as err:
+            logger.error(f"Failed to parse OpenAI response as JSON or extract query: {str(err)}")
             logger.error(f"Raw content: {content}")
             
-            # Attempt to extract queries using a simple string parsing method
-            lines = content.split('\n')
-            search_queries = [line.split(":")[1].strip().strip('"') for line in lines if line.strip() and ":" in line]
+            # Attempt to extract query using a simple string parsing method
+            search_query = content.split(":")[1].strip().strip('"') if ":" in content else ""
         
-        logger.info(f"Generated search queries: {search_queries}")
-        return search_queries, content  # Return both queries and raw content
+        logger.info(f"Generated search query: {search_query}")
+        return search_query, content  # Return both query and raw content
     except Exception as e:
-        logger.error(f"Error generating search queries: {str(e)}")
+        logger.error(f"Error generating search query: {str(e)}")
         logger.error(f"Full traceback: {traceback.format_exc()}")
-        return [], str(e)  # Return empty list and error message
+        return "", str(e)  # Return empty string and error message
 
 def google_search(query):
     conn = http.client.HTTPSConnection("www.googleapis.com")
@@ -87,7 +81,7 @@ def google_search(query):
         'key': GOOGLE_API_KEY,
         'cx': GOOGLE_CSE_ID,
         'q': query,
-        'num': 1  # Limit to 1 result
+        'num': 6  # Get top 6 results
     })
     logger.info(f"Sending Google search request for query: {query}")
     conn.request("GET", f"/customsearch/v1?{params}")
@@ -135,37 +129,34 @@ def process_prompt(user_prompt):
         "steps": []
     }
     try:
-        # Step 1: Generate search queries
-        search_queries, raw_query_response = generate_search_queries(user_prompt)
+        # Step 1: Generate search query
+        search_query, raw_query_response = generate_search_query(user_prompt)
         result["steps"].append({
-            "step": "Generate Search Queries",
-            "search_queries": search_queries,
+            "step": "Generate Search Query",
+            "search_query": search_query,
             "raw_openai_response": raw_query_response
         })
         
-        if not search_queries:
-            logger.warning("No search queries were generated. Returning error response.")
-            result["error"] = "Failed to generate search queries"
+        if not search_query:
+            logger.warning("No search query was generated. Returning error response.")
+            result["error"] = "Failed to generate search query"
             return result
 
-        # Step 2: Perform Google searches and fetch content
+        # Step 2: Perform Google search and fetch content
+        search_result = google_search(search_query)
+        result["steps"].append({
+            "step": "Google Search",
+            "search_result": search_result
+        })
+
         scraped_contents = []
-        google_search_results = []
-        for query in search_queries:
-            search_result = google_search(query)
-            google_search_results.append({"query": query, "result": search_result})
-            logger.info(f"Google API response for query '{query}': {json.dumps(search_result, indent=2)}")
-            
-            # Fetch content for the single top result of each query
-            if search_result.get('items'):
-                item = search_result['items'][0]
-                url = item['link']
-                content = get_page_content(url)
-                scraped_contents.append({"url": url, "content": content})
+        for item in search_result.get('items', [])[:6]:
+            url = item['link']
+            content = get_page_content(url)
+            scraped_contents.append({"url": url, "content": content})
 
         result["steps"].append({
-            "step": "Google Search and Content Scraping",
-            "google_search_results": google_search_results,
+            "step": "Content Scraping",
             "scraped_contents": scraped_contents
         })
 
