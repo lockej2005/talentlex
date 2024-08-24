@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import Layout from './pages/Layout';
-import Comparison from './pages/Comparison';
+import ApplicationReview from './pages/ApplicationReview';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Scrape from './pages/Scrape';
@@ -51,7 +51,7 @@ function App() {
             </PrivateRoute>
           }
         >
-          <Route index element={<Comparison />} />
+          <Route index element={<ApplicationReview />} />
           <Route path="scrape" element={<Scrape />} />
           <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="ai-usage-policy" element={<AIUsagePolicy />} />

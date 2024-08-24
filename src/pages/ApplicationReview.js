@@ -4,14 +4,14 @@ import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
 import ReactMarkdown from 'react-markdown';
 import { createClient } from '@supabase/supabase-js';
 import ApplicationInput from './ApplicationInput';
-import './comparison.css';
+import './ApplicationReview.css';
 
 // Initialize Supabase
 const supabaseUrl = 'https://atbphpeswwgqvwlbplko.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-function Comparison() {
+function ApplicationReview() {
   const [leftWidth, setLeftWidth] = useState(50);
   const [applicationText, setApplicationText] = useState("Enter your application here or generate a draft.");
   const [feedback, setFeedback] = useState("");
@@ -291,7 +291,7 @@ function Comparison() {
       }
 
       const data = await response.json();
-      console.log('Usage:', data.usage);
+console.log('Usage:', data.usage);
 
       localTotalTokens += data.usage.total_tokens;
       setTotalTokens(localTotalTokens);
@@ -424,4 +424,4 @@ function Comparison() {
   );
 }
 
-export default Comparison;
+export default ApplicationReview;

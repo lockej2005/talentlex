@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import { Routes, Route, Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { supabase } from '../supabaseClient'; // Adjust the import path as needed
-import Comparison from './Comparison';
+import ApplicationReview from './ApplicationReview';
 import Scrape from './Scrape';
 import PrivacyPolicy from './PrivacyPolicy';
 import AIUsagePolicy from './AIUsagePolicy';
@@ -204,7 +204,7 @@ const Layout = () => {
         </button>
         <div className="content-area">
           <Routes>
-            <Route path="/" element={<Comparison />} />
+            <Route path="/" element={<ApplicationReview />} />
             <Route path="/review-arena" element={<ComparisonDashboard />} />
             <Route path="/due-diligence" element={<DueDiligence />} />
             <Route path="/videos" element={<Videos />} />
