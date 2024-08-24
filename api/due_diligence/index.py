@@ -41,14 +41,12 @@ def generate_search_queries(user_prompt):
     system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 6 separate search queries relevant to due diligence research a lawyer might need to do in relation to the given context. Format your response as a JSON object with the following structure:
 
     {
-      "search_queries": [
-        "Query 1",
-        "Query 2",
-        "Query 3",
-        "Query 4",
-        "Query 5",
-        "Query 6"
-      ]
+        "query1": "Query 1",
+        "query2": "Query 2",
+        "query3": "Query 3",
+        "query4": "Query 4",
+        "query5": "Query 5",
+        "query6": "Query 6"
     }
 
     Ensure that your response is a valid JSON object."""
@@ -67,15 +65,17 @@ def generate_search_queries(user_prompt):
         # Try to parse the content as JSON
         try:
             queries = json.loads(content)
+            search_queries = list(queries.values())
         except json.JSONDecodeError as json_err:
             logger.error(f"Failed to parse OpenAI response as JSON: {str(json_err)}")
             logger.error(f"Raw content: {content}")
             
             # Attempt to extract queries using a simple string parsing method
             lines = content.split('\n')
-            queries = {"search_queries": [line.strip() for line in lines if line.strip() and not line.strip().startswith('{') and not line.strip().endswith('}')]}        
-        logger.info(f"Generated search queries: {queries['search_queries']}")
-        return queries['search_queries'], content  # Return both queries and raw content
+            search_queries = [line.split(":")[1].strip().strip('"') for line in lines if line.strip() and ":" in line]
+        
+        logger.info(f"Generated search queries: {search_queries}")
+        return search_queries, content  # Return both queries and raw content
     except Exception as e:
         logger.error(f"Error generating search queries: {str(e)}")
         logger.error(f"Full traceback: {traceback.format_exc()}")
