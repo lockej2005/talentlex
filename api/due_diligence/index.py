@@ -38,7 +38,7 @@ def get_openai_response(messages, model="gpt-4o-mini"):
         raise
 
 def generate_search_query(user_prompt):
-    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 1 search query relevant to due diligence research a lawyer might need to do in relation to the given context, keep the query short and succinct (less than 10 words) to get the msot relevant results. Format your response as a JSON object with the following structure:
+    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 1 search query relevant to due diligence research a lawyer might need to do in relation to the given context, keep the query short and succinct (less than 10 words) to get the most relevant results. Format your response as a JSON object with the following structure:
 
     {
         "query": "Your generated search query"
@@ -118,9 +118,8 @@ def get_page_content(url):
         logger.info(f"Successfully extracted content from URL: {url}")
         return text[:2000]  # Limit to first 2000 characters
     except Exception as e:
-        logger.error(f"Error scraping {url}: {str(e)}")
-        logger.error(traceback.format_exc())
-        return ""
+        logger.warning(f"Error scraping {url}: {str(e)}")
+        return None  # Return None instead of an empty string for failed scrapes
 
 def process_prompt(user_prompt):
     logger.info(f"Processing prompt: {user_prompt}")
@@ -153,7 +152,8 @@ def process_prompt(user_prompt):
         for item in search_result.get('items', [])[:6]:
             url = item['link']
             content = get_page_content(url)
-            scraped_contents.append({"url": url, "content": content})
+            if content is not None:
+                scraped_contents.append({"url": url, "content": content})
 
         result["steps"].append({
             "step": "Content Scraping",
