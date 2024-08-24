@@ -125,6 +125,43 @@ function Comparison() {
     setWordCount(calculateWordCount(applicationText));
   }, [applicationText]);
 
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from('user_drafts')
+          .select('application_text, feedback')
+          .eq('user_id', user.id)
+          .single();
+
+        if (data) {
+          setApplicationText(data.application_text);
+          setFeedback(data.feedback);
+        }
+      }
+    };
+
+    loadUserData();
+  }, [user]);
+
+  const saveUserData = async () => {
+    if (user) {
+      const { error } = await supabase
+        .from('user_drafts')
+        .upsert({ 
+          user_id: user.id, 
+          application_text: applicationText, 
+          feedback: feedback 
+        });
+
+      if (error) console.error('Error saving user data:', error);
+    }
+  };
+
+  useEffect(() => {
+    saveUserData();
+  }, [applicationText, feedback]);
+
   const handleMouseDown = (e) => {
     e.preventDefault();
     document.addEventListener('mousemove', handleMouseMove);
