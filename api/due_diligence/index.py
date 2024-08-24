@@ -17,6 +17,10 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 GOOGLE_API_KEY = "AIzaSyBqJNAkR48aA-9VKTpawAsUIjqQqou6q9I"
 GOOGLE_CSE_ID = "b7adcaafedbb6484a"
 
+if not OPENAI_API_KEY:
+    logger.error("OpenAI API key is not set. Please set the OPENAI_API_KEY environment variable.")
+    raise ValueError("OpenAI API key is not set")
+
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 def get_openai_response(messages, model="gpt-4o-mini"):
@@ -59,13 +63,24 @@ def generate_search_queries(user_prompt):
         openai_response = get_openai_response(messages)
         content = openai_response.choices[0].message.content
         logger.info(f"Raw OpenAI response for search queries: {content}")
-        queries = json.loads(content)
+        
+        # Try to parse the content as JSON
+        try:
+            queries = json.loads(content)
+        except json.JSONDecodeError as json_err:
+            logger.error(f"Failed to parse OpenAI response as JSON: {str(json_err)}")
+            logger.error(f"Raw content: {content}")
+            
+            # Attempt to extract queries using a simple string parsing method
+            lines = content.split('\n')
+            queries = {"search_queries": [line.strip() for line in lines if line.strip() and not line.strip().startswith('{') and not line.strip().endswith('}')}]
+        
         logger.info(f"Generated search queries: {queries['search_queries']}")
-        return queries['search_queries']
+        return queries['search_queries'], content  # Return both queries and raw content
     except Exception as e:
         logger.error(f"Error generating search queries: {str(e)}")
-        logger.error(traceback.format_exc())
-        return []
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        return [], str(e)  # Return empty list and error message
 
 def google_search(query):
     conn = http.client.HTTPSConnection("www.googleapis.com")
@@ -116,11 +131,25 @@ def get_page_content(url):
 
 def process_prompt(user_prompt):
     logger.info(f"Processing prompt: {user_prompt}")
+    result = {
+        "user_prompt": user_prompt,
+        "steps": []
+    }
     try:
-        # Get search queries
-        search_queries = generate_search_queries(user_prompt)
+        # Step 1: Generate search queries
+        search_queries, raw_query_response = generate_search_queries(user_prompt)
+        result["steps"].append({
+            "step": "Generate Search Queries",
+            "search_queries": search_queries,
+            "raw_openai_response": raw_query_response
+        })
+        
+        if not search_queries:
+            logger.warning("No search queries were generated. Returning error response.")
+            result["error"] = "Failed to generate search queries"
+            return result
 
-        # Perform Google searches and fetch content
+        # Step 2: Perform Google searches and fetch content
         scraped_contents = []
         google_search_results = []
         for query in search_queries:
@@ -135,10 +164,20 @@ def process_prompt(user_prompt):
                 content = get_page_content(url)
                 scraped_contents.append({"url": url, "content": content})
 
-        # Prepare the context for OpenAI
-        context = "\n\n".join([f"Content from {item['url']}:\n{item['content']}" for item in scraped_contents])
+        result["steps"].append({
+            "step": "Google Search and Content Scraping",
+            "google_search_results": google_search_results,
+            "scraped_contents": scraped_contents
+        })
 
-        # Generate due diligence points with additional context
+        # Step 3: Prepare the context for OpenAI
+        context = "\n\n".join([f"Content from {item['url']}:\n{item['content']}" for item in scraped_contents])
+        result["steps"].append({
+            "step": "Prepare Context",
+            "context": context
+        })
+
+        # Step 4: Generate due diligence points with additional context
         system_prompt = """You are an AI assistant specialized in due diligence for mergers and acquisitions. Here's the context for your analysis:
 
         Known risks are those uncovered by the Buyer during due diligence or voluntarily disclosed by the Seller. These are typically managed through express indemnities. For example, if Seller is subject to a pending lawsuit from a former partner, Buyer may require Seller's owners to indemnify Buyer against any costs associated with that lawsuit. Such indemnities are often tailored to the specific risks and can last indefinitely.
@@ -194,28 +233,35 @@ def process_prompt(user_prompt):
             {"role": "user", "content": f"User Prompt: {user_prompt}\n\nAdditional Context:\n{context}"}
         ]
 
+        result["steps"].append({
+            "step": "Generate Due Diligence Points",
+            "messages": messages
+        })
+
         openai_response = get_openai_response(messages)
         due_diligence_content = openai_response.choices[0].message.content
         logger.info(f"Raw OpenAI response for due diligence: {due_diligence_content}")
         due_diligence_points = json.loads(due_diligence_content)
 
-        # Prepare the result
-        result = {
-            "user_prompt": user_prompt,
-            "search_queries": search_queries,
-            "google_search_results": google_search_results,
-            "scraped_contents": scraped_contents,
-            "context": context,
-            "due_diligence_points": due_diligence_points["due_diligence_points"],
-            "helpful_links": due_diligence_points.get("helpful_links", []),
-        }
+        result["steps"].append({
+            "step": "Process Due Diligence Points",
+            "raw_openai_response": due_diligence_content,
+            "processed_points": due_diligence_points
+        })
+
+        # Final result
+        result["due_diligence_points"] = due_diligence_points["due_diligence_points"]
+        result["helpful_links"] = due_diligence_points.get("helpful_links", [])
 
         logger.info("Successfully processed prompt and generated response")
         return result
     except Exception as e:
         logger.error(f"Error in process_prompt: {str(e)}")
-        logger.error(traceback.format_exc())
-        return {"error": "An unexpected error occurred", "details": str(e)}
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        result["error"] = "An unexpected error occurred"
+        result["error_details"] = str(e)
+        result["error_traceback"] = traceback.format_exc()
+        return result
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
