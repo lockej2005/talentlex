@@ -73,8 +73,7 @@ def generate_search_queries(user_prompt):
             
             # Attempt to extract queries using a simple string parsing method
             lines = content.split('\n')
-            queries = {"search_queries": [line.strip() for line in lines if line.strip() and not line.strip().startswith('{') and not line.strip().endswith('}')}]
-        
+            queries = {"search_queries": [line.strip() for line in lines if line.strip() and not line.strip().startswith('{') and not line.strip().endswith('}')]}        
         logger.info(f"Generated search queries: {queries['search_queries']}")
         return queries['search_queries'], content  # Return both queries and raw content
     except Exception as e:
