@@ -38,7 +38,7 @@ def get_openai_response(messages, model="gpt-4o-mini"):
         raise
 
 def generate_search_query(user_prompt):
-    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 1 search query relevant to due diligence research a lawyer might need to do in relation to the given context. Format your response as a JSON object with the following structure:
+    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 1 search query relevant to due diligence research a lawyer might need to do in relation to the given context, keep the query short and succinct (less than 10 words) to get the msot relevant results. Format your response as a JSON object with the following structure:
 
     {
         "query": "Your generated search query"
