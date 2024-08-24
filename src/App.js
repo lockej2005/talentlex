@@ -5,7 +5,6 @@ import Layout from './pages/Layout';
 import ApplicationReview from './pages/ApplicationReview';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Scrape from './pages/Scrape';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import AIUsagePolicy from './pages/AIUsagePolicy';
 import NegotiationSimulator from './pages/NegotiationSimulator';
@@ -52,7 +51,6 @@ function App() {
           }
         >
           <Route index element={<ApplicationReview />} />
-          <Route path="scrape" element={<Scrape />} />
           <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="ai-usage-policy" element={<AIUsagePolicy />} />
           <Route path="negotiation-simulator" element={<NegotiationSimulator />} />
