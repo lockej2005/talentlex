@@ -33,3 +33,24 @@ export const subtractCredits = async (userId, cost) => {
     return { success: false, error: error.message };
   }
 };
+
+export const subtractCreditsAndUpdateUser = async (userId, totalTokens) => {
+  try {
+    const cost = Math.round(totalTokens * 0.005);
+    const { success, newBalance, error } = await subtractCredits(userId, cost);
+
+    if (!success) {
+      throw new Error(error || 'Failed to subtract credits');
+    }
+
+    return { success: true, cost, newBalance };
+  } catch (error) {
+    console.error('Error subtracting credits:', error);
+    return { 
+      success: false, 
+      error: error.message === 'Insufficient credits' 
+        ? "Error: Insufficient credits to complete this operation." 
+        : "Error: Unable to process credits. Please try again later."
+    };
+  }
+};

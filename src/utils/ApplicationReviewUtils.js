@@ -1,9 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-import { subtractCredits } from './CreditManager';
-
-const supabaseUrl = 'https://atbphpeswwgqvwlbplko.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU';
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from '../supabaseClient';
+import { subtractCreditsAndUpdateUser } from './CreditManager';
 
 export const getCurrentUser = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -120,8 +116,7 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
   const endTime = Date.now();
   setResponseTime((endTime - startTime) / 1000);
 
-  const cost = Math.round(localTotalTokens * 0.005);
-  const { success, newBalance, error } = await subtractCredits(user.id, cost);
+  const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, localTotalTokens);
 
   if (!success) {
     throw new Error(error);
@@ -154,8 +149,7 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
 
   setApplicationText(data.draft);
 
-  const cost = Math.round(localTotalTokens * 0.005);
-  const { success, newBalance, error } = await subtractCredits(user.id, cost);
+  const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, localTotalTokens);
   
   if (!success) {
     throw new Error(error);

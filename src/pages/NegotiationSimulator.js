@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import './NegotiationSimulator.css';
-
-// Initialize Supabase
-const supabaseUrl = 'https://atbphpeswwgqvwlbplko.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU';
-const supabase = createClient(supabaseUrl, supabaseKey);
+import {
+  getCurrentUser,
+  getResponse,
+  getFinalDecision,
+  renderJsonStructure
+} from '../utils/NegotiationSimulatorUtils';
+import { subtractCreditsAndUpdateUser } from '../utils/CreditManager';
 
 const NegotiationSimulator = () => {
   const [scenario, setScenario] = useState('');
@@ -19,20 +20,12 @@ const NegotiationSimulator = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const getCurrentUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+    const fetchCurrentUser = async () => {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
     };
 
-    getCurrentUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
+    fetchCurrentUser();
   }, []);
 
   const toggleItem = (index) => {
@@ -64,203 +57,33 @@ const NegotiationSimulator = () => {
     try {
       let currentScenario = scenario;
       for (let i = 0; i < 5; i++) {
-        await getResponse('user_agent', currentScenario, i * 2);
-        await getResponse('opposition_agent', currentScenario, i * 2 + 1);
-        currentScenario = `${scenario}\n\nPrevious offers:\n${negotiationResults[negotiationResults.length - 2]?.content || ''}\n${negotiationResults[negotiationResults.length - 1]?.content || ''}`;
+        const userResponse = await getResponse('user_agent', currentScenario, negotiationResults);
+        const oppositionResponse = await getResponse('opposition_agent', currentScenario, negotiationResults);
+        
+        setNegotiationResults(prev => [...prev, userResponse.result, oppositionResponse.result]);
+        setOpenItems(prev => new Set([...prev, i*2, i*2+1]));
+        setTotalTokens(prev => prev + userResponse.usage.total_tokens + oppositionResponse.usage.total_tokens);
+        
+        currentScenario = `${scenario}\n\nPrevious offers:\n${userResponse.result.content}\n${oppositionResponse.result.content}`;
       }
-      await getFinalDecision();
+      
+      const finalDecision = await getFinalDecision(scenario, negotiationResults);
+      setUserOffer(finalDecision.userOffer);
+      setLawyerDecision(finalDecision.lawyerDecision);
+      setTotalTokens(prev => prev + finalDecision.userOfferTokens + finalDecision.lawyerDecisionTokens);
 
       // After all API calls are complete, subtract credits
-      await subtractCreditsAndUpdateUser();
+      const { success, cost, newBalance, error: creditError } = await subtractCreditsAndUpdateUser(user.id, totalTokens);
+      if (!success) {
+        throw new Error(creditError);
+      }
+      setError(`Credits used: ${cost}. Remaining credits: ${newBalance}`);
     } catch (error) {
       console.error('Error:', error);
-      setError("An error occurred while processing your request.");
+      setError("An error occurred while processing your request: " + error.message);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const getResponse = async (agent, currentScenario, index) => {
-    try {
-      const response = await fetch(`/api/${agent}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          scenario: currentScenario, 
-          previous_responses: negotiationResults
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-      
-      if (data.result && data.usage) {
-        setNegotiationResults(prev => {
-          const newResults = [...prev];
-          newResults[index] = {
-            side: agent === 'user_agent' ? 'user' : 'opposing',
-            heading: data.result.heading || `${agent.split('_')[0].toUpperCase()} Response`,
-            content: typeof data.result.content === 'object' ? JSON.stringify(data.result.content) : (data.result.content || 'No content provided'),
-          };
-          return newResults;
-        });
-
-        setOpenItems(prev => new Set([...prev, index]));
-
-        // Update total tokens
-        setTotalTokens(prev => prev + data.usage.total_tokens);
-      } else {
-        throw new Error('Unexpected response structure');
-      }
-    } catch (error) {
-      console.error('Error fetching response:', error);
-      setNegotiationResults(prev => {
-        const newResults = [...prev];
-        newResults[index] = {
-          side: agent === 'user_agent' ? 'user' : 'opposing',
-          heading: 'Error',
-          content: 'Failed to fetch response.',
-        };
-        return newResults;
-      });
-    }
-  };
-
-  const getFinalDecision = async () => {
-    try {
-      // Get user's final offer
-      const userOfferResponse = await fetch('/api/user_descision', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          scenario, 
-          conversation_history: negotiationResults
-        }),
-      });
-
-      if (!userOfferResponse.ok) {
-        throw new Error(`HTTP error! status: ${userOfferResponse.status}`);
-      }
-
-      const userOfferData = await userOfferResponse.json();
-      if (userOfferData.result && userOfferData.usage) {
-        setUserOffer(userOfferData.result);
-        setTotalTokens(prev => prev + userOfferData.usage.total_tokens);
-      } else {
-        throw new Error('Unexpected user offer response structure');
-      }
-
-      // Get lawyer's decision
-      const lawyerDecisionResponse = await fetch('/api/lawyer_descision', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          scenario,
-          conversation_history: negotiationResults,
-          user_offer: userOfferData.result
-        }),
-      });
-
-      if (!lawyerDecisionResponse.ok) {
-        throw new Error(`HTTP error! status: ${lawyerDecisionResponse.status}`);
-      }
-
-      const lawyerDecisionData = await lawyerDecisionResponse.json();
-      if (lawyerDecisionData.result && lawyerDecisionData.usage) {
-        setLawyerDecision(lawyerDecisionData.result);
-        setTotalTokens(prev => prev + lawyerDecisionData.usage.total_tokens);
-      } else {
-        throw new Error('Unexpected lawyer decision response structure');
-      }
-
-    } catch (error) {
-      console.error('Error getting final decision:', error);
-      setUserOffer({ error: 'Failed to fetch user offer.' });
-      setLawyerDecision({ error: 'Failed to fetch lawyer decision.' });
-    }
-  };
-
-  const subtractCreditsAndUpdateUser = async () => {
-    try {
-      const cost = Math.round(totalTokens * 0.005);
-      console.log(cost)
-      const { data: userData, error: userError } = await supabase
-        .from('profiles')
-        .select('credits')
-        .eq('id', user.id)
-        .single();
-
-      if (userError) throw userError;
-
-      if (userData.credits < cost) {
-        throw new Error('Insufficient credits');
-      }
-
-      const newCreditBalance = userData.credits - cost;
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ credits: newCreditBalance })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
-
-      setError(`Credits used: ${cost}. Remaining credits: ${newCreditBalance}`);
-    } catch (error) {
-      console.error('Error subtracting credits:', error);
-      setError(error.message === 'Insufficient credits' 
-        ? "Error: Insufficient credits to complete this operation." 
-        : "Error: Unable to process credits. Please try again later.");
-    }
-  };
-
-  const renderJsonStructure = (data, depth = 0) => {
-    if (data === null || data === undefined) return <span>N/A</span>;
-
-    if (typeof data !== 'object') {
-      return <span>{String(data)}</span>;
-    }
-
-    if (Array.isArray(data)) {
-      return (
-        <ul style={{ paddingLeft: `${depth * 20}px`, listStyleType: 'none' }}>
-          {data.map((item, index) => (
-            <li key={index}>{renderJsonStructure(item, depth + 1)}</li>
-          ))}
-        </ul>
-      );
-    }
-
-    return (
-      <div style={{ paddingLeft: `${depth * 20}px` }}>
-        {Object.entries(data).map(([key, value]) => (
-          <div key={key}>
-            <strong>{key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}:</strong>{' '}
-            {renderJsonStructure(value, depth + 1)}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  const renderDecision = (title, data) => {
-    if (!data) return null;
-  
-    console.log(`${title} data:`, data);  // Add this line for debugging
-
-    return (
-      <div className="arena-final-decision">
-        <h3>{title}:</h3>
-        {data.error ? (
-          <p>{data.error}</p>
-        ) : (
-          renderJsonStructure(data)
-        )}
-      </div>
-    );
   };
 
   const renderColumn = (isLeft) => (
@@ -290,6 +113,21 @@ const NegotiationSimulator = () => {
         })}
     </div>
   );
+
+  const renderDecision = (title, data) => {
+    if (!data) return null;
+  
+    return (
+      <div className="arena-final-decision">
+        <h3>{title}:</h3>
+        {data.error ? (
+          <p>{data.error}</p>
+        ) : (
+          renderJsonStructure(data)
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="arena-comparison-dashboard">
