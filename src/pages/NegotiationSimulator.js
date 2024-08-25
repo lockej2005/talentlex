@@ -86,6 +86,47 @@ const NegotiationSimulator = () => {
     }
   };
 
+  const renderStructureAsJsx = (structure) => {
+    if (Array.isArray(structure)) {
+      return (
+        <ul style={{ paddingLeft: '20px', listStyleType: 'none' }}>
+          {structure.map((item, index) => (
+            <li key={index}>
+              <strong>{item.key}:</strong> {renderStructureAsJsx(item.value)}
+            </li>
+          ))}
+        </ul>
+      );
+    } else if (typeof structure === 'object' && structure !== null) {
+      return (
+        <div>
+          {Object.entries(structure).map(([key, value]) => (
+            <div key={key}>
+              <strong>{key}:</strong> {renderStructureAsJsx(value)}
+            </div>
+          ))}
+        </div>
+      );
+    } else {
+      return String(structure);
+    }
+  };
+
+  const renderDecision = (title, data) => {
+    if (!data) return null;
+  
+    return (
+      <div className="arena-final-decision">
+        <h3>{title}:</h3>
+        {data.error ? (
+          <p>{data.error}</p>
+        ) : (
+          renderStructureAsJsx(renderJsonStructure(data))
+        )}
+      </div>
+    );
+  };
+
   const renderColumn = (isLeft) => (
     <div className={`arena-column ${isLeft ? 'arena-left-column' : 'arena-right-column'}`}>
       <h2 className="arena-column-heading">
@@ -113,21 +154,6 @@ const NegotiationSimulator = () => {
         })}
     </div>
   );
-
-  const renderDecision = (title, data) => {
-    if (!data) return null;
-  
-    return (
-      <div className="arena-final-decision">
-        <h3>{title}:</h3>
-        {data.error ? (
-          <p>{data.error}</p>
-        ) : (
-          renderJsonStructure(data)
-        )}
-      </div>
-    );
-  };
 
   return (
     <div className="arena-comparison-dashboard">
