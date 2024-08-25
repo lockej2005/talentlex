@@ -69,11 +69,11 @@ def generate_search_query(user_prompt):
             search_query = content.split(":")[1].strip().strip('"') if ":" in content else ""
         
         logger.info(f"Generated search query: {search_query}")
-        return search_query, content  # Return both query and raw content
+        return search_query, content, openai_response.usage.total_tokens  # Return query, raw content, and token usage
     except Exception as e:
         logger.error(f"Error generating search query: {str(e)}")
         logger.error(f"Full traceback: {traceback.format_exc()}")
-        return "", str(e)  # Return empty string and error message
+        return "", str(e), 0  # Return empty string, error message, and 0 tokens
 
 def google_search(query):
     conn = http.client.HTTPSConnection("www.googleapis.com")
@@ -128,9 +128,11 @@ def process_prompt(user_prompt):
         "user_prompt": user_prompt,
         "steps": []
     }
+    total_tokens = 0
     try:
         # Step 1: Generate search query
-        search_query, raw_query_response = generate_search_query(user_prompt)
+        search_query, raw_query_response, query_tokens = generate_search_query(user_prompt)
+        total_tokens += query_tokens
         result["steps"].append({
             "step": "Generate Search Query",
             "search_query": search_query,
@@ -230,6 +232,7 @@ def process_prompt(user_prompt):
 
         openai_response = get_openai_response(messages)
         due_diligence_content = openai_response.choices[0].message.content
+        total_tokens += openai_response.usage.total_tokens
         logger.info(f"Raw OpenAI response for due diligence: {due_diligence_content}")
         due_diligence_points = json.loads(due_diligence_content)
 
@@ -242,6 +245,9 @@ def process_prompt(user_prompt):
         # Final result
         result["due_diligence_points"] = due_diligence_points["due_diligence_points"]
         result["helpful_links"] = due_diligence_points.get("helpful_links", [])
+        result["usage"] = {
+            "total_tokens": total_tokens
+        }
 
         logger.info("Successfully processed prompt and generated response")
         return result
@@ -251,6 +257,9 @@ def process_prompt(user_prompt):
         result["error"] = "An unexpected error occurred"
         result["error_details"] = str(e)
         result["error_traceback"] = traceback.format_exc()
+        result["usage"] = {
+            "total_tokens": total_tokens
+        }
         return result
 
 class handler(BaseHTTPRequestHandler):
