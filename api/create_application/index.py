@@ -12,6 +12,7 @@ def read_prompt(filename):
 # Read only the three specified prompts
 sidley_austin_career_question = read_prompt('sidley_austin_career_question.txt')
 goodwin_why_question = read_prompt('goodwin_why_question.txt')
+jones_day_prompt = read_prompt('jones_day_prompt.txt')
 default_prompt = read_prompt('default_prompt.txt')
 
 class handler(BaseHTTPRequestHandler):
@@ -49,12 +50,18 @@ class handler(BaseHTTPRequestHandler):
             # Select the appropriate prompt based on firm and question
             if firm == "Sidley Austin" and question == "Why does a career in commercial law and specifically Sidley Austin interest you? (250 words max)":
                 system_prompt = sidley_austin_career_question
+                base_model="gpt-4o-mini"   
             elif firm == "Goodwin" and question == "Why are you applying to Goodwin? (100 words)":
                 system_prompt = goodwin_why_question
+                base_model = "ft:gpt-4o-mini-2024-07 18:personal:appdrafterdataset:9vG3pVmA"
+            elif firm == "Jones Day":
+                system_prompt = jones_day_prompt
+                base_model = "ft:gpt-4o-2024-08-06:personal:jonesdaydrafter:9zJFj48D"
             else:
                 system_prompt = default_prompt
+                base_model="gpt-4o-mini"   
 
-            model = "ft:gpt-4o-mini-2024-07-18:personal:appdrafterdataset:9vG3pVmA"
+            model = base_model
 
             prompt = f"""
             Generate a draft application for {firm} addressing the following question:
