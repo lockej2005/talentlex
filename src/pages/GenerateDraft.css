@@ -1,6 +1,6 @@
-/* Comparison.css */
+/* GenerateDraft.css */
 
-.comparison-container {
+.comparison-container-draft {
     max-width: 100%;
     margin: 0 auto;
     font-family: 'Inter', sans-serif;
@@ -9,27 +9,14 @@
     min-height: 95vh;
 }
 
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 50px;
-}
-
-h2 {
-    color: #fff;
-    font-size: 3rem;
-    margin: 0;
-}
-
-.content {
+.content-draft {
     display: flex;
     position: relative;
     overflow: visible;
     flex-grow: 1;
 }
 
-.left-column, .right-column {
+.left-column-draft, .right-column-draft {
     display: flex;
     flex-direction: column;
     padding: 0 20px;
@@ -37,7 +24,7 @@ h2 {
     flex-grow: 1;
 }
 
-.divider {
+.divider-draft {
     width: 20px;
     background-color: transparent;
     cursor: col-resize;
@@ -48,7 +35,7 @@ h2 {
     position: relative;
 }
 
-.divider-line {
+.divider-line-draft {
     width: 1px;
     background-color: #276D8B;
     position: absolute;
@@ -56,17 +43,17 @@ h2 {
     transform: translateX(-50%);
 }
 
-.divider-line.top {
+.divider-line-draft.top {
     top: 0;
     height: calc(50% - 20px);
 }
 
-.divider-line.bottom {
+.divider-line-draft.bottom {
     bottom: 0;
     height: calc(50% - 20px);
 }
 
-.divider-handle {
+.divider-handle-draft {
     width: 30px;
     height: 30px;
     background-color: none;
@@ -83,16 +70,17 @@ h2 {
     transform: translate(-50%, -50%);
 }
 
-.button-container {
+.button-container-draft {
     display: flex;
     flex-direction: row;
     margin: 10px 30px;
     gap: 15px;
 }
 
-.submit-button {
+.submit-button-draft {
     flex: 1;
     padding: 20px 15px;
+    margin: 0;
     font-size: 0.9rem;
     background-color: #272221;
     color: white;
@@ -104,104 +92,122 @@ h2 {
     align-self: center;
 }
 
-.submit-button:hover {
+.submit-button-draft:hover {
     background-color: #3a3a3a;
 }
 
-.submit-button:disabled {
+.submit-button-draft:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
 }
 
-
-.text-content {
+.rich-text-editor-draft {
     background-color: rgba(39, 109, 139, 0.6);
-    padding: 25px;
     border-radius: 10px;
-    color: #fff;
-    overflow-y: auto;
-    flex-grow: 1;
     margin: 10px 30px;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
-.text-content textarea {
-    width: 100%;
-    height: 100%;
-    min-height: 200px;
+.editor-toolbar-draft {
+    background-color: rgba(39, 109, 139, 0.8);
+    padding: 10px;
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.editor-toolbar-draft button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    margin-right: 10px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+}
+
+.editor-toolbar-draft button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.editor-content-draft {
+    flex-grow: 1;
+    padding: 15px;
+    color: #fff;
+    font-size: 1rem;
+    font-family: inherit;
+    outline: none;
+    overflow-y: auto;
+    min-height: 300px;
+    background-color: transparent;
     border: none;
     resize: none;
-    background-color: transparent;
-    color: inherit;
-    font: inherit;
-    padding: 10px;
+    width: 100%;
     box-sizing: border-box;
-    outline: none;
 }
 
-.text-content .bracketed-text {
-    color: #FFD700; /* Gold color */
-    font-style: italic;
+.editor-content-draft::placeholder {
+    color: rgba(255, 255, 255, 0.5);
 }
 
-.divider2 {
-    width: 95%;
-    height: 3px;
-    display: none;
-    background-color: rgba(0, 0, 0);
-    margin: 20px 0;
-    border-color: #111;
-    align-self: center;
+.editor-content-draft * {
+    direction: ltr !important;
+    text-align: left !important;
 }
 
-/* Responsive design */
+.editor-content-draft[placeholder]:empty:before {
+    content: attr(placeholder);
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Adjust the existing styles */
+.right-column-draft .text-content-draft {
+    display: none; /* Hide the old text-content div */
+}
+
+.right-column-draft .title-card-draft {
+    display: none; /* Hide the title card as requested */
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .comparison-container {
+    .comparison-container-draft {
         max-width: 100%;
         height: auto;
         overflow-y: visible;
         padding: 20px;
     }
 
-    .content {
+    .content-draft {
         flex-direction: column;
         overflow-y: visible;
     }
     
-    .left-column, .right-column {
+    .left-column-draft, .right-column-draft {
         width: 100% !important;
         height: auto;
         padding: 0px 0px;
     }
 
-    .header {
-        padding: 20px 20px;
-        text-align: left;
-    }
-
-    h2 {
-        font-size: 2rem; /* Reduced font size for mobile */
-    }
-
-    .text-content {
-        margin: 10px 0px;
-    }
-
-    .divider {
+    .divider-draft {
         display: none;
     }
 
-    .submit-button {
+    .submit-button-draft {
         margin: 10px 0px;
         padding: 10px 30px;
     }
 
-    .button-container {
-        margin: 00px 0px;
+    .button-container-draft {
+        margin: 0px 0px;
     }
 
-    .divider2 {
-        display: block;
+    .rich-text-editor-draft {
+        margin: 10px 0;
     }
 }

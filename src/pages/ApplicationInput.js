@@ -1,46 +1,20 @@
 import React from 'react';
 import Select from 'react-select';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import './ApplicationInput.css';
 
-function EditableContent({ value, onChange, wordCount }) {
-  return (
-    <div className="editable-content-container">
-      <textarea
-        className="editable-content"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        style={{
-          width: '100%',
-          height: '100%',
-          border: 'none',
-          resize: 'none',
-          backgroundColor: 'transparent',
-          color: 'inherit',
-          font: 'inherit',
-          padding: '10px',
-          boxSizing: 'border-box',
-        }}
-      />
-      <div className="word-count">{wordCount} words</div>
-    </div>
-  );
-}
-
-function ApplicationInput({ 
-  applicationText, 
-  setApplicationText, 
-  selectedFirm, 
-  setSelectedFirm, 
-  selectedQuestion, 
-  setSelectedQuestion, 
-  firms, 
+function ApplicationInput({
+  applicationText,
+  setApplicationText,
+  selectedFirm,
+  setSelectedFirm,
+  selectedQuestion,
+  setSelectedQuestion,
+  firms,
   getQuestions,
   additionalInfo,
   onAdditionalInfoChange,
-  isExpanded, 
-  setIsExpanded,
-  wordCount
+  wordCount,
+  inputType // New prop to determine which input type to display
 }) {
   const customStyles = {
     control: (provided) => ({
@@ -76,11 +50,11 @@ function ApplicationInput({
     onAdditionalInfoChange(field, value);
   };
 
-  return (
+  const renderSimpleInput = () => (
     <div className="application-container">
-      <div className={`title-card ${isExpanded ? 'expanded' : ''}`}>
+      <div className="title-card">
         <h3>Your Application</h3>
-        <p>Select which firm you're applying to and the relevant question for a review. If you're feeling stuck, expand the input below and jot down some notes in the fields, then click 'generate draft'. Note: generating a draft only works if you select a question.</p>
+        <p>Select which firm you're applying to and the relevant question for a review.</p>
         <div className="dropdown-container">
           <Select
             value={selectedFirm}
@@ -101,51 +75,59 @@ function ApplicationInput({
             isSearchable={false}
           />
         </div>
-        {isExpanded && (
-          <div className="additional-fields">
-            <div className="input-field">
-              <label>Key reason(s) for applying to firm:</label>
-              <textarea
-                value={additionalInfo.keyReasons}
-                onChange={(e) => handleInputChange('keyReasons', e.target.value)}
-              />
-            </div>
-            <div className="input-field">
-              <label>Relevant experience:</label>
-              <textarea
-                value={additionalInfo.relevantExperience}
-                onChange={(e) => handleInputChange('relevantExperience', e.target.value)}
-              />
-            </div>
-            <div className="input-field">
-              <label>Relevant interaction with firm (if any):</label>
-              <textarea
-                value={additionalInfo.relevantInteraction}
-                onChange={(e) => handleInputChange('relevantInteraction', e.target.value)}
-              />
-            </div>
-            <div className="input-field">
-              <label>Any other personal information you'd like to include:</label>
-              <textarea
-                value={additionalInfo.personalInfo}
-                onChange={(e) => handleInputChange('personalInfo', e.target.value)}
-              />
-            </div>
-          </div>
-        )}
-        <button className="expand-button" onClick={() => setIsExpanded(!isExpanded)}>
-          {isExpanded ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
-        </button>
       </div>
       <div className="text-content">
-        <EditableContent 
-          value={applicationText} 
-          onChange={(newText) => setApplicationText(newText)} 
-          wordCount={wordCount}
+        <textarea
+          className="editable-content"
+          value={applicationText}
+          onChange={(e) => setApplicationText(e.target.value)}
+          placeholder="Enter your application here..."
         />
+        <div className="word-count">{wordCount} words</div>
       </div>
     </div>
   );
+
+  const renderExpandedInput = () => (
+    <div className="application-container">
+      <div className="title-card expanded">
+        <h3>Additional Information</h3>
+        <p>Please provide the following details to help generate your draft.</p>
+        <div className="additional-fields">
+          <div className="input-field">
+            <label>Key reason(s) for applying to firm:</label>
+            <textarea
+              value={additionalInfo.keyReasons}
+              onChange={(e) => handleInputChange('keyReasons', e.target.value)}
+            />
+          </div>
+          <div className="input-field">
+            <label>Relevant experience:</label>
+            <textarea
+              value={additionalInfo.relevantExperience}
+              onChange={(e) => handleInputChange('relevantExperience', e.target.value)}
+            />
+          </div>
+          <div className="input-field">
+            <label>Relevant interaction with firm (if any):</label>
+            <textarea
+              value={additionalInfo.relevantInteraction}
+              onChange={(e) => handleInputChange('relevantInteraction', e.target.value)}
+            />
+          </div>
+          <div className="input-field">
+            <label>Any other personal information you'd like to include:</label>
+            <textarea
+              value={additionalInfo.personalInfo}
+              onChange={(e) => handleInputChange('personalInfo', e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return inputType === 'simple' ? renderSimpleInput() : renderExpandedInput();
 }
 
 export default ApplicationInput;

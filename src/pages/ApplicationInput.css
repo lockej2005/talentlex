@@ -13,8 +13,14 @@
     border-radius: 10px;
     margin: 10px 30px;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
+/* Only expand the title card when it is in expanded state */
+.title-card.expanded {
+    flex-grow: 1;
+}
 .title-card h3 {
     margin: 0 0 10px 0;
     font-size: 1.2em;
@@ -31,17 +37,16 @@
 }
 
 .text-content {
+    flex-grow: 1; /* Ensure this takes the remaining space if it should */
     background-color: rgba(39, 109, 139, 0.6);
     padding: 25px;
     border-radius: 10px;
     color: #fff;
     overflow-y: auto;
-    flex-grow: 1;
     margin: 10px 30px;
     display: flex;
     flex-direction: column;
 }
-
 .editable-content {
     width: 100%;
     height: 100%;
@@ -98,7 +103,7 @@
 }
 
 .title-card.expanded .additional-fields {
-    max-height: 500px; /* Adjust as needed */
+    max-height: 1000px; /* Adjust as needed */
 }
 
 .input-field {
@@ -166,3 +171,25 @@
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.7);
   }
+
+  .input-field textarea {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #276D8B;
+    resize: vertical;
+    min-height: 100px; /* Adjusted from 38px to 100px */
+    max-height: 300px; /* Optional: Adjust if you want a larger maximum height */
+    overflow-y: auto;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.editable-content {
+    width: 100%;
+    height: 100%; /* Ensure this takes the remaining space */
+    padding-bottom: 30px; /* Make room for word count */
+    min-height: 300px; /* New addition to ensure more space for content */
+}

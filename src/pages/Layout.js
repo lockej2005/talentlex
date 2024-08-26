@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import { Routes, Route, Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
-import { supabase } from '../supabaseClient'; // Adjust the import path as needed
+import { supabase } from '../supabaseClient';
 import ApplicationReview from './ApplicationReview';
+import GenerateDraft from './GenerateDraft';
 import PrivacyPolicy from './PrivacyPolicy';
 import AIUsagePolicy from './AIUsagePolicy';
 import NegotiationSimulator from './NegotiationSimulator';
-import SocietyCodeInput from './SocietyCodeInput'; // Make sure this import is correct
-import DueDiligence from './DueDiligence'; // New import for Due Diligence
+import SocietyCodeInput from './SocietyCodeInput';
+import DueDiligence from './DueDiligence';
 import './Layout.css';
 import Videos from './Videos';
-import './Authentication.css'; // Import the Authentication CSS
+import './Authentication.css';
 import SpeakToFounders from './SpeakToFounders';
 
 const PopupSocietyJoin = ({ onClose, onJoin }) => {
@@ -94,7 +95,6 @@ const Layout = () => {
           }
         }
 
-        // Subscribe to changes in the user's credits
         supabase
           .channel('public:profiles')
           .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` }, payload => {
@@ -157,6 +157,9 @@ const Layout = () => {
             <ul>
               <li className="section-title">Tools</li>
               <div className='seperator'></div>
+              <li className={location.pathname === "/generate-draft" ? "active" : ""}>
+                <Link to="/generate-draft">Generate Draft</Link>
+              </li>
               <li className={location.pathname === "/" ? "active" : ""}>
                 <Link to="/">Application Review</Link>
               </li>
@@ -203,6 +206,7 @@ const Layout = () => {
         </button>
         <div className="content-area">
           <Routes>
+            <Route path="/generate-draft" element={<GenerateDraft />} />
             <Route path="/" element={<ApplicationReview />} />
             <Route path="/negotiation-simulator" element={<NegotiationSimulator />} />
             <Route path="/due-diligence" element={<DueDiligence />} />

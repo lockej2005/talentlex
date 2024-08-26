@@ -9,7 +9,6 @@ import {
   getUserData,
   saveUserData,
   handleApplicationSubmit,
-  handleDraftCreation
 } from '../utils/ApplicationReviewUtils';
 import { firms, questions } from '../data/ApplicationReviewData';
 
@@ -21,15 +20,8 @@ function ApplicationReview() {
   const [selectedFirm, setSelectedFirm] = useState(firms[0]);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [responseTime, setResponseTime] = useState(null);
-  const [isExpanded, setIsExpanded] = useState(false);
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
-  const [additionalInfo, setAdditionalInfo] = useState({
-    keyReasons: '',
-    relevantExperience: '',
-    relevantInteraction: '',
-    personalInfo: ''
-  });
   const [user, setUser] = useState(null);
   const [totalTokens, setTotalTokens] = useState(0);
   const [wordCount, setWordCount] = useState(0);
@@ -137,50 +129,8 @@ function ApplicationReview() {
     }
   };
 
-  const handleAdditionalInfoChange = (field, value) => {
-    setAdditionalInfo(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleCreateDraft = async () => {
-    if (!user) {
-      alert('Please log in to generate a draft.');
-      return;
-    }
-
-    const areAllFieldsFilled = Object.values(additionalInfo).every((field) => field.trim() !== '');
-
-    if (!areAllFieldsFilled) {
-      setIsExpanded(true);
-      alert('Please fill out all the additional information fields before generating a draft.');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const result = await handleDraftCreation(
-        user,
-        selectedFirm,
-        selectedQuestion,
-        additionalInfo,
-        setApplicationText,
-        setTotalTokens,
-        setFeedback
-      );
-      setFeedback(`Draft generated successfully. Credits used: ${result.cost}. Remaining credits: ${result.newBalance}`);
-    } catch (error) {
-      console.error('Error:', error);
-      setFeedback("Error: " + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="comparison-container">
-      <div className="header">
-      </div>
-      <div className="divider2"></div>
-
       <div className="content" ref={containerRef}>
         <div className="left-column" style={{width: `${leftWidth}%`}}>
           <ApplicationInput
@@ -192,11 +142,8 @@ function ApplicationReview() {
             setSelectedQuestion={setSelectedQuestion}
             firms={firms}
             getQuestions={getQuestions}
-            additionalInfo={additionalInfo}
-            onAdditionalInfoChange={handleAdditionalInfoChange}
-            isExpanded={isExpanded}
-            setIsExpanded={setIsExpanded}
             wordCount={wordCount}
+            inputType="simple"
           />
         </div>
         <div className="divider" ref={dividerRef} onMouseDown={handleMouseDown}>
@@ -210,9 +157,6 @@ function ApplicationReview() {
           <div className="button-container">
             <button className="submit-button" onClick={handleSubmit} disabled={isLoading || !user}>
               {isLoading ? 'Sending...' : 'Send for Review'}
-            </button>
-            <button className="submit-button" onClick={handleCreateDraft} disabled={isLoading || !user}>
-              {isLoading ? 'Generating...' : 'Generate a Draft'}
             </button>
           </div>
           <div className="title-card">

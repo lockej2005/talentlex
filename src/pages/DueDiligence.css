@@ -41,26 +41,26 @@
   margin-bottom: 10px;
 }
 
-.submit-button {
+.submit-button-due {
   width: 15%;
   background-color: #000000;
   color: #FFFFFF;
   border: none;
   cursor: pointer;
+  margin: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  margin: 15px;
   transition: background-color 0.3s ease;
   align-self: stretch;
 }
 
-.submit-button:hover:not(:disabled) {
+.submit-button-due:hover:not(:disabled) {
   background-color: #333333;
 }
 
-.submit-button:disabled {
+.submit-button-due:disabled {
   background-color: #888888;
   cursor: not-allowed;
 }
@@ -131,7 +131,7 @@
     padding: 10px;
   }
 
-  .submit-button {
+  .submit-button-due {
     width: 100%;
     padding: 15px;
     border-radius: 0 0 8px 8px;

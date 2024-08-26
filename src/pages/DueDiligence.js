@@ -81,7 +81,7 @@ const DueDiligence = () => {
               className="facts-input"
             />
           </div>
-          <button type="submit" className="submit-button" disabled={loading || !user}>
+          <button type="submit" className="submit-button-due" disabled={loading || !user}>
             {loading ? 'Processing...' : <ArrowUp size={24} />}
           </button>
         </div>
