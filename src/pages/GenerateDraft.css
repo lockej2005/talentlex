@@ -135,6 +135,7 @@
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+/* Draft.js editor container */
 .editor-content-draft {
     flex-grow: 1;
     padding: 15px;
@@ -146,15 +147,17 @@
     min-height: 300px;
     background-color: transparent;
     border: none;
-    resize: none;
-    width: 100%;
     box-sizing: border-box;
     direction: ltr;
     text-align: left;
 }
 
-.editor-content-draft::placeholder {
-    color: rgba(255, 255, 255, 0.5);
+.editor-content-draft .public-DraftEditor-content {
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0;
+    margin: 0;
 }
 
 /* Styling for formatted content */
@@ -224,45 +227,20 @@
     }
 }
 
-.editor-container {
-    position: relative;
-    flex-grow: 1;
-  }
-  
-  .editor-content-draft {
+.word-count {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 15px;
-    color: transparent;
-    caret-color: #fff;
-    font-size: 1rem;
-    font-family: inherit;
-    outline: none;
-    overflow-y: auto;
-    background-color: transparent;
-    border: none;
-    resize: none;
-    box-sizing: border-box;
-    z-index: 2;
-  }
-  
-  .formatted-preview {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 15px;
+    bottom: 10px;
+    right: 15px;
     color: #fff;
-    font-size: 1rem;
-    font-family: inherit;
-    overflow-y: auto;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    box-sizing: border-box;
-    z-index: 1;
-    pointer-events: none;
-  }
+    font-size: 0.9rem;
+    background-color: rgba(0, 0, 0, 0.5); /* Optional: background for better visibility */
+    padding: 5px 10px;
+    border-radius: 5px;
+    pointer-events: none; /* So it doesn't interfere with text selection */
+    z-index: 10;
+}
+
+.editor-container {
+    position: relative; /* Ensure the word count is positioned relative to the editor */
+    flex-grow: 1;
+}

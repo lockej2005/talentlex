@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Editor, EditorState, ContentState, RichUtils } from 'draft-js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight, faBold, faItalic, faUnderline, faListUl, faListOl, faQuoteRight } from '@fortawesome/free-solid-svg-icons';
 import ApplicationInput from './ApplicationInput';
@@ -13,11 +14,14 @@ import { firms, questions } from '../data/ApplicationReviewData';
 
 function GenerateDraft() {
   const [leftWidth, setLeftWidth] = useState(50);
-  const [draftText, setDraftText] = useState("");
+  const [editorState, setEditorState] = useState(() => 
+    EditorState.createWithContent(ContentState.createFromText('Start writing...'))
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [selectedFirm, setSelectedFirm] = useState(firms[0]);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [responseTime, setResponseTime] = useState(null);
+  const [wordCount, setWordCount] = useState(2); // Initialize with the word count of "Start writing..."
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
   const editorRef = useRef(null);
@@ -57,8 +61,10 @@ function GenerateDraft() {
       if (user) {
         try {
           const data = await getUserData(user.id);
-          if (data) {
-            setDraftText(data.draft_text || "");
+          if (data && data.draft_text) {
+            const contentState = ContentState.createFromText(data.draft_text);
+            setEditorState(EditorState.createWithContent(contentState));
+            setWordCount(countWords(data.draft_text));
           }
         } catch (error) {
           console.error('Error loading user data:', error);
@@ -71,11 +77,12 @@ function GenerateDraft() {
 
   useEffect(() => {
     if (user) {
-      saveUserData(user.id, { draft_text: draftText }).catch(error => {
+      const contentState = editorState.getCurrentContent();
+      saveUserData(user.id, { draft_text: contentState.getPlainText() }).catch(error => {
         console.error('Error saving user data:', error);
       });
     }
-  }, [draftText, user]);
+  }, [editorState, user]);
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -135,7 +142,11 @@ function GenerateDraft() {
         selectedFirm,
         selectedQuestion,
         additionalInfo,
-        setDraftText,
+        (newDraftText) => {
+          const contentState = ContentState.createFromText(newDraftText);
+          setEditorState(EditorState.createWithContent(contentState));
+          setWordCount(countWords(newDraftText));
+        },
         setTotalTokens
       );
       const endTime = Date.now();
@@ -149,62 +160,22 @@ function GenerateDraft() {
     }
   };
 
-  const renderFormattedText = (text) => {
-    let formattedText = text;
-    // Bold
-    formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // Italic
-    formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    // Underline
-    formattedText = formattedText.replace(/__(.*?)__/g, '<u>$1</u>');
-    // Unordered List
-    formattedText = formattedText.replace(/^- (.*)$/gm, '<li>$1</li>').replace(/<li>.*<\/li>/s, '<ul>$&</ul>');
-    // Ordered List
-    formattedText = formattedText.replace(/^\d+\. (.*)$/gm, '<li>$1</li>').replace(/<li>.*<\/li>/s, '<ol>$&</ol>');
-    // Blockquote
-    formattedText = formattedText.replace(/^> (.*)$/gm, '<blockquote>$1</blockquote>');
-
-    return formattedText;
+  const onEditorChange = (newEditorState) => {
+    setEditorState(newEditorState);
+    const currentContent = newEditorState.getCurrentContent().getPlainText();
+    setWordCount(countWords(currentContent));
   };
 
-  const handleEditorChange = (e) => {
-    setDraftText(e.target.value);
+  const applyInlineStyle = (style) => {
+    setEditorState(RichUtils.toggleInlineStyle(editorState, style));
   };
 
-  const applyStyle = (style) => {
-    const textarea = editorRef.current;
-    if (!textarea) return;
+  const applyBlockType = (blockType) => {
+    setEditorState(RichUtils.toggleBlockType(editorState, blockType));
+  };
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = draftText.substring(start, end);
-    let newText = draftText;
-
-    switch (style) {
-      case 'bold':
-        newText = draftText.substring(0, start) + `**${selectedText}**` + draftText.substring(end);
-        break;
-      case 'italic':
-        newText = draftText.substring(0, start) + `*${selectedText}*` + draftText.substring(end);
-        break;
-      case 'underline':
-        newText = draftText.substring(0, start) + `__${selectedText}__` + draftText.substring(end);
-        break;
-      case 'insertUnorderedList':
-        newText = draftText.substring(0, start) + `\n- ${selectedText}` + draftText.substring(end);
-        break;
-      case 'insertOrderedList':
-        newText = draftText.substring(0, start) + `\n1. ${selectedText}` + draftText.substring(end);
-        break;
-      case 'formatBlock':
-        newText = draftText.substring(0, start) + `\n> ${selectedText}` + draftText.substring(end);
-        break;
-      default:
-        break;
-    }
-
-    setDraftText(newText);
-    textarea.focus();
+  const countWords = (text) => {
+    return text.trim().split(/\s+/).length;
   };
 
   return (
@@ -239,25 +210,24 @@ function GenerateDraft() {
           </div>
           <div className="rich-text-editor-draft">
             <div className="editor-toolbar-draft">
-              <button onClick={() => applyStyle('bold')}><FontAwesomeIcon icon={faBold} /></button>
-              <button onClick={() => applyStyle('italic')}><FontAwesomeIcon icon={faItalic} /></button>
-              <button onClick={() => applyStyle('underline')}><FontAwesomeIcon icon={faUnderline} /></button>
-              <button onClick={() => applyStyle('insertUnorderedList')}><FontAwesomeIcon icon={faListUl} /></button>
-              <button onClick={() => applyStyle('insertOrderedList')}><FontAwesomeIcon icon={faListOl} /></button>
-              <button onClick={() => applyStyle('formatBlock')}><FontAwesomeIcon icon={faQuoteRight} /></button>
+              <button onClick={() => applyInlineStyle('BOLD')}><FontAwesomeIcon icon={faBold} /></button>
+              <button onClick={() => applyInlineStyle('ITALIC')}><FontAwesomeIcon icon={faItalic} /></button>
+              <button onClick={() => applyInlineStyle('UNDERLINE')}><FontAwesomeIcon icon={faUnderline} /></button>
+              <button onClick={() => applyBlockType('unordered-list-item')}><FontAwesomeIcon icon={faListUl} /></button>
+              <button onClick={() => applyBlockType('ordered-list-item')}><FontAwesomeIcon icon={faListOl} /></button>
+              <button onClick={() => applyBlockType('blockquote')}><FontAwesomeIcon icon={faQuoteRight} /></button>
             </div>
             <div className="editor-container">
-              <textarea
-                ref={editorRef}
-                className="editor-content-draft"
-                value={draftText}
-                onChange={handleEditorChange}
-                placeholder="Your generated draft will appear here..."
-              />
-              <div 
-                className="formatted-preview"
-                dangerouslySetInnerHTML={{ __html: renderFormattedText(draftText) }}
-              />
+              <div className="editor-content-draft">
+                <Editor
+                  editorState={editorState}
+                  onChange={onEditorChange}
+                  ref={editorRef}
+                />
+              </div>
+              <div className="word-count">
+                Word count: {wordCount}
+              </div>
             </div>
           </div>
         </div>
