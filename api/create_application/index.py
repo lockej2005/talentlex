@@ -33,10 +33,17 @@ class handler(BaseHTTPRequestHandler):
 
         firm = data.get('firm')
         question = data.get('question')
-        key_reasons = data.get('keyReasons')
-        relevant_experience = data.get('relevantExperience')
-        relevant_interaction = data.get('relevantInteraction')
-        personal_info = data.get('personalInfo')
+
+        if firm == "Jones Day":
+            why_law = data.get('whyLaw')
+            why_jones_day = data.get('whyJonesDay')
+            why_you = data.get('whyYou')
+            relevant_experiences = data.get('relevantExperiences')
+        else:
+            key_reasons = data.get('keyReasons')
+            relevant_experience = data.get('relevantExperience')
+            relevant_interaction = data.get('relevantInteraction')
+            personal_info = data.get('personalInfo')
 
         if not firm or not question:
             self.send_response(400)
@@ -63,18 +70,32 @@ class handler(BaseHTTPRequestHandler):
 
             model = base_model
 
-            prompt = f"""
-            Generate a draft application for {firm} addressing the following question:
-            "{question}"
+            if firm == "Jones Day":
+                prompt = f"""
+                Generate a draft application for Jones Day addressing the following question:
+                "{question}"
 
-            Include the following information in your response:
-            - Key reason(s) for applying: {key_reasons}
-            - Relevant experience: {relevant_experience}
-            - Relevant interaction with the firm: {relevant_interaction}
-            - Additional personal information: {personal_info}
+                Include the following information in your response:
+                - Why law: {why_law}
+                - Why Jones Day: {why_jones_day}
+                - Why you: {why_you}
+                - Relevant experiences: {relevant_experiences}
 
-            Please create a well-structured, professional application that incorporates all the provided information seamlessly.
-            """
+                Please create a well-structured, professional application that incorporates all the provided information seamlessly.
+                """
+            else:
+                prompt = f"""
+                Generate a draft application for {firm} addressing the following question:
+                "{question}"
+
+                Include the following information in your response:
+                - Key reason(s) for applying: {key_reasons}
+                - Relevant experience: {relevant_experience}
+                - Relevant interaction with the firm: {relevant_interaction}
+                - Additional personal information: {personal_info}
+
+                Please create a well-structured, professional application that incorporates all the provided information seamlessly.
+                """
 
             completion = client.chat.completions.create(
                 model=model,
@@ -109,4 +130,3 @@ class handler(BaseHTTPRequestHandler):
             self.end_headers()
             response = json.dumps({"error": str(e)})
             self.wfile.write(response.encode('utf-8'))
-
