@@ -162,25 +162,32 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
     throw new Error(error);
   }
 
-  await insertDraftGeneration({
-    email: user.email,
-    firm: selectedFirm.value,
-    question: selectedQuestion.value,
-    ...(selectedFirm.value === "Jones Day" 
-      ? {
-          why_law: additionalInfo.whyLaw,
-          why_jones_day: additionalInfo.whyJonesDay,
-          why_you: additionalInfo.whyYou,
-          relevant_experiences: additionalInfo.relevantExperiences
-        }
-      : {
-          key_reasons: additionalInfo.keyReasons,
-          relevant_experience: additionalInfo.relevantExperience,
-          relevant_interaction: additionalInfo.relevantInteraction,
-          personal_info: additionalInfo.personalInfo
-        }),
-    generated_draft: data.draft
-  });
+  let draftGenerationData;
+  if (selectedFirm.value === "Jones Day") {
+    draftGenerationData = {
+      email: user.email,
+      firm: selectedFirm.value,
+      question: selectedQuestion.value,
+      key_reasons: additionalInfo.whyLaw,
+      relevant_experience: additionalInfo.relevantExperiences,
+      relevant_interaction: additionalInfo.whyJonesDay,
+      personal_info: additionalInfo.whyYou,
+      generated_draft: data.draft
+    };
+  } else {
+    draftGenerationData = {
+      email: user.email,
+      firm: selectedFirm.value,
+      question: selectedQuestion.value,
+      key_reasons: additionalInfo.keyReasons,
+      relevant_experience: additionalInfo.relevantExperience,
+      relevant_interaction: additionalInfo.relevantInteraction,
+      personal_info: additionalInfo.personalInfo,
+      generated_draft: data.draft
+    };
+  }
+
+  await insertDraftGeneration(draftGenerationData);
 
   return { cost, newBalance };
 };
