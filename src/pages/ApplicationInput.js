@@ -50,31 +50,36 @@ function ApplicationInput({
     onAdditionalInfoChange(field, value);
   };
 
+  // This is common to both simple and expanded inputs
+  const dropdownSection = (
+    <div className="dropdown-container">
+      <Select
+        value={selectedFirm}
+        onChange={(option) => {
+          setSelectedFirm(option);
+          const questions = getQuestions(option.value);
+          setSelectedQuestion(questions[0]);
+        }}
+        options={firms}
+        styles={customStyles}
+        isSearchable={false}
+      />
+      <Select
+        value={selectedQuestion}
+        onChange={setSelectedQuestion}
+        options={getQuestions(selectedFirm.value)}
+        styles={customStyles}
+        isSearchable={false}
+      />
+    </div>
+  );
+
   const renderSimpleInput = () => (
     <div className="application-container">
       <div className="title-card">
         <h3>Your Application</h3>
         <p>Select which firm you're applying to and the relevant question for a review.</p>
-        <div className="dropdown-container">
-          <Select
-            value={selectedFirm}
-            onChange={(option) => {
-              setSelectedFirm(option);
-              const questions = getQuestions(option.value);
-              setSelectedQuestion(questions[0]);
-            }}
-            options={firms}
-            styles={customStyles}
-            isSearchable={false}
-          />
-          <Select
-            value={selectedQuestion}
-            onChange={setSelectedQuestion}
-            options={getQuestions(selectedFirm.value)}
-            styles={customStyles}
-            isSearchable={false}
-          />
-        </div>
+        {dropdownSection}
       </div>
       <div className="text-content">
         <textarea
@@ -93,6 +98,7 @@ function ApplicationInput({
       <div className="title-card expanded">
         <h3>Additional Information</h3>
         <p>Please provide the following details to help generate your draft.</p>
+        {dropdownSection}
         <div className="additional-fields">
           <div className="input-field">
             <label>Key reason(s) for applying to firm:</label>

@@ -57,14 +57,16 @@ h2 {
 }
 
 .divider-line.top {
-    top: 0;
-    height: calc(50% - 20px);
+    top: 20px;  /* Adds space at the top */
+    height: calc(50% - 40px);  /* Adjusts height to maintain the space at both ends */
 }
 
 .divider-line.bottom {
-    bottom: 0;
-    height: calc(50% - 20px);
+    bottom: 20px;  /* Adds space at the bottom */
+    height: calc(50% - 40px);  /* Adjusts height to maintain the space at both ends */
 }
+
+
 
 .divider-handle {
     width: 30px;

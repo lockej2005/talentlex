@@ -70,6 +70,17 @@
     transform: translate(-50%, -50%);
 }
 
+.divider-line-draft.top {
+    top: 20px;  /* Adds space at the top */
+    height: calc(50% - 40px);  /* Adjusts height to maintain the space at both ends */
+}
+
+.divider-line-draft.bottom {
+    bottom: 20px;  /* Adds space at the bottom */
+    height: calc(50% - 40px);  /* Adjusts height to maintain the space at both ends */
+}
+
+
 .button-container-draft {
     display: flex;
     flex-direction: row;
