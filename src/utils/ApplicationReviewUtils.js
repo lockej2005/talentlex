@@ -130,10 +130,17 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
     throw new Error('Please log in to generate a draft.');
   }
 
-  const areAllFieldsFilled = Object.values(additionalInfo).every((field) => field.trim() !== '');
+  let requiredFields;
+  if (selectedFirm.value === "Jones Day") {
+    requiredFields = ['whyLaw', 'whyJonesDay', 'whyYou', 'relevantExperiences'];
+  } else {
+    requiredFields = ['keyReasons', 'relevantExperience', 'relevantInteraction', 'personalInfo'];
+  }
+
+  const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field]?.trim() !== '');
 
   if (!areAllFieldsFilled) {
-    throw new Error('Please fill out all the additional information fields before generating a draft.');
+    throw new Error('Please fill out all the required information fields before generating a draft.');
   }
 
   let localTotalTokens = 0;
@@ -159,10 +166,19 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
     email: user.email,
     firm: selectedFirm.value,
     question: selectedQuestion.value,
-    key_reasons: additionalInfo.keyReasons,
-    relevant_experience: additionalInfo.relevantExperience,
-    relevant_interaction: additionalInfo.relevantInteraction,
-    personal_info: additionalInfo.personalInfo,
+    ...(selectedFirm.value === "Jones Day" 
+      ? {
+          why_law: additionalInfo.whyLaw,
+          why_jones_day: additionalInfo.whyJonesDay,
+          why_you: additionalInfo.whyYou,
+          relevant_experiences: additionalInfo.relevantExperiences
+        }
+      : {
+          key_reasons: additionalInfo.keyReasons,
+          relevant_experience: additionalInfo.relevantExperience,
+          relevant_interaction: additionalInfo.relevantInteraction,
+          personal_info: additionalInfo.personalInfo
+        }),
     generated_draft: data.draft
   });
 

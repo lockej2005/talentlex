@@ -25,7 +25,11 @@ function GenerateDraft() {
     keyReasons: '',
     relevantExperience: '',
     relevantInteraction: '',
-    personalInfo: ''
+    personalInfo: '',
+    whyLaw: '',
+    whyJonesDay: '',
+    whyYou: '',
+    relevantExperiences: ''
   });
   const [user, setUser] = useState(null);
   const [totalTokens, setTotalTokens] = useState(0);
@@ -109,12 +113,19 @@ function GenerateDraft() {
       return;
     }
 
-    const areAllFieldsFilled = Object.values(additionalInfo).every((field) => field.trim() !== '');
+    let requiredFields;
+    if (selectedFirm.value === "Jones Day") {
+      requiredFields = ['whyLaw', 'whyJonesDay', 'whyYou', 'relevantExperiences'];
+    } else {
+      requiredFields = ['keyReasons', 'relevantExperience', 'relevantInteraction', 'personalInfo'];
+    }
+
+    const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field].trim() !== '');
 
     if (!areAllFieldsFilled) {
-      alert('Please fill out all the additional information fields before generating a draft.');
+      alert('Please fill out all the required information fields before generating a draft.');
       return;
-    }
+    } 
 
     setIsLoading(true);
     const startTime = Date.now();
