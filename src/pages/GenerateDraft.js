@@ -20,7 +20,7 @@ function GenerateDraft() {
   const [responseTime, setResponseTime] = useState(null);
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
-  const textareaRef = useRef(null);
+  const editorRef = useRef(null);
   const [additionalInfo, setAdditionalInfo] = useState({
     keyReasons: '',
     relevantExperience: '',
@@ -138,12 +138,30 @@ function GenerateDraft() {
     }
   };
 
+  const renderFormattedText = (text) => {
+    let formattedText = text;
+    // Bold
+    formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Italic
+    formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    // Underline
+    formattedText = formattedText.replace(/__(.*?)__/g, '<u>$1</u>');
+    // Unordered List
+    formattedText = formattedText.replace(/^- (.*)$/gm, '<li>$1</li>').replace(/<li>.*<\/li>/s, '<ul>$&</ul>');
+    // Ordered List
+    formattedText = formattedText.replace(/^\d+\. (.*)$/gm, '<li>$1</li>').replace(/<li>.*<\/li>/s, '<ol>$&</ol>');
+    // Blockquote
+    formattedText = formattedText.replace(/^> (.*)$/gm, '<blockquote>$1</blockquote>');
+
+    return formattedText;
+  };
+
   const handleEditorChange = (e) => {
     setDraftText(e.target.value);
   };
 
   const applyStyle = (style) => {
-    const textarea = textareaRef.current;
+    const textarea = editorRef.current;
     if (!textarea) return;
 
     const start = textarea.selectionStart;
@@ -176,7 +194,6 @@ function GenerateDraft() {
 
     setDraftText(newText);
     textarea.focus();
-    textarea.setSelectionRange(start, end + 4); // +4 for the added markdown characters
   };
 
   return (
@@ -192,7 +209,8 @@ function GenerateDraft() {
             getQuestions={getQuestions}
             additionalInfo={additionalInfo}
             onAdditionalInfoChange={handleAdditionalInfoChange}
-            inputType="expanded" // Specify the expanded input type
+            inputType="expanded"
+            fullHeight={true}
           />
         </div>
         <div className="divider-draft" ref={dividerRef} onMouseDown={handleMouseDown}>
@@ -217,13 +235,19 @@ function GenerateDraft() {
               <button onClick={() => applyStyle('insertOrderedList')}><FontAwesomeIcon icon={faListOl} /></button>
               <button onClick={() => applyStyle('formatBlock')}><FontAwesomeIcon icon={faQuoteRight} /></button>
             </div>
-            <textarea
-              ref={textareaRef}
-              className="editor-content-draft"
-              value={draftText}
-              onChange={handleEditorChange}
-              placeholder="Your generated draft will appear here..."
-            />
+            <div className="editor-container">
+              <textarea
+                ref={editorRef}
+                className="editor-content-draft"
+                value={draftText}
+                onChange={handleEditorChange}
+                placeholder="Your generated draft will appear here..."
+              />
+              <div 
+                className="formatted-preview"
+                dangerouslySetInnerHTML={{ __html: renderFormattedText(draftText) }}
+              />
+            </div>
           </div>
         </div>
       </div>

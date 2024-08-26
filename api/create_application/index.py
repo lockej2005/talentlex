@@ -53,7 +53,7 @@ class handler(BaseHTTPRequestHandler):
                 base_model="gpt-4o-mini"   
             elif firm == "Goodwin" and question == "Why are you applying to Goodwin? (100 words)":
                 system_prompt = goodwin_why_question
-                base_model = "ft:gpt-4o-mini-2024-07 18:personal:appdrafterdataset:9vG3pVmA"
+                base_model = "ft:gpt-4o-mini-2024-07-18:personal:appdrafterdataset:9vG3pVmA"
             elif firm == "Jones Day":
                 system_prompt = jones_day_prompt
                 base_model = "ft:gpt-4o-2024-08-06:personal:jonesdaydrafter:9zJFj48D"

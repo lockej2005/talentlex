@@ -44,13 +44,13 @@
 }
 
 .divider-line-draft.top {
-    top: 0;
-    height: calc(50% - 20px);
+    top: 20px;
+    height: calc(50% - 40px);
 }
 
 .divider-line-draft.bottom {
-    bottom: 0;
-    height: calc(50% - 20px);
+    bottom: 20px;
+    height: calc(50% - 40px);
 }
 
 .divider-handle-draft {
@@ -69,17 +69,6 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
-
-.divider-line-draft.top {
-    top: 20px;  /* Adds space at the top */
-    height: calc(50% - 40px);  /* Adjusts height to maintain the space at both ends */
-}
-
-.divider-line-draft.bottom {
-    bottom: 20px;  /* Adds space at the bottom */
-    height: calc(50% - 40px);  /* Adjusts height to maintain the space at both ends */
-}
-
 
 .button-container-draft {
     display: flex;
@@ -160,29 +149,41 @@
     resize: none;
     width: 100%;
     box-sizing: border-box;
+    direction: ltr;
+    text-align: left;
 }
 
 .editor-content-draft::placeholder {
     color: rgba(255, 255, 255, 0.5);
 }
 
-.editor-content-draft * {
-    direction: ltr !important;
-    text-align: left !important;
+/* Styling for formatted content */
+.editor-content-draft b, .editor-content-draft strong {
+    font-weight: bold;
 }
 
-.editor-content-draft[placeholder]:empty:before {
-    content: attr(placeholder);
-    color: rgba(255, 255, 255, 0.5);
+.editor-content-draft i, .editor-content-draft em {
+    font-style: italic;
 }
 
-/* Adjust the existing styles */
-.right-column-draft .text-content-draft {
-    display: none; /* Hide the old text-content div */
+.editor-content-draft u {
+    text-decoration: underline;
 }
 
-.right-column-draft .title-card-draft {
-    display: none; /* Hide the title card as requested */
+.editor-content-draft ul, .editor-content-draft ol {
+    padding-left: 30px;
+    margin: 10px 0;
+}
+
+.editor-content-draft ul li, .editor-content-draft ol li {
+    margin-bottom: 5px;
+}
+
+.editor-content-draft blockquote {
+    border-left: 3px solid #fff;
+    margin: 10px 0;
+    padding-left: 10px;
+    font-style: italic;
 }
 
 /* Responsive adjustments */
@@ -222,3 +223,46 @@
         margin: 10px 0;
     }
 }
+
+.editor-container {
+    position: relative;
+    flex-grow: 1;
+  }
+  
+  .editor-content-draft {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+    color: transparent;
+    caret-color: #fff;
+    font-size: 1rem;
+    font-family: inherit;
+    outline: none;
+    overflow-y: auto;
+    background-color: transparent;
+    border: none;
+    resize: none;
+    box-sizing: border-box;
+    z-index: 2;
+  }
+  
+  .formatted-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+    color: #fff;
+    font-size: 1rem;
+    font-family: inherit;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    box-sizing: border-box;
+    z-index: 1;
+    pointer-events: none;
+  }
