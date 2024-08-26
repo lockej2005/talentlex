@@ -170,4 +170,4 @@ function ApplicationInput({
   return inputType === 'simple' ? renderSimpleInput() : renderExpandedInput();
 }
 
-export default ApplicationInput;o
+export default ApplicationInput;
