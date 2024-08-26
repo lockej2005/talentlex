@@ -109,27 +109,27 @@ function GenerateDraft() {
       return;
     }
 
-    const areAllFieldsFilled = Object.values(additionalInfo).every((field) => field.trim() !== '');
+    const areAllFieldsFilled = Object.values(additionalInfo).every(field => field.trim() !== '') && selectedFirm && selectedQuestion;
 
     if (!areAllFieldsFilled) {
-      alert('Please fill out all the additional information fields before generating a draft.');
+      alert('Please fill out all fields and make sure you\'ve selected a firm and a question.');
       return;
     }
 
     setIsLoading(true);
     const startTime = Date.now();
     try {
-      const result = await handleDraftCreation(
-        user,
-        selectedFirm,
-        selectedQuestion,
-        additionalInfo,
-        setDraftText,
-        setTotalTokens
-      );
+      const draftData = {
+        firm: selectedFirm.value,
+        question: selectedQuestion.label,  // Assuming .label is the text to be sent
+        ...additionalInfo
+      };
+
+      const result = await createApplicationDraft(draftData);
       const endTime = Date.now();
       setResponseTime((endTime - startTime) / 1000);
-      alert(`Draft generated successfully. Credits used: ${result.cost}. Remaining credits: ${result.newBalance}`);
+      setDraftText(result.draft);
+      alert(`Draft generated successfully. Credits used: ${result.usage.total_tokens}. Remaining credits: ${result.newBalance}`);
     } catch (error) {
       console.error('Error:', error);
       alert("Error: " + error.message);
@@ -137,6 +137,7 @@ function GenerateDraft() {
       setIsLoading(false);
     }
   };
+
 
   const handleEditorChange = (e) => {
     setDraftText(e.target.value);
