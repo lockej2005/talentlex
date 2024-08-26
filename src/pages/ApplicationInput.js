@@ -14,7 +14,7 @@ function ApplicationInput({
   additionalInfo,
   onAdditionalInfoChange,
   wordCount,
-  inputType // New prop to determine which input type to display
+  inputType
 }) {
   const customStyles = {
     control: (provided) => ({
@@ -50,7 +50,6 @@ function ApplicationInput({
     onAdditionalInfoChange(field, value);
   };
 
-  // This is common to both simple and expanded inputs
   const dropdownSection = (
     <div className="dropdown-container">
       <Select
@@ -100,34 +99,69 @@ function ApplicationInput({
         <p>Please provide the following details to help generate your draft.</p>
         {dropdownSection}
         <div className="additional-fields">
-          <div className="input-field">
-            <label>Key reason(s) for applying to firm:</label>
-            <textarea
-              value={additionalInfo.keyReasons}
-              onChange={(e) => handleInputChange('keyReasons', e.target.value)}
-            />
-          </div>
-          <div className="input-field">
-            <label>Relevant experience:</label>
-            <textarea
-              value={additionalInfo.relevantExperience}
-              onChange={(e) => handleInputChange('relevantExperience', e.target.value)}
-            />
-          </div>
-          <div className="input-field">
-            <label>Relevant interaction with firm (if any):</label>
-            <textarea
-              value={additionalInfo.relevantInteraction}
-              onChange={(e) => handleInputChange('relevantInteraction', e.target.value)}
-            />
-          </div>
-          <div className="input-field">
-            <label>Any other personal information you'd like to include:</label>
-            <textarea
-              value={additionalInfo.personalInfo}
-              onChange={(e) => handleInputChange('personalInfo', e.target.value)}
-            />
-          </div>
+          {selectedFirm.value === "Jones Day" ? (
+            <>
+              <div className="input-field">
+                <label>Why law (paste your full 'why law' here):</label>
+                <textarea
+                  value={additionalInfo.whyLaw}
+                  onChange={(e) => handleInputChange('whyLaw', e.target.value)}
+                />
+              </div>
+              <div className="input-field">
+                <label>Why Jones Day (interactions with the firm, key reasons for applying etc…):</label>
+                <textarea
+                  value={additionalInfo.whyJonesDay}
+                  onChange={(e) => handleInputChange('whyJonesDay', e.target.value)}
+                />
+              </div>
+              <div className="input-field">
+                <label>Why you (any relevant personal reasons):</label>
+                <textarea
+                  value={additionalInfo.whyYou}
+                  onChange={(e) => handleInputChange('whyYou', e.target.value)}
+                />
+              </div>
+              <div className="input-field">
+                <label>Any relevant experiences:</label>
+                <textarea
+                  value={additionalInfo.relevantExperiences}
+                  onChange={(e) => handleInputChange('relevantExperiences', e.target.value)}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="input-field">
+                <label>Key reason(s) for applying to firm:</label>
+                <textarea
+                  value={additionalInfo.keyReasons}
+                  onChange={(e) => handleInputChange('keyReasons', e.target.value)}
+                />
+              </div>
+              <div className="input-field">
+                <label>Relevant experience:</label>
+                <textarea
+                  value={additionalInfo.relevantExperience}
+                  onChange={(e) => handleInputChange('relevantExperience', e.target.value)}
+                />
+              </div>
+              <div className="input-field">
+                <label>Relevant interaction with firm (if any):</label>
+                <textarea
+                  value={additionalInfo.relevantInteraction}
+                  onChange={(e) => handleInputChange('relevantInteraction', e.target.value)}
+                />
+              </div>
+              <div className="input-field">
+                <label>Any other personal information you'd like to include:</label>
+                <textarea
+                  value={additionalInfo.personalInfo}
+                  onChange={(e) => handleInputChange('personalInfo', e.target.value)}
+                />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
@@ -136,4 +170,4 @@ function ApplicationInput({
   return inputType === 'simple' ? renderSimpleInput() : renderExpandedInput();
 }
 
-export default ApplicationInput;
+export default ApplicationInput;o
