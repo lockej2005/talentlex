@@ -41,7 +41,7 @@ export const logToSupabase = async (data) => {
 
 export const fetchDueDiligenceResults = async (backgroundInfo, facts, user) => {
   try {
-    const response = await axios.post('http://localhost:5000/api/due_diligence', {
+    const response = await axios.post('/api/due_diligence', {
       prompt: `Background Information: ${backgroundInfo}\n\nFacts: ${facts}`
     });
 
