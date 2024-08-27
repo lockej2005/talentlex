@@ -1,9 +1,9 @@
 {
     "version": 2,
     "functions": {
-      "api/due_diligence.py": {
-        "memory": 1024,
-        "maxDuration": 60
-      }
+        "api/due_diligence/index.py": {
+            "memory": 1024,
+            "maxDuration": 60
+        }
     }
-  }
+}
