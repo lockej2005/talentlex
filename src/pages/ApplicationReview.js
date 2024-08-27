@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
 import ReactMarkdown from 'react-markdown';
@@ -9,14 +9,18 @@ import {
   handleApplicationSubmit,
 } from '../utils/ApplicationReviewUtils';
 import { firms, questions } from '../data/ApplicationReviewData';
+import { UserInputContext } from '../context/UserInputContext';
 
 function ApplicationReview() {
+  const { 
+    applicationText, setApplicationText,
+    reviewSelectedFirm, setReviewSelectedFirm,
+    reviewSelectedQuestion, setReviewSelectedQuestion,
+    feedback, setFeedback
+  } = useContext(UserInputContext);
+
   const [leftWidth, setLeftWidth] = useState(50);
-  const [applicationText, setApplicationText] = useState("Enter your application here or generate a draft.");
-  const [feedback, setFeedback] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedFirm, setSelectedFirm] = useState(firms[0]);
-  const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [responseTime, setResponseTime] = useState(null);
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
@@ -38,9 +42,17 @@ function ApplicationReview() {
   }, []);
 
   useEffect(() => {
-    const firmQuestions = getQuestions(selectedFirm.value);
-    setSelectedQuestion(firmQuestions[0]);
-  }, [selectedFirm]);
+    if (!reviewSelectedFirm) {
+      setReviewSelectedFirm(firms[0]);
+    }
+  }, [reviewSelectedFirm, setReviewSelectedFirm]);
+
+  useEffect(() => {
+    if (reviewSelectedFirm && !reviewSelectedQuestion) {
+      const firmQuestions = getQuestions(reviewSelectedFirm.value);
+      setReviewSelectedQuestion(firmQuestions[0]);
+    }
+  }, [reviewSelectedFirm, reviewSelectedQuestion, setReviewSelectedQuestion]);
 
   useEffect(() => {
     const calculateWordCount = (text) => {
@@ -86,8 +98,8 @@ function ApplicationReview() {
       const result = await handleApplicationSubmit(
         user,
         applicationText,
-        selectedFirm,
-        selectedQuestion,
+        reviewSelectedFirm,
+        reviewSelectedQuestion,
         setFeedback,
         setTotalTokens,
         setResponseTime
@@ -108,10 +120,10 @@ function ApplicationReview() {
           <ApplicationInput
             applicationText={applicationText}
             setApplicationText={setApplicationText}
-            selectedFirm={selectedFirm}
-            setSelectedFirm={setSelectedFirm}
-            selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
+            selectedFirm={reviewSelectedFirm}
+            setSelectedFirm={setReviewSelectedFirm}
+            selectedQuestion={reviewSelectedQuestion}
+            setSelectedQuestion={setReviewSelectedQuestion}
             firms={firms}
             getQuestions={getQuestions}
             wordCount={wordCount}
