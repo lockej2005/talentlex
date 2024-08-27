@@ -156,9 +156,14 @@ function GenerateDraft() {
         selectedQuestion,
         additionalInfo,
         (newDraftText) => {
-          const contentState = ContentState.createFromText(newDraftText);
+          // Combine new draft text with existing text in the editor
+          const currentContent = editorState.getCurrentContent().getPlainText();
+          const updatedDraftText = currentContent + '\n' + newDraftText;
+          
+          const contentState = ContentState.createFromText(updatedDraftText);
           setEditorState(EditorState.createWithContent(contentState));
-          setWordCount(countWords(newDraftText));
+          setDraftText(updatedDraftText);
+          setWordCount(countWords(updatedDraftText));
         },
         setTotalTokens
       );
@@ -197,10 +202,6 @@ function GenerateDraft() {
             setSelectedFirm={setSelectedFirm}
             additionalInfo={additionalInfo}
             onAdditionalInfoChange={handleAdditionalInfoChange}
-            selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
-            firms={firms}
-            getQuestions={getQuestions}
           />
         </div>
         <div className="divider-draft" ref={dividerRef} onMouseDown={handleMouseDown}>
@@ -245,4 +246,3 @@ function GenerateDraft() {
 }
 
 export default GenerateDraft;
-  
