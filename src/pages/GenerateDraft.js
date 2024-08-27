@@ -26,7 +26,7 @@ function GenerateDraft() {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [responseTime, setResponseTime] = useState(null);
   const [wordCount, setWordCount] = useState(() => countWords(draftText || 'Start writing...'));
-  const [leftWidth, setLeftWidth] = useState(50); // Initialize with default width
+  const [leftWidth, setLeftWidth] = useState(50);
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
   const editorRef = useRef(null);
@@ -44,12 +44,18 @@ function GenerateDraft() {
     };
 
     fetchCurrentUser();
+
+    // Set default firm to Goodwin
+    const defaultFirm = firms.find(firm => firm.value === "Goodwin") || firms[0];
+    setSelectedFirm(defaultFirm);
   }, []);
 
   useEffect(() => {
     if (selectedFirm) {
       const firmQuestions = getQuestions(selectedFirm.value);
-      setSelectedQuestion(firmQuestions[0]);
+      // Set default question to "Why are you applying to Goodwin?"
+      const defaultQuestion = firmQuestions.find(q => q.value === "Why are you applying to Goodwin?") || firmQuestions[0];
+      setSelectedQuestion(defaultQuestion);
     }
   }, [selectedFirm]);
 
@@ -112,7 +118,6 @@ function GenerateDraft() {
         selectedQuestion,
         additionalInfo,
         (newDraftText) => {
-          // Combine new draft text with existing text in the editor
           const updatedDraftText = newDraftText;
           
           const contentState = ContentState.createFromText(updatedDraftText);
@@ -126,7 +131,6 @@ function GenerateDraft() {
       setResponseTime((endTime - startTime) / 1000);
       alert(`Draft generated successfully. Credits used: ${result.cost}. Remaining credits: ${result.newBalance}`);
 
-      // Save the draft text to the database
       await saveUserData(user.id, draftText, null);
     } catch (error) {
       console.error('Error:', error);
@@ -156,10 +160,18 @@ function GenerateDraft() {
       <div className="content-draft" ref={containerRef}>
         <div className="left-column-draft" style={{ width: `${leftWidth}%` }}>
           <ApplicationInput
+            applicationText={draftText}
+            setApplicationText={setDraftText}
             selectedFirm={selectedFirm}
             setSelectedFirm={setSelectedFirm}
+            selectedQuestion={selectedQuestion}
+            setSelectedQuestion={setSelectedQuestion}
+            firms={firms}
+            getQuestions={getQuestions}
             additionalInfo={additionalInfo}
             onAdditionalInfoChange={handleAdditionalInfoChange}
+            wordCount={wordCount}
+            inputType="expanded"
           />
         </div>
         <div className="divider-draft" ref={dividerRef} onMouseDown={handleMouseDown}>

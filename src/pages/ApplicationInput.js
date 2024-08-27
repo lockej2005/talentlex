@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Select from 'react-select';
 import './ApplicationInput.css';
 
@@ -11,7 +11,7 @@ function ApplicationInput({
   setSelectedQuestion,
   firms,
   getQuestions,
-  additionalInfo,
+  additionalInfo = {}, // Default to an empty object if undefined
   onAdditionalInfoChange,
   wordCount,
   inputType
@@ -46,31 +46,19 @@ function ApplicationInput({
     }),
   };
 
-  // Function to handle changes in the additional info fields
   const handleInputChange = (field, value) => {
     onAdditionalInfoChange(field, value);
-  };
-
-  useEffect(() => {
-    // Set default firm and question on component mount
-    if (!selectedFirm && firms.length > 0) {
-      setSelectedFirm(firms[0]);
-      const initialQuestions = getQuestions(firms[0].value);
-      setSelectedQuestion(initialQuestions[0]);
-    }
-  }, [selectedFirm, setSelectedFirm, setSelectedQuestion, firms, getQuestions]);
-
-  const handleFirmChange = (option) => {
-    setSelectedFirm(option);
-    const questions = getQuestions(option.value);
-    setSelectedQuestion(questions[0]);
   };
 
   const dropdownSection = (
     <div className="dropdown-container">
       <Select
         value={selectedFirm}
-        onChange={handleFirmChange}
+        onChange={(option) => {
+          setSelectedFirm(option);
+          const questions = getQuestions(option?.value || "");  // Ensure option.value is defined
+          setSelectedQuestion(questions[0]);
+        }}
         options={firms}
         styles={customStyles}
         isSearchable={false}
@@ -78,7 +66,7 @@ function ApplicationInput({
       <Select
         value={selectedQuestion}
         onChange={setSelectedQuestion}
-        options={selectedFirm ? getQuestions(selectedFirm.value) : []}
+        options={selectedFirm ? getQuestions(selectedFirm.value) : []} // Check for null selectedFirm
         styles={customStyles}
         isSearchable={false}
       />
@@ -116,28 +104,28 @@ function ApplicationInput({
               <div className="input-field">
                 <label>Why law (paste your full 'why law' here):</label>
                 <textarea
-                  value={additionalInfo.whyLaw}
+                  value={additionalInfo?.whyLaw || ""} // Ensure additionalInfo is defined
                   onChange={(e) => handleInputChange('whyLaw', e.target.value)}
                 />
               </div>
               <div className="input-field">
                 <label>Why Jones Day (interactions with the firm, key reasons for applying etc…):</label>
                 <textarea
-                  value={additionalInfo.whyJonesDay}
+                  value={additionalInfo?.whyJonesDay || ""} // Ensure additionalInfo is defined
                   onChange={(e) => handleInputChange('whyJonesDay', e.target.value)}
                 />
               </div>
               <div className="input-field">
                 <label>Why you (any relevant personal reasons):</label>
                 <textarea
-                  value={additionalInfo.whyYou}
+                  value={additionalInfo?.whyYou || ""} // Ensure additionalInfo is defined
                   onChange={(e) => handleInputChange('whyYou', e.target.value)}
                 />
               </div>
               <div className="input-field">
                 <label>Any relevant experiences:</label>
                 <textarea
-                  value={additionalInfo.relevantExperiences}
+                  value={additionalInfo?.relevantExperiences || ""} // Ensure additionalInfo is defined
                   onChange={(e) => handleInputChange('relevantExperiences', e.target.value)}
                 />
               </div>
@@ -147,28 +135,28 @@ function ApplicationInput({
               <div className="input-field">
                 <label>Key reason(s) for applying to firm:</label>
                 <textarea
-                  value={additionalInfo.keyReasons}
+                  value={additionalInfo?.keyReasons || ""} // Ensure additionalInfo is defined
                   onChange={(e) => handleInputChange('keyReasons', e.target.value)}
                 />
               </div>
               <div className="input-field">
                 <label>Relevant experience:</label>
                 <textarea
-                  value={additionalInfo.relevantExperience}
+                  value={additionalInfo?.relevantExperience || ""} // Ensure additionalInfo is defined
                   onChange={(e) => handleInputChange('relevantExperience', e.target.value)}
                 />
               </div>
               <div className="input-field">
                 <label>Relevant interaction with firm (if any):</label>
                 <textarea
-                  value={additionalInfo.relevantInteraction}
+                  value={additionalInfo?.relevantInteraction || ""} // Ensure additionalInfo is defined
                   onChange={(e) => handleInputChange('relevantInteraction', e.target.value)}
                 />
               </div>
               <div className="input-field">
                 <label>Any other personal information you'd like to include:</label>
                 <textarea
-                  value={additionalInfo.personalInfo}
+                  value={additionalInfo?.personalInfo || ""} // Ensure additionalInfo is defined
                   onChange={(e) => handleInputChange('personalInfo', e.target.value)}
                 />
               </div>
