@@ -6,8 +6,6 @@ import ApplicationInput from './ApplicationInput';
 import './ApplicationReview.css';
 import {
   getCurrentUser,
-  getUserData,
-  saveUserData,
   handleApplicationSubmit,
 } from '../utils/ApplicationReviewUtils';
 import { firms, questions } from '../data/ApplicationReviewData';
@@ -50,32 +48,6 @@ function ApplicationReview() {
     };
     setWordCount(calculateWordCount(applicationText));
   }, [applicationText]);
-
-  useEffect(() => {
-    const loadUserData = async () => {
-      if (user) {
-        try {
-          const data = await getUserData(user.id);
-          if (data) {
-            setApplicationText(data.application_text);
-            setFeedback(data.feedback);
-          }
-        } catch (error) {
-          console.error('Error loading user data:', error);
-        }
-      }
-    };
-
-    loadUserData();
-  }, [user]);
-
-  useEffect(() => {
-    if (user) {
-      saveUserData(user.id, applicationText, feedback).catch(error => {
-        console.error('Error saving user data:', error);
-      });
-    }
-  }, [applicationText, feedback, user]);
 
   const handleMouseDown = (e) => {
     e.preventDefault();
