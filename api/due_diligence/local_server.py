@@ -3,35 +3,29 @@ import json
 import logging
 import traceback
 from flask import Flask, request, jsonify
-from openai import OpenAI
 from flask_cors import CORS
+from openai import OpenAI
 import requests
-from bs4 import BeautifulSoup
-
-app = Flask(__name__)
-CORS(app)
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})  # Enable CORS for all routes and all origins
+
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
-GOOGLE_CSE_ID = "b7adcaafedbb6484a"
+JIGSAW_API_KEY = os.environ.get("JIGSAW_API_KEY")
+
+if not OPENAI_API_KEY:
+    logger.error("OpenAI API key is not set. Please set the OPENAI_API_KEY environment variable.")
+    raise ValueError("OpenAI API key is not set")
+
+if not JIGSAW_API_KEY:
+    logger.error("Jigsaw API key is not set. Please set the JIGSAW_API_KEY environment variable.")
+    raise ValueError("Jigsaw API key is not set")
 
 client = OpenAI(api_key=OPENAI_API_KEY)
-
-# Basic error handling
-@app.errorhandler(Exception)
-def handle_exception(e):
-    logger.error(f"Unhandled exception: {str(e)}")
-    logger.error(traceback.format_exc())
-    return jsonify(error=str(e)), 500
-
-@app.before_request
-def log_request_info():
-    logger.debug('Headers: %s', request.headers)
-    logger.debug('Body: %s', request.get_data())
 
 def get_openai_response(messages, model="gpt-4o-mini"):
     try:
@@ -47,18 +41,11 @@ def get_openai_response(messages, model="gpt-4o-mini"):
         logger.error(traceback.format_exc())
         raise
 
-def generate_search_queries(user_prompt):
-    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 6 separate search queries relevant to due diligence research a lawyer might need to do in relation to the given context. Format your response as a JSON object with the following structure:
+def generate_search_query(user_prompt):
+    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 1 search query relevant to due diligence research a lawyer might need to do in relation to the given context, keep the query short and succinct (less than 10 words) to get the most relevant results. Format your response as a JSON object with the following structure:
 
     {
-      "search_queries": [
-        "Query 1",
-        "Query 2",
-        "Query 3",
-        "Query 4",
-        "Query 5",
-        "Query 6"
-      ]
+        "query": "Your generated search query"
     }
 
     Ensure that your response is a valid JSON object."""
@@ -69,85 +56,92 @@ def generate_search_queries(user_prompt):
     ]
 
     try:
-        logger.info("Generating search queries")
+        logger.info("Generating search query")
         openai_response = get_openai_response(messages)
         content = openai_response.choices[0].message.content
-        logger.info(f"Raw OpenAI response for search queries: {content}")
-        queries = json.loads(content)
-        logger.info(f"Generated search queries: {queries['search_queries']}")
-        return queries['search_queries']
+        logger.info(f"Raw OpenAI response for search query: {content}")
+        
+        query_json = json.loads(content)
+        search_query = query_json["query"]
+        
+        logger.info(f"Generated search query: {search_query}")
+        return search_query, content, openai_response.usage.total_tokens
     except Exception as e:
-        logger.error(f"Error generating search queries: {str(e)}")
-        logger.error(traceback.format_exc())
-        return []
+        logger.error(f"Error generating search query: {str(e)}")
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        return "", str(e), 0
 
-def google_search(query):
-    url = "https://www.googleapis.com/customsearch/v1"
-    params = {
-        'key': GOOGLE_API_KEY,
-        'cx': GOOGLE_CSE_ID,
-        'q': query
+def jigsaw_search(query):
+    url = "https://api.jigsawstack.com/v1/web/search"
+    headers = {
+        "x-api-key": JIGSAW_API_KEY
     }
-    logger.info(f"Sending Google search request for query: {query}")
-    response = requests.get(url, params=params)
-    logger.info(f"Received Google search response for query: {query}")
-    return response.json()
+    params = {
+        "query": query,
+        "ai_overview": "true",
+        "safe_search": "moderate",
+        "spell_check": "true"
+    }
+    
+    logger.info(f"Sending Jigsaw search request for query: {query}")
+    response = requests.get(url, headers=headers, params=params)
+    logger.info(f"Received Jigsaw search response for query: {query}")
+    
+    if response.status_code == 200:
+        return response.json()
+    else:
+        logger.error(f"Error in Jigsaw search: {response.status_code} - {response.text}")
+        raise Exception(f"Jigsaw search failed: {response.status_code}")
 
-def get_page_content(url):
+def process_prompt(user_prompt):
+    logger.info(f"Processing prompt: {user_prompt}")
+    result = {
+        "user_prompt": user_prompt,
+        "steps": []
+    }
+    total_tokens = 0
     try:
-        logger.info(f"Fetching content from URL: {url}")
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-        response = requests.get(url, headers=headers, timeout=10)
-        soup = BeautifulSoup(response.text, 'html.parser')
+        # Step 1: Generate search query
+        search_query, raw_query_response, query_tokens = generate_search_query(user_prompt)
+        total_tokens += query_tokens
+        result["steps"].append({
+            "step": "Generate Search Query",
+            "search_query": search_query,
+            "raw_openai_response": raw_query_response
+        })
         
-        # Remove script and style elements
-        for script in soup(["script", "style"]):
-            script.decompose()
-        
-        # Get text
-        text = soup.get_text(separator=' ', strip=True)
-        
-        # Break into lines and remove leading and trailing space on each
-        lines = (line.strip() for line in text.splitlines())
-        # Break multi-headlines into a line each
-        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        # Drop blank lines
-        text = ' '.join(chunk for chunk in chunks if chunk)
-        
-        logger.info(f"Successfully extracted content from URL: {url}")
-        return text[:2000]  # Limit to first 2000 characters
-    except Exception as e:
-        logger.error(f"Error scraping {url}: {str(e)}")
-        logger.error(traceback.format_exc())
-        return ""
+        if not search_query:
+            logger.warning("No search query was generated. Returning error response.")
+            result["error"] = "Failed to generate search query"
+            return result
 
-@app.route('/due_diligence', methods=['POST'])
-def process_prompt():
-    logger.info("Received request to /process_prompt")
-    try:
-        user_prompt = request.json.get('prompt')
-        logger.info(f"Received prompt: {user_prompt}")
+        # Step 2: Perform Jigsaw search
+        search_result = jigsaw_search(search_query)
+        result["steps"].append({
+            "step": "Jigsaw Search",
+            "search_result": search_result
+        })
 
-        # Get search queries
-        search_queries = generate_search_queries(user_prompt)
-
-        # Perform Google searches and fetch content
-        scraped_contents = []
-        for query in search_queries:
-            search_result = google_search(query)
-            logger.info(f"Google API response for query '{query}': {json.dumps(search_result, indent=2)}")
+        # Step 3: Prepare the context for OpenAI using Jigsaw search results
+        context_items = []
+        for item in search_result.get('results', []):
+            url = item.get('url', '')
+            title = item.get('title', '')
+            description = item.get('description', '')
+            content = item.get('content', '')
+            snippets = item.get('snippets', [])
             
-            # Fetch content for the first result of each query
-            if search_result.get('items'):
-                item = search_result['items'][0]
-                url = item['link']
-                content = get_page_content(url)
-                scraped_contents.append({"url": url, "content": content})
+            scraped_content = f"Title: {title}\nDescription: {description}\nContent: {content}\nSnippets: {' '.join(snippets)}"
+            context_item = f"link: {url}\nscraped_content: {scraped_content}"
+            context_items.append(context_item)
 
-        # Prepare the context for OpenAI
-        context = "\n\n".join([f"Content from {item['url']}:\n{item['content']}" for item in scraped_contents])
+        context = "\n\n".join(context_items)
+        result["steps"].append({
+            "step": "Prepare Context",
+            "context": context
+        })
 
-        # Generate due diligence points with additional context
+        # Step 4: Generate due diligence points with additional context
         system_prompt = """You are an AI assistant specialized in due diligence for mergers and acquisitions. Here's the context for your analysis:
 
         Known risks are those uncovered by the Buyer during due diligence or voluntarily disclosed by the Seller. These are typically managed through express indemnities. For example, if Seller is subject to a pending lawsuit from a former partner, Buyer may require Seller's owners to indemnify Buyer against any costs associated with that lawsuit. Such indemnities are often tailored to the specific risks and can last indefinitely.
@@ -166,7 +160,7 @@ def process_prompt():
 
         Remember, this is an adversarial negotiation. Everyone aims to maximise their benefits and minimise their risks. Buyer wants to limit Seller's exposure to liabilities, while Seller's owners want to maximise the purchase price and limit their exposure.
 
-        Based on the given scenario, user input, and additional context, identify 6 key points a Lawyer could use for due diligence in the given context. For each point, provide a title, a detailed explanation, and cite the specific source (URL) to cite where you got the information from, for liability reasons. Try to use a variety of sources for the seperate points and assign a valid link to every source.
+        Based on the given scenario, user input, and additional context, identify 6 key points a Lawyer could use for due diligence in the given context. For each point, provide a title, a detailed explanation, and cite a specific source (URL) from the user prompt to cite where you got the information from, this url needs to be from additional context retrieved by a Jigsaw AI search call and provided to you in the user prompt. Use only links and the scraped content given from each link.
 
         Before you reply, consider your Belief, Desire, and Intention in the following format:
         - Belief: Your understanding of the situation, including any assumptions or knowledge.
@@ -203,26 +197,59 @@ def process_prompt():
             {"role": "user", "content": f"User Prompt: {user_prompt}\n\nAdditional Context:\n{context}"}
         ]
 
+        result["steps"].append({
+            "step": "Generate Due Diligence Points",
+            "messages": messages
+        })
+
         openai_response = get_openai_response(messages)
         due_diligence_content = openai_response.choices[0].message.content
+        total_tokens += openai_response.usage.total_tokens
         logger.info(f"Raw OpenAI response for due diligence: {due_diligence_content}")
         due_diligence_points = json.loads(due_diligence_content)
 
-        # Prepare the result
-        result = {
-            "search_queries": search_queries,
-            "due_diligence_points": due_diligence_points["due_diligence_points"],
-            "helpful_links": due_diligence_points.get("helpful_links", []),
-            "scraped_contents": scraped_contents
+        result["steps"].append({
+            "step": "Process Due Diligence Points",
+            "raw_openai_response": due_diligence_content,
+            "processed_points": due_diligence_points
+        })
+
+        # Final result
+        result["due_diligence_points"] = due_diligence_points["due_diligence_points"]
+        result["helpful_links"] = due_diligence_points.get("helpful_links", [])
+        result["usage"] = {
+            "total_tokens": total_tokens
         }
+        result["search_queries"] = [search_query]
+        result["jigsaw_results"] = search_result.get('results', [])
 
         logger.info("Successfully processed prompt and generated response")
-        return jsonify(result)
+        return result
     except Exception as e:
         logger.error(f"Error in process_prompt: {str(e)}")
-        logger.error(traceback.format_exc())
-        return jsonify({"error": "An unexpected error occurred", "details": str(e)}), 500
+        logger.error(f"Full traceback: {traceback.format_exc()}")
+        result["error"] = "An unexpected error occurred"
+        result["error_details"] = str(e)
+        result["error_traceback"] = traceback.format_exc()
+        result["usage"] = {
+            "total_tokens": total_tokens
+        }
+        return result
+
+@app.route('/api/due_diligence', methods=['POST'])
+def due_diligence():
+    data = request.json
+    prompt = data.get('prompt')
+    
+    if not prompt:
+        return jsonify({"error": "Missing 'prompt' in request body"}), 400
+
+    try:
+        result = process_prompt(prompt)
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Error processing prompt: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    logger.info("Starting Flask application")
     app.run(debug=True)

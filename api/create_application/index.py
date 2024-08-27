@@ -1,3 +1,4 @@
+#EXAMPLE OF RANDOM ENDPOINT THAT WORKS ON VERCEL SERVERLESS FUNCTION
 import json
 import os
 from openai import OpenAI
