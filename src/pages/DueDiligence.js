@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { ArrowUp, ExternalLink } from 'lucide-react';
 import { supabase } from '../supabaseClient';
 import { logToSupabase, fetchDueDiligenceResults } from '../utils/DueDiligenceUtils';
+import { UserInputContext } from '../context/UserInputContext';
 import './DueDiligence.css';
 
 const DueDiligence = () => {
-  const [backgroundInfo, setBackgroundInfo] = useState('');
-  const [facts, setFacts] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState(null);
-  const [searchQueries, setSearchQueries] = useState(null);
-  const [searchResults, setSearchResults] = useState(null);
-  const [error, setError] = useState(null);
-  const [user, setUser] = useState(null);
-  const [creditsUsed, setCreditsUsed] = useState(null);
-  const [newBalance, setNewBalance] = useState(null);
+  const {
+    backgroundInfo, setBackgroundInfo,
+    facts, setFacts,
+    dueDiligenceResults, setDueDiligenceResults,
+    searchQueries, setSearchQueries,
+    searchResults, setSearchResults,
+    creditsUsed, setCreditsUsed,
+    newBalance, setNewBalance
+  } = useContext(UserInputContext);
+
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
+  const [user, setUser] = React.useState(null);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -34,20 +38,20 @@ const DueDiligence = () => {
 
     setLoading(true);
     setError(null);
-    setResults(null);
+    setDueDiligenceResults(null);
     setSearchQueries(null);
     setSearchResults(null);
     setCreditsUsed(null);
     setNewBalance(null);
 
     try {
-      const { results, searchQueries, searchResults, creditsUsed, newBalance } = await fetchDueDiligenceResults(backgroundInfo, facts, user);
+      const { results, searchQueries: queries, searchResults: sResults, creditsUsed: credits, newBalance: balance } = await fetchDueDiligenceResults(backgroundInfo, facts, user);
 
-      setResults(results);
-      setSearchQueries(searchQueries);
-      setSearchResults(searchResults);
-      setCreditsUsed(creditsUsed);
-      setNewBalance(newBalance);
+      setDueDiligenceResults(results);
+      setSearchQueries(queries);
+      setSearchResults(sResults);
+      setCreditsUsed(credits);
+      setNewBalance(balance);
 
       // Log to Supabase
       await logToSupabase({
@@ -96,10 +100,10 @@ const DueDiligence = () => {
         </div>
       )}
 
-      {results && (
+      {dueDiligenceResults && (
         <div className="results-container">
           <div className="info-boxes">
-            {results.map((point, index) => (
+            {dueDiligenceResults.map((point, index) => (
               <div key={index} className="info-box">
                 <div className="info-box-header">{point.title}</div>
                 <div className="info-box-content">

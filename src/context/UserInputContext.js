@@ -14,6 +14,15 @@ export const UserInputProvider = ({ children }) => {
   const [reviewSelectedQuestion, setReviewSelectedQuestion] = useState(null);
   const [feedback, setFeedback] = useState("");
 
+  // Due Diligence state
+  const [backgroundInfo, setBackgroundInfo] = useState('');
+  const [facts, setFacts] = useState('');
+  const [dueDiligenceResults, setDueDiligenceResults] = useState(null);
+  const [searchQueries, setSearchQueries] = useState(null);
+  const [searchResults, setSearchResults] = useState(null);
+  const [creditsUsed, setCreditsUsed] = useState(null);
+  const [newBalance, setNewBalance] = useState(null);
+
   return (
     <UserInputContext.Provider value={{ 
       draftText, setDraftText, 
@@ -23,7 +32,15 @@ export const UserInputProvider = ({ children }) => {
       applicationText, setApplicationText,
       reviewSelectedFirm, setReviewSelectedFirm,
       reviewSelectedQuestion, setReviewSelectedQuestion,
-      feedback, setFeedback
+      feedback, setFeedback,
+      // Due Diligence context
+      backgroundInfo, setBackgroundInfo,
+      facts, setFacts,
+      dueDiligenceResults, setDueDiligenceResults,
+      searchQueries, setSearchQueries,
+      searchResults, setSearchResults,
+      creditsUsed, setCreditsUsed,
+      newBalance, setNewBalance
     }}>
       {children}
     </UserInputContext.Provider>
