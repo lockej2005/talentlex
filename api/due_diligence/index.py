@@ -4,6 +4,7 @@ import logging
 import traceback
 from http.server import BaseHTTPRequestHandler
 from urllib.request import urlopen, Request
+from urllib.parse import urlencode
 from openai import OpenAI
 
 # Set up logging
@@ -68,7 +69,14 @@ def generate_search_query(user_prompt):
         return "", str(e), 0
 
 def jigsaw_search(query):
-    url = f"https://api.jigsawstack.com/v1/web/search?query={query}&ai_overview=true&safe_search=moderate&spell_check=true"
+    base_url = "https://api.jigsawstack.com/v1/web/search"
+    params = {
+        "query": query,
+        "ai_overview": "true",
+        "safe_search": "moderate",
+        "spell_check": "true"
+    }
+    url = f"{base_url}?{urlencode(params)}"
     headers = {
         "x-api-key": JIGSAW_API_KEY
     }
