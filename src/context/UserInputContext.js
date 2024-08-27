@@ -8,7 +8,7 @@ export const UserInputProvider = ({ children }) => {
   const [selectedFirm, setSelectedFirm] = useState(null);
   
   // New state variables for application review
-  const [applicationText, setApplicationText] = useState("Enter your application here or generate a draft.");
+  const [applicationText, setApplicationText] = useState("Enter your application here...");
   const [reviewSelectedFirm, setReviewSelectedFirm] = useState(null);
   const [reviewSelectedQuestion, setReviewSelectedQuestion] = useState(null);
   const [feedback, setFeedback] = useState("");

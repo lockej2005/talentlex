@@ -81,13 +81,15 @@ function ApplicationInput({
         {dropdownSection}
       </div>
       <div className="text-content">
-        <textarea
-          className="editable-content"
-          value={applicationText}
-          onChange={(e) => setApplicationText(e.target.value)}
-          placeholder="Enter your application here..."
-        />
-        <div className="word-count">{wordCount} words</div>
+        <div className="editable-content-container">
+          <textarea
+            className="editable-content"
+            value={applicationText}
+            onChange={(e) => setApplicationText(e.target.value)}
+            placeholder="Enter your application here..."
+          />
+          <div className="word-count">{wordCount} words</div>
+        </div>
       </div>
     </div>
   );

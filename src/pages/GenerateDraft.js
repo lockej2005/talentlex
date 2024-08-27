@@ -201,7 +201,7 @@ function GenerateDraft() {
                   ref={editorRef}
                 />
               </div>
-              <div className="word-count">
+              <div className="word-count-draft">
                 Word count: {wordCount}
               </div>
             </div>
