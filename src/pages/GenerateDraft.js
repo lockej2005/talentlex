@@ -197,6 +197,10 @@ function GenerateDraft() {
             setSelectedFirm={setSelectedFirm}
             additionalInfo={additionalInfo}
             onAdditionalInfoChange={handleAdditionalInfoChange}
+            selectedQuestion={selectedQuestion}
+            setSelectedQuestion={setSelectedQuestion}
+            firms={firms}
+            getQuestions={getQuestions}
           />
         </div>
         <div className="divider-draft" ref={dividerRef} onMouseDown={handleMouseDown}>
@@ -241,3 +245,4 @@ function GenerateDraft() {
 }
 
 export default GenerateDraft;
+  

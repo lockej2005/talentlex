@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Select from 'react-select';
 import './ApplicationInput.css';
 
@@ -46,19 +46,31 @@ function ApplicationInput({
     }),
   };
 
+  // Function to handle changes in the additional info fields
   const handleInputChange = (field, value) => {
     onAdditionalInfoChange(field, value);
+  };
+
+  useEffect(() => {
+    // Set default firm and question on component mount
+    if (!selectedFirm && firms.length > 0) {
+      setSelectedFirm(firms[0]);
+      const initialQuestions = getQuestions(firms[0].value);
+      setSelectedQuestion(initialQuestions[0]);
+    }
+  }, [selectedFirm, setSelectedFirm, setSelectedQuestion, firms, getQuestions]);
+
+  const handleFirmChange = (option) => {
+    setSelectedFirm(option);
+    const questions = getQuestions(option.value);
+    setSelectedQuestion(questions[0]);
   };
 
   const dropdownSection = (
     <div className="dropdown-container">
       <Select
         value={selectedFirm}
-        onChange={(option) => {
-          setSelectedFirm(option);
-          const questions = getQuestions(option.value);
-          setSelectedQuestion(questions[0]);
-        }}
+        onChange={handleFirmChange}
         options={firms}
         styles={customStyles}
         isSearchable={false}
@@ -66,7 +78,7 @@ function ApplicationInput({
       <Select
         value={selectedQuestion}
         onChange={setSelectedQuestion}
-        options={selectedFirm ? getQuestions(selectedFirm.value) : []} // Check for null selectedFirm
+        options={selectedFirm ? getQuestions(selectedFirm.value) : []}
         styles={customStyles}
         isSearchable={false}
       />
