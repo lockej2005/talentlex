@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import './NegotiationSimulator.css';
 import {
   getCurrentUser,
@@ -7,16 +7,20 @@ import {
   renderJsonStructure
 } from '../utils/NegotiationSimulatorUtils';
 import { subtractCreditsAndUpdateUser } from '../utils/CreditManager';
+import { UserInputContext } from '../context/UserInputContext';
 
 const NegotiationSimulator = () => {
-  const [scenario, setScenario] = useState('');
-  const [negotiationResults, setNegotiationResults] = useState([]);
-  const [openItems, setOpenItems] = useState(new Set());
+  const {
+    scenario, setScenario,
+    negotiationResults, setNegotiationResults,
+    openItems, setOpenItems,
+    userOffer, setUserOffer,
+    lawyerDecision, setLawyerDecision,
+    totalTokens, setTotalTokens
+  } = useContext(UserInputContext);
+
   const [isLoading, setIsLoading] = useState(false);
-  const [userOffer, setUserOffer] = useState(null);
-  const [lawyerDecision, setLawyerDecision] = useState(null);
   const [user, setUser] = useState(null);
-  const [totalTokens, setTotalTokens] = useState(0);
   const [error, setError] = useState(null);
 
   useEffect(() => {

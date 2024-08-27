@@ -23,6 +23,14 @@ export const UserInputProvider = ({ children }) => {
   const [creditsUsed, setCreditsUsed] = useState(null);
   const [newBalance, setNewBalance] = useState(null);
 
+  // Negotiation Simulator state
+  const [scenario, setScenario] = useState('');
+  const [negotiationResults, setNegotiationResults] = useState([]);
+  const [openItems, setOpenItems] = useState(new Set());
+  const [userOffer, setUserOffer] = useState(null);
+  const [lawyerDecision, setLawyerDecision] = useState(null);
+  const [totalTokens, setTotalTokens] = useState(0);
+
   return (
     <UserInputContext.Provider value={{ 
       draftText, setDraftText, 
@@ -40,7 +48,14 @@ export const UserInputProvider = ({ children }) => {
       searchQueries, setSearchQueries,
       searchResults, setSearchResults,
       creditsUsed, setCreditsUsed,
-      newBalance, setNewBalance
+      newBalance, setNewBalance,
+      // Negotiation Simulator context
+      scenario, setScenario,
+      negotiationResults, setNegotiationResults,
+      openItems, setOpenItems,
+      userOffer, setUserOffer,
+      lawyerDecision, setLawyerDecision,
+      totalTokens, setTotalTokens
     }}>
       {children}
     </UserInputContext.Provider>
