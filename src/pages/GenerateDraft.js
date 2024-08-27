@@ -7,7 +7,6 @@ import './GenerateDraft.css';
 import { UserInputContext } from '../context/UserInputContext';
 import {
   getCurrentUser,
-  getUserData,
   saveUserData,
   handleDraftCreation
 } from '../utils/ApplicationReviewUtils';
@@ -53,49 +52,6 @@ function GenerateDraft() {
       setSelectedQuestion(firmQuestions[0]);
     }
   }, [selectedFirm]);
-
-  useEffect(() => {
-    const loadUserData = async () => {
-      if (user) {
-        try {
-          const data = await getUserData(user.id);
-          if (data) {
-            if (data.draft_text) {
-              const contentState = ContentState.createFromText(data.draft_text);
-              setEditorState(EditorState.createWithContent(contentState));
-              setWordCount(countWords(data.draft_text));
-            }
-            if (data.additional_info) {
-              setAdditionalInfo(data.additional_info);
-            }
-            if (data.selected_firm) {
-              setSelectedFirm(data.selected_firm);
-              const firmQuestions = getQuestions(data.selected_firm?.value || "");
-              setSelectedQuestion(firmQuestions[0]);
-            }
-          }
-        } catch (error) {
-          console.error('Error loading user data:', error);
-        }
-      }
-    };
-
-    loadUserData();
-  }, [user]);
-
-  useEffect(() => {
-    if (user) {
-      const contentState = editorState.getCurrentContent();
-      const dataToSave = {
-        draft_text: contentState.getPlainText(),
-        additional_info: additionalInfo,
-        selected_firm: selectedFirm,
-      };
-      saveUserData(user.id, dataToSave).catch(error => {
-        console.error('Error saving user data:', error);
-      });
-    }
-  }, [editorState, additionalInfo, selectedFirm, user]);
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -157,8 +113,7 @@ function GenerateDraft() {
         additionalInfo,
         (newDraftText) => {
           // Combine new draft text with existing text in the editor
-          const currentContent = editorState.getCurrentContent().getPlainText();
-          const updatedDraftText = currentContent + '\n' + newDraftText;
+          const updatedDraftText = newDraftText;
           
           const contentState = ContentState.createFromText(updatedDraftText);
           setEditorState(EditorState.createWithContent(contentState));
@@ -170,6 +125,9 @@ function GenerateDraft() {
       const endTime = Date.now();
       setResponseTime((endTime - startTime) / 1000);
       alert(`Draft generated successfully. Credits used: ${result.cost}. Remaining credits: ${result.newBalance}`);
+
+      // Save the draft text to the database
+      await saveUserData(user.id, draftText, null);
     } catch (error) {
       console.error('Error:', error);
       alert("Error: " + error.message);
