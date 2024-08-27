@@ -7,7 +7,6 @@ import './GenerateDraft.css';
 import { UserInputContext } from '../context/UserInputContext';
 import {
   getCurrentUser,
-  saveUserData,
   handleDraftCreation
 } from '../utils/ApplicationReviewUtils';
 import { firms, questions } from '../data/ApplicationReviewData';
@@ -130,8 +129,6 @@ function GenerateDraft() {
       const endTime = Date.now();
       setResponseTime((endTime - startTime) / 1000);
       alert(`Draft generated successfully. Credits used: ${result.cost}. Remaining credits: ${result.newBalance}`);
-
-      await saveUserData(user.id, draftText, null);
     } catch (error) {
       console.error('Error:', error);
       alert("Error: " + error.message);
