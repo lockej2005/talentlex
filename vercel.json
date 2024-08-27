@@ -5,5 +5,10 @@
             "memory": 1024,
             "maxDuration": 60
         }
-    }
+    },
+    "build": {
+        "env": {
+          "PYTHON_VERSION": "3.11"
+        }
+      }
 }
