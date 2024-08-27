@@ -66,7 +66,7 @@ function ApplicationInput({
       <Select
         value={selectedQuestion}
         onChange={setSelectedQuestion}
-        options={getQuestions(selectedFirm.value)}
+        options={selectedFirm ? getQuestions(selectedFirm.value) : []} // Check for null selectedFirm
         styles={customStyles}
         isSearchable={false}
       />
@@ -99,7 +99,7 @@ function ApplicationInput({
         <p>Please provide the following details to help generate your draft.</p>
         {dropdownSection}
         <div className="additional-fields">
-          {selectedFirm.value === "Jones Day" ? (
+          {selectedFirm && selectedFirm.value === "Jones Day" ? (
             <>
               <div className="input-field">
                 <label>Why law (paste your full 'why law' here):</label>

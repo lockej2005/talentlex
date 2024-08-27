@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Editor, EditorState, ContentState, RichUtils } from 'draft-js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight, faBold, faItalic, faUnderline, faListUl, faListOl, faQuoteRight } from '@fortawesome/free-solid-svg-icons';
 import ApplicationInput from './ApplicationInput';
 import './GenerateDraft.css';
+import { UserInputContext } from '../context/UserInputContext';
 import {
   getCurrentUser,
   getUserData,
@@ -12,29 +13,24 @@ import {
 } from '../utils/ApplicationReviewUtils';
 import { firms, questions } from '../data/ApplicationReviewData';
 
+const countWords = (text) => {
+  return text.trim().split(/\s+/).length;
+};
+
 function GenerateDraft() {
-  const [leftWidth, setLeftWidth] = useState(50);
+  const { draftText, setDraftText, additionalInfo, setAdditionalInfo, selectedFirm, setSelectedFirm } = useContext(UserInputContext);
+
   const [editorState, setEditorState] = useState(() => 
-    EditorState.createWithContent(ContentState.createFromText('Start writing...'))
+    EditorState.createWithContent(ContentState.createFromText(draftText || 'Start writing...'))
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedFirm, setSelectedFirm] = useState(firms[0]);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [responseTime, setResponseTime] = useState(null);
-  const [wordCount, setWordCount] = useState(2); // Initialize with the word count of "Start writing..."
+  const [wordCount, setWordCount] = useState(() => countWords(draftText || 'Start writing...'));
+  const [leftWidth, setLeftWidth] = useState(50); // Initialize with default width
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
   const editorRef = useRef(null);
-  const [additionalInfo, setAdditionalInfo] = useState({
-    keyReasons: '',
-    relevantExperience: '',
-    relevantInteraction: '',
-    personalInfo: '',
-    whyLaw: '',
-    whyJonesDay: '',
-    whyYou: '',
-    relevantExperiences: ''
-  });
   const [user, setUser] = useState(null);
   const [totalTokens, setTotalTokens] = useState(0);
 
@@ -52,8 +48,10 @@ function GenerateDraft() {
   }, []);
 
   useEffect(() => {
-    const firmQuestions = getQuestions(selectedFirm.value);
-    setSelectedQuestion(firmQuestions[0]);
+    if (selectedFirm) {
+      const firmQuestions = getQuestions(selectedFirm.value);
+      setSelectedQuestion(firmQuestions[0]);
+    }
   }, [selectedFirm]);
 
   useEffect(() => {
@@ -61,10 +59,20 @@ function GenerateDraft() {
       if (user) {
         try {
           const data = await getUserData(user.id);
-          if (data && data.draft_text) {
-            const contentState = ContentState.createFromText(data.draft_text);
-            setEditorState(EditorState.createWithContent(contentState));
-            setWordCount(countWords(data.draft_text));
+          if (data) {
+            if (data.draft_text) {
+              const contentState = ContentState.createFromText(data.draft_text);
+              setEditorState(EditorState.createWithContent(contentState));
+              setWordCount(countWords(data.draft_text));
+            }
+            if (data.additional_info) {
+              setAdditionalInfo(data.additional_info);
+            }
+            if (data.selected_firm) {
+              setSelectedFirm(data.selected_firm);
+              const firmQuestions = getQuestions(data.selected_firm?.value || "");
+              setSelectedQuestion(firmQuestions[0]);
+            }
           }
         } catch (error) {
           console.error('Error loading user data:', error);
@@ -78,11 +86,16 @@ function GenerateDraft() {
   useEffect(() => {
     if (user) {
       const contentState = editorState.getCurrentContent();
-      saveUserData(user.id, { draft_text: contentState.getPlainText() }).catch(error => {
+      const dataToSave = {
+        draft_text: contentState.getPlainText(),
+        additional_info: additionalInfo,
+        selected_firm: selectedFirm,
+      };
+      saveUserData(user.id, dataToSave).catch(error => {
         console.error('Error saving user data:', error);
       });
     }
-  }, [editorState, user]);
+  }, [editorState, additionalInfo, selectedFirm, user]);
 
   const handleMouseDown = (e) => {
     e.preventDefault();
@@ -121,13 +134,13 @@ function GenerateDraft() {
     }
 
     let requiredFields;
-    if (selectedFirm.value === "Jones Day") {
+    if (selectedFirm?.value === "Jones Day") {
       requiredFields = ['whyLaw', 'whyJonesDay', 'whyYou', 'relevantExperiences'];
     } else {
       requiredFields = ['keyReasons', 'relevantExperience', 'relevantInteraction', 'personalInfo'];
     }
 
-    const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field].trim() !== '');
+    const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field]?.trim() !== '');
 
     if (!areAllFieldsFilled) {
       alert('Please fill out all the required information fields before generating a draft.');
@@ -163,6 +176,7 @@ function GenerateDraft() {
   const onEditorChange = (newEditorState) => {
     setEditorState(newEditorState);
     const currentContent = newEditorState.getCurrentContent().getPlainText();
+    setDraftText(currentContent);
     setWordCount(countWords(currentContent));
   };
 
@@ -174,25 +188,15 @@ function GenerateDraft() {
     setEditorState(RichUtils.toggleBlockType(editorState, blockType));
   };
 
-  const countWords = (text) => {
-    return text.trim().split(/\s+/).length;
-  };
-
   return (
     <div className="comparison-container-draft">
       <div className="content-draft" ref={containerRef}>
-        <div className="left-column-draft" style={{width: `${leftWidth}%`}}>
+        <div className="left-column-draft" style={{ width: `${leftWidth}%` }}>
           <ApplicationInput
             selectedFirm={selectedFirm}
             setSelectedFirm={setSelectedFirm}
-            selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
-            firms={firms}
-            getQuestions={getQuestions}
             additionalInfo={additionalInfo}
             onAdditionalInfoChange={handleAdditionalInfoChange}
-            inputType="expanded"
-            fullHeight={true}
           />
         </div>
         <div className="divider-draft" ref={dividerRef} onMouseDown={handleMouseDown}>
@@ -202,7 +206,7 @@ function GenerateDraft() {
           </div>
           <div className="divider-line-draft bottom"></div>
         </div>
-        <div className="right-column-draft" style={{width: `${100 - leftWidth}%`}}>
+        <div className="right-column-draft" style={{ width: `${100 - leftWidth}%` }}>
           <div className="button-container-draft">
             <button className="submit-button-draft" onClick={handleCreateDraft} disabled={isLoading || !user}>
               {isLoading ? 'Generating...' : 'Generate Draft'}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
-import { Routes, Route, Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import ApplicationReview from './ApplicationReview';
 import GenerateDraft from './GenerateDraft';
@@ -13,6 +13,7 @@ import './Layout.css';
 import Videos from './Videos';
 import './Authentication.css';
 import SpeakToFounders from './SpeakToFounders';
+import { UserInputProvider } from '../context/UserInputContext'; // Import the UserInputProvider
 
 const PopupSocietyJoin = ({ onClose, onJoin }) => {
   const [societyCode, setSocietyCode] = useState('');
@@ -149,90 +150,92 @@ const Layout = () => {
   };
 
   return (
-    <div className="layout">
-      <div className={`sidebar ${menuOpen ? 'open' : ''}`}>
-        <div className="sidebar-content">
-          <div className="logo">TalentLex</div>
-          <nav>
-            <ul>
-              <li className="section-title">Tools</li>
-              <div className='seperator'></div>
-              <li className={location.pathname === "/generate-draft" ? "active" : ""}>
-                <Link to="/generate-draft">Generate Draft</Link>
-              </li>
-              <li className={location.pathname === "/" ? "active" : ""}>
-                <Link to="/">Application Review</Link>
-              </li>
-              <li className={location.pathname === "/due-diligence" ? "active" : ""}>
-                <Link to="/due-diligence">Due Diligence Tool</Link>
-              </li>
-              <li className={location.pathname === "/negotiation-simulator" ? "active" : ""}>
-                <Link to="/negotiation-simulator">Negotiation Simulator</Link>
-              </li>
-              <li className="section-title">Guide</li>
-              <div className='seperator'></div>
-              <li className={location.pathname === "/videos" ? "active" : ""}>
-                <Link to="/videos">Videos</Link>
-              </li>
-              <li className={location.pathname === "/speak-to-founders" ? "active" : ""}>
-                <Link to="/speak-to-founders">Speak to the Founders</Link>
-              </li>
-              <li className="section-title">Legal</li>
-              <div className='seperator'></div>
-              <li className={location.pathname === "/privacy-policy" ? "active" : ""}>
-                <Link to="/privacy-policy">Privacy Policy</Link>
-              </li>
-              <li className={location.pathname === "/ai-usage-policy" ? "active" : ""}>
-                <Link to="/ai-usage-policy">AI Data Usage</Link>
-              </li>
-            </ul>
-          </nav>
+    <UserInputProvider> {/* Wrap the entire layout with the UserInputProvider */}
+      <div className="layout">
+        <div className={`sidebar ${menuOpen ? 'open' : ''}`}>
+          <div className="sidebar-content">
+            <div className="logo">TalentLex</div>
+            <nav>
+              <ul>
+                <li className="section-title">Tools</li>
+                <div className='seperator'></div>
+                <li className={location.pathname === "/generate-draft" ? "active" : ""}>
+                  <Link to="/generate-draft">Generate Draft</Link>
+                </li>
+                <li className={location.pathname === "/" ? "active" : ""}>
+                  <Link to="/">Application Review</Link>
+                </li>
+                <li className={location.pathname === "/due-diligence" ? "active" : ""}>
+                  <Link to="/due-diligence">Due Diligence Tool</Link>
+                </li>
+                <li className={location.pathname === "/negotiation-simulator" ? "active" : ""}>
+                  <Link to="/negotiation-simulator">Negotiation Simulator</Link>
+                </li>
+                <li className="section-title">Guide</li>
+                <div className='seperator'></div>
+                <li className={location.pathname === "/videos" ? "active" : ""}>
+                  <Link to="/videos">Videos</Link>
+                </li>
+                <li className={location.pathname === "/speak-to-founders" ? "active" : ""}>
+                  <Link to="/speak-to-founders">Speak to the Founders</Link>
+                </li>
+                <li className="section-title">Legal</li>
+                <div className='seperator'></div>
+                <li className={location.pathname === "/privacy-policy" ? "active" : ""}>
+                  <Link to="/privacy-policy">Privacy Policy</Link>
+                </li>
+                <li className={location.pathname === "/ai-usage-policy" ? "active" : ""}>
+                  <Link to="/ai-usage-policy">AI Data Usage</Link>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <div className="user-info">
+            <div className="credits">{userCredits} credits</div>
+            <div className='seperator'></div>
+            <div className='user-name'>{userName || 'Loading...'}</div>
+            {societyName ? (
+              <div className="society-name" onClick={() => setShowSocietyDetailsPopup(true)}>{societyName}</div>
+            ) : (
+              <div className="join-society" onClick={() => setShowJoinPopup(true)}>Join a society</div>
+            )}
+            <button onClick={handleLogout} className="logout-btn">Log Out</button>
+          </div>
         </div>
-        <div className="user-info">
-          <div className="credits">{userCredits} credits</div>
-          <div className='seperator'></div>
-          <div className='user-name'>{userName || 'Loading...'}</div>
-          {societyName ? (
-            <div className="society-name" onClick={() => setShowSocietyDetailsPopup(true)}>{societyName}</div>
-          ) : (
-            <div className="join-society" onClick={() => setShowJoinPopup(true)}>Join a society</div>
-          )}
-          <button onClick={handleLogout} className="logout-btn">Log Out</button>
+        <div className="main-content">
+          <button className="menu-toggle" onClick={toggleMenu}>
+            <Menu size={24} />
+          </button>
+          <div className="content-area">
+            <Routes>
+              <Route path="/generate-draft" element={<GenerateDraft />} />
+              <Route path="/" element={<ApplicationReview />} />
+              <Route path="/negotiation-simulator" element={<NegotiationSimulator />} />
+              <Route path="/due-diligence" element={<DueDiligence />} />
+              <Route path="/videos" element={<Videos />} />
+              <Route path="/speak-to-founders" element={<SpeakToFounders />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/ai-usage-policy" element={<AIUsagePolicy />} />
+            </Routes>
+          </div>
         </div>
+        {showOverlay && (
+          <div className="menu-overlay" onClick={closeMenu}></div>
+        )}
+        {showJoinPopup && (
+          <PopupSocietyJoin 
+            onClose={() => setShowJoinPopup(false)}
+            onJoin={handleJoinSociety}
+          />
+        )}
+        {showSocietyDetailsPopup && societyDetails && (
+          <PopupSocietyDetails 
+            society={societyDetails}
+            onClose={() => setShowSocietyDetailsPopup(false)}
+          />
+        )}
       </div>
-      <div className="main-content">
-        <button className="menu-toggle" onClick={toggleMenu}>
-          <Menu size={24} />
-        </button>
-        <div className="content-area">
-          <Routes>
-            <Route path="/generate-draft" element={<GenerateDraft />} />
-            <Route path="/" element={<ApplicationReview />} />
-            <Route path="/negotiation-simulator" element={<NegotiationSimulator />} />
-            <Route path="/due-diligence" element={<DueDiligence />} />
-            <Route path="/videos" element={<Videos />} />
-            <Route path="/speak-to-founders" element={<SpeakToFounders />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/ai-usage-policy" element={<AIUsagePolicy />} />
-          </Routes>
-        </div>
-      </div>
-      {showOverlay && (
-        <div className="menu-overlay" onClick={closeMenu}></div>
-      )}
-      {showJoinPopup && (
-        <PopupSocietyJoin 
-          onClose={() => setShowJoinPopup(false)}
-          onJoin={handleJoinSociety}
-        />
-      )}
-      {showSocietyDetailsPopup && societyDetails && (
-        <PopupSocietyDetails 
-          society={societyDetails}
-          onClose={() => setShowSocietyDetailsPopup(false)}
-        />
-      )}
-    </div>
+    </UserInputProvider>
   );
 };
 
