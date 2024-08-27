@@ -16,13 +16,17 @@ const countWords = (text) => {
 };
 
 function GenerateDraft() {
-  const { draftText, setDraftText, additionalInfo, setAdditionalInfo, selectedFirm, setSelectedFirm } = useContext(UserInputContext);
+  const { 
+    draftText, setDraftText, 
+    additionalInfo, setAdditionalInfo, 
+    selectedFirm, setSelectedFirm,
+    selectedQuestion, setSelectedQuestion
+  } = useContext(UserInputContext);
 
   const [editorState, setEditorState] = useState(() => 
     EditorState.createWithContent(ContentState.createFromText(draftText || 'Start writing...'))
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [responseTime, setResponseTime] = useState(null);
   const [wordCount, setWordCount] = useState(() => countWords(draftText || 'Start writing...'));
   const [leftWidth, setLeftWidth] = useState(50);
@@ -44,19 +48,21 @@ function GenerateDraft() {
 
     fetchCurrentUser();
 
-    // Set default firm to Goodwin
-    const defaultFirm = firms.find(firm => firm.value === "Goodwin") || firms[0];
-    setSelectedFirm(defaultFirm);
-  }, []);
+    // Set default firm to Goodwin if not already set
+    if (!selectedFirm) {
+      const defaultFirm = firms.find(firm => firm.value === "Goodwin") || firms[0];
+      setSelectedFirm(defaultFirm);
+    }
+  }, [selectedFirm, setSelectedFirm]);
 
   useEffect(() => {
-    if (selectedFirm) {
+    if (selectedFirm && !selectedQuestion) {
       const firmQuestions = getQuestions(selectedFirm.value);
-      // Set default question to "Why are you applying to Goodwin?"
+      // Set default question to "Why are you applying to Goodwin?" if not already set
       const defaultQuestion = firmQuestions.find(q => q.value === "Why are you applying to Goodwin?") || firmQuestions[0];
       setSelectedQuestion(defaultQuestion);
     }
-  }, [selectedFirm]);
+  }, [selectedFirm, selectedQuestion, setSelectedQuestion]);
 
   const handleMouseDown = (e) => {
     e.preventDefault();
