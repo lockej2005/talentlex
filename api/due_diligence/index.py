@@ -1,25 +1,26 @@
-from http.server import BaseHTTPRequestHandler
-import os
 import json
+import os
 import logging
 import traceback
+from http.server import BaseHTTPRequestHandler
+from urllib.request import urlopen, Request
+from urllib.parse import urlencode
 from openai import OpenAI
-import http.client
-import urllib.parse
-from urllib.request import urlopen
-from bs4 import BeautifulSoup
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-GOOGLE_API_KEY = "AIzaSyBqJNAkR48aA-9VKTpawAsUIjqQqou6q9I"
-GOOGLE_CSE_ID = "b7adcaafedbb6484a"
+JIGSAW_API_KEY = "sk_0cbf9d0b8bb72b6fd6b37b7ccbcd6ed0ce3dd4071085339a22446da533c9b924a416f333d14c22ce374fc49e07bfbed5ccb59a5cf33929ae48f8b71074bf8acc0240FLHWDqEs4KLg1S4Ua"
 
 if not OPENAI_API_KEY:
     logger.error("OpenAI API key is not set. Please set the OPENAI_API_KEY environment variable.")
     raise ValueError("OpenAI API key is not set")
+
+if not JIGSAW_API_KEY:
+    logger.error("Jigsaw API key is not set. Please set the JIGSAW_API_KEY environment variable.")
+    raise ValueError("Jigsaw API key is not set")
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
@@ -38,7 +39,7 @@ def get_openai_response(messages, model="gpt-4o-mini"):
         raise
 
 def generate_search_query(user_prompt):
-    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 1 search query relevant to due diligence research a lawyer might need to do in relation to the given context, keep the query short and succinct (less than 10 words) to get the msot relevant results. Format your response as a JSON object with the following structure:
+    system_prompt = """You are an AI assistant specialized in generating relevant search queries. Based on the given user input, generate 1 search query relevant to due diligence research a lawyer might need to do in relation to the given context, keep the query short and succinct (less than 10 words) to get the most relevant results. Format your response as a JSON object with the following structure:
 
     {
         "query": "Your generated search query"
@@ -57,70 +58,36 @@ def generate_search_query(user_prompt):
         content = openai_response.choices[0].message.content
         logger.info(f"Raw OpenAI response for search query: {content}")
         
-        # Try to parse the content as JSON
-        try:
-            query_json = json.loads(content)
-            search_query = query_json["query"]
-        except (json.JSONDecodeError, KeyError) as err:
-            logger.error(f"Failed to parse OpenAI response as JSON or extract query: {str(err)}")
-            logger.error(f"Raw content: {content}")
-            
-            # Attempt to extract query using a simple string parsing method
-            search_query = content.split(":")[1].strip().strip('"') if ":" in content else ""
+        query_json = json.loads(content)
+        search_query = query_json["query"]
         
         logger.info(f"Generated search query: {search_query}")
-        return search_query, content, openai_response.usage.total_tokens  # Return query, raw content, and token usage
+        return search_query, content, openai_response.usage.total_tokens
     except Exception as e:
         logger.error(f"Error generating search query: {str(e)}")
         logger.error(f"Full traceback: {traceback.format_exc()}")
-        return "", str(e), 0  # Return empty string, error message, and 0 tokens
+        return "", str(e), 0
 
-def google_search(query):
-    conn = http.client.HTTPSConnection("www.googleapis.com")
-    params = urllib.parse.urlencode({
-        'key': GOOGLE_API_KEY,
-        'cx': GOOGLE_CSE_ID,
-        'q': query,
-        'num': 6  # Get top 6 results
-    })
-    logger.info(f"Sending Google search request for query: {query}")
-    conn.request("GET", f"/customsearch/v1?{params}")
-    response = conn.getresponse()
-    data = response.read()
-    conn.close()
-    logger.info(f"Received Google search response for query: {query}")
+def jigsaw_search(query):
+    base_url = "https://api.jigsawstack.com/v1/web/search"
+    params = {
+        "query": query,
+        "ai_overview": "true",
+        "safe_search": "moderate",
+        "spell_check": "true"
+    }
+    url = f"{base_url}?{urlencode(params)}"
+    headers = {
+        "x-api-key": JIGSAW_API_KEY
+    }
+    
+    logger.info(f"Sending Jigsaw search request for query: {query}")
+    req = Request(url, headers=headers)
+    with urlopen(req) as response:
+        data = response.read()
+    logger.info(f"Received Jigsaw search response for query: {query}")
+    
     return json.loads(data)
-
-def get_page_content(url):
-    try:
-        logger.info(f"Fetching content from URL: {url}")
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-        req = urllib.request.Request(url, headers=headers)
-        with urlopen(req, timeout=10) as response:
-            html = response.read()
-        
-        soup = BeautifulSoup(html, 'html.parser')
-        
-        # Remove script and style elements
-        for script in soup(["script", "style"]):
-            script.decompose()
-        
-        # Get text
-        text = soup.get_text(separator=' ', strip=True)
-        
-        # Break into lines and remove leading and trailing space on each
-        lines = (line.strip() for line in text.splitlines())
-        # Break multi-headlines into a line each
-        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        # Drop blank lines
-        text = ' '.join(chunk for chunk in chunks if chunk)
-        
-        logger.info(f"Successfully extracted content from URL: {url}")
-        return text[:2000]  # Limit to first 2000 characters
-    except Exception as e:
-        logger.error(f"Error scraping {url}: {str(e)}")
-        logger.error(traceback.format_exc())
-        return ""
 
 def process_prompt(user_prompt):
     logger.info(f"Processing prompt: {user_prompt}")
@@ -144,26 +111,27 @@ def process_prompt(user_prompt):
             result["error"] = "Failed to generate search query"
             return result
 
-        # Step 2: Perform Google search and fetch content
-        search_result = google_search(search_query)
+        # Step 2: Perform Jigsaw search
+        search_result = jigsaw_search(search_query)
         result["steps"].append({
-            "step": "Google Search",
+            "step": "Jigsaw Search",
             "search_result": search_result
         })
 
-        scraped_contents = []
-        for item in search_result.get('items', [])[:6]:
-            url = item['link']
-            content = get_page_content(url)
-            scraped_contents.append({"url": url, "content": content})
+        # Step 3: Prepare the context for OpenAI using Jigsaw search results
+        context_items = []
+        for item in search_result.get('results', []):
+            url = item.get('url', '')
+            title = item.get('title', '')
+            description = item.get('description', '')
+            content = item.get('content', '')
+            snippets = item.get('snippets', [])
+            
+            scraped_content = f"Title: {title}\nDescription: {description}\nContent: {content}\nSnippets: {' '.join(snippets)}"
+            context_item = f"link: {url}\nscraped_content: {scraped_content}"
+            context_items.append(context_item)
 
-        result["steps"].append({
-            "step": "Content Scraping",
-            "scraped_contents": scraped_contents
-        })
-
-        # Step 3: Prepare the context for OpenAI
-        context = "\n\n".join([f"Content from {item['url']}:\n{item['content']}" for item in scraped_contents])
+        context = "\n\n".join(context_items)
         result["steps"].append({
             "step": "Prepare Context",
             "context": context
@@ -188,7 +156,7 @@ def process_prompt(user_prompt):
 
         Remember, this is an adversarial negotiation. Everyone aims to maximise their benefits and minimise their risks. Buyer wants to limit Seller's exposure to liabilities, while Seller's owners want to maximise the purchase price and limit their exposure.
 
-        Based on the given scenario, user input, and additional context, identify 6 key points a Lawyer could use for due diligence in the given context. For each point, provide a title, a detailed explanation, and cite a specific source (URL) from the user prompt to cite where you got the information from, this url needs to be from additional context retrieved by a Google API call and provided to you in the user prompt.
+        Based on the given scenario, user input, and additional context, identify 6 key points a Lawyer could use for due diligence in the given context. For each point, provide a title, a detailed explanation, and cite a specific source (URL) from the user prompt to cite where you got the information from, this url needs to be from additional context retrieved by a Jigsaw AI search call and provided to you in the user prompt. Use only links and the scraped content given from each link.
 
         Before you reply, consider your Belief, Desire, and Intention in the following format:
         - Belief: Your understanding of the situation, including any assumptions or knowledge.
@@ -248,6 +216,8 @@ def process_prompt(user_prompt):
         result["usage"] = {
             "total_tokens": total_tokens
         }
+        result["search_queries"] = [search_query]
+        result["jigsaw_results"] = search_result.get('results', [])
 
         logger.info("Successfully processed prompt and generated response")
         return result
@@ -263,33 +233,44 @@ def process_prompt(user_prompt):
         return result
 
 class handler(BaseHTTPRequestHandler):
+    def set_CORS_headers(self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        self.send_header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    
+    def do_OPTIONS(self):
+        self.send_response(200)
+        self.set_CORS_headers()
+        self.end_headers()
+
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length)
         data = json.loads(post_data.decode('utf-8'))
+
+        prompt = data.get('prompt')
         
-        user_prompt = data.get('prompt')
-        
-        if not user_prompt:
-            self.send_error(400, "Missing 'prompt' in request body")
+        if not prompt:
+            self.send_response(400)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps({"error": "Missing 'prompt' in request body"})
+            self.wfile.write(response.encode('utf-8'))
             return
 
         try:
-            result = process_prompt(user_prompt)
-            
+            result = process_prompt(prompt)
             self.send_response(200)
+            self.set_CORS_headers()
             self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             response = json.dumps(result)
             self.wfile.write(response.encode('utf-8'))
-
         except Exception as e:
-            self.send_error(500, str(e))
-
-    def do_OPTIONS(self):
-        self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type")
-        self.end_headers()
+            logger.error(f"Error processing prompt: {str(e)}")
+            self.send_response(500)
+            self.set_CORS_headers()
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            response = json.dumps({"error": str(e)})
+            self.wfile.write(response.encode('utf-8'))
