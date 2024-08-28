@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Editor, EditorState, ContentState, RichUtils } from 'draft-js';
+import { Editor, EditorState, ContentState, RichUtils, SelectionState } from 'draft-js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight, faBold, faItalic, faUnderline, faListUl, faListOl, faQuoteRight } from '@fortawesome/free-solid-svg-icons';
 import ApplicationInput from './ApplicationInput';
@@ -35,6 +35,7 @@ function GenerateDraft() {
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
   const editorRef = useRef(null);
+  const editorContainerRef = useRef(null);
   const [user, setUser] = useState(null);
   const [totalTokens, setTotalTokens] = useState(0);
   const [showSaveToolbar, setShowSaveToolbar] = useState(false);
@@ -53,7 +54,6 @@ function GenerateDraft() {
 
     fetchCurrentUser();
 
-    // Set default firm to Goodwin if not already set
     if (!selectedFirm) {
       const defaultFirm = firms.find(firm => firm.value === "Goodwin") || firms[0];
       setSelectedFirm(defaultFirm);
@@ -63,7 +63,6 @@ function GenerateDraft() {
   useEffect(() => {
     if (selectedFirm && !selectedQuestion) {
       const firmQuestions = getQuestions(selectedFirm.value);
-      // Set default question to "Why are you applying to Goodwin?" if not already set
       const defaultQuestion = firmQuestions.find(q => q.value === "Why are you applying to Goodwin?") || firmQuestions[0];
       setSelectedQuestion(defaultQuestion);
     }
@@ -98,7 +97,6 @@ function GenerateDraft() {
               }
             }
 
-            // Load the 4 question text fields into additionalInfo
             setAdditionalInfo({
               whyLaw: savedDraft.answer_1 || '',
               whyJonesDay: savedDraft.answer_2 || '',
@@ -116,7 +114,6 @@ function GenerateDraft() {
           setIsLoading(false);
         }
       } else {
-        // Clear the fields for a new draft
         setDraftText('');
         setEditorState(EditorState.createEmpty());
         setWordCount(0);
@@ -132,7 +129,6 @@ function GenerateDraft() {
 
   useEffect(() => {
     if (location.pathname === '/generate-draft') {
-      // Reset state when navigating to the new draft page without params
       setDraftText('');
       setEditorState(EditorState.createEmpty());
       setWordCount(0);
@@ -193,7 +189,7 @@ function GenerateDraft() {
     if (!areAllFieldsFilled) {
       alert('Please fill out all the required information fields before generating a draft.');
       return;
-    } 
+    }
 
     setIsLoading(true);
     const startTime = Date.now();
@@ -205,7 +201,7 @@ function GenerateDraft() {
         additionalInfo,
         (newDraftText) => {
           const updatedDraftText = newDraftText;
-          
+
           const contentState = ContentState.createFromText(updatedDraftText);
           setEditorState(EditorState.createWithContent(contentState));
           setDraftText(updatedDraftText);
@@ -246,7 +242,6 @@ function GenerateDraft() {
       };
 
       if (draftId) {
-        // Update existing draft
         const { error } = await supabase
           .from('saved_drafts')
           .update(draftData)
@@ -254,7 +249,6 @@ function GenerateDraft() {
 
         if (error) throw error;
       } else {
-        // Create new draft
         const { error } = await supabase
           .from('saved_drafts')
           .insert(draftData);
@@ -265,7 +259,7 @@ function GenerateDraft() {
       alert('Draft saved successfully!');
       setShowSaveToolbar(false);
       setIsEdited(false);
-      navigate('/generate-draft'); // Navigate back to the main generate draft page
+      navigate('/generate-draft');
     } catch (error) {
       console.error('Error saving draft:', error);
       alert('Failed to save draft. Please try again.');
@@ -291,17 +285,50 @@ function GenerateDraft() {
     setEditorState(RichUtils.toggleBlockType(editorState, blockType));
   };
 
+  const handleEditorClick = (e) => {
+    const editorContainer = editorContainerRef.current;
+    if (!editorContainer) return;
+
+    const { top, left } = editorContainer.getBoundingClientRect();
+    const x = e.clientX - left;
+    const y = e.clientY - top;
+
+    const contentState = editorState.getCurrentContent();
+    const blockMap = contentState.getBlockMap();
+    let blockKey = blockMap.first().getKey();
+
+    blockMap.forEach((block) => {
+      const blockNode = document.querySelector(`[data-offset-key="${block.getKey()}-0-0"]`);
+      if (blockNode) {
+        const { top: blockTop, height: blockHeight } = blockNode.getBoundingClientRect();
+        if (y >= blockTop && y <= blockTop + blockHeight) {
+          blockKey = block.getKey();
+        }
+      }
+    });
+
+    const selection = SelectionState.createEmpty(blockKey);
+    const newSelection = selection.merge({
+      anchorOffset: 0,
+      focusOffset: 0,
+    });
+
+    const newEditorState = EditorState.forceSelection(editorState, newSelection);
+    setEditorState(newEditorState);
+    editorRef.current.focus();
+  };
+
   return (
     <div className="comparison-container-draft">
-        <div className="save-toolbar">
-          <input
-            type="text"
-            placeholder="Enter a title for your draft"
-            value={draftTitle}
-            onChange={(e) => setDraftTitle(e.target.value)}
-          />
-          <button onClick={handleSaveDraft}>Save Draft</button>
-        </div>
+      <div className="save-toolbar">
+        <input
+          type="text"
+          placeholder="Enter a title for your draft"
+          value={draftTitle}
+          onChange={(e) => setDraftTitle(e.target.value)}
+        />
+        <button onClick={handleSaveDraft}>Save Draft</button>
+      </div>
       <div className="content-draft" ref={containerRef}>
         <div className="left-column-draft" style={{ width: `${leftWidth}%` }}>
           <ApplicationInput
@@ -341,7 +368,7 @@ function GenerateDraft() {
               <button onClick={() => applyBlockType('ordered-list-item')}><FontAwesomeIcon icon={faListOl} /></button>
               <button onClick={() => applyBlockType('blockquote')}><FontAwesomeIcon icon={faQuoteRight} /></button>
             </div>
-            <div className="editor-container">
+            <div className="editor-container" ref={editorContainerRef} onClick={handleEditorClick}>
               <div className="editor-content-draft">
                 <Editor
                   editorState={editorState}
