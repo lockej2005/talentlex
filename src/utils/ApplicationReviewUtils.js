@@ -125,6 +125,21 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
   return { cost, newBalance };
 };
 
+export const saveDraft = async (userId, title, draft, firm, question) => {
+  const { data, error } = await supabase
+    .from('saved_drafts')
+    .insert({
+      user_id: userId,
+      title: title,
+      draft: draft,
+      firm: firm,
+      question: question
+    });
+
+  if (error) throw error;
+  return data;
+};
+
 export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, additionalInfo, setApplicationText, setTotalTokens, setFeedback) => {
   if (!user) {
     throw new Error('Please log in to generate a draft.');

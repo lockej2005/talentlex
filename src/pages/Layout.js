@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Menu } from 'lucide-react';
-import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, ChevronDown, ChevronRight } from 'lucide-react';
+import { Routes, Route, Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import ApplicationReview from './ApplicationReview';
 import GenerateDraft from './GenerateDraft';
@@ -13,7 +13,7 @@ import './Layout.css';
 import Videos from './Videos';
 import './Authentication.css';
 import SpeakToFounders from './SpeakToFounders';
-import { UserInputProvider } from '../context/UserInputContext'; // Import the UserInputProvider
+import { UserInputProvider } from '../context/UserInputContext';
 
 const PopupSocietyJoin = ({ onClose, onJoin }) => {
   const [societyCode, setSocietyCode] = useState('');
@@ -63,12 +63,17 @@ const Layout = () => {
   const [showJoinPopup, setShowJoinPopup] = useState(false);
   const [showSocietyDetailsPopup, setShowSocietyDetailsPopup] = useState(false);
   const [userCredits, setUserCredits] = useState(0);
+  const [savedDrafts, setSavedDrafts] = useState([]);
+  const [generateDraftExpanded, setGenerateDraftExpanded] = useState(false);
+  const [selectedDraftId, setSelectedDraftId] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
   const fetchUserProfile = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
+      setUser(user);
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('name, society, credits')
@@ -95,22 +100,79 @@ const Layout = () => {
             setSocietyDetails(societyData);
           }
         }
-
-        supabase
-          .channel('public:profiles')
-          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` }, payload => {
-            console.log('Change received!', payload);
-            const updatedCredits = payload.new.credits;
-            setUserCredits(updatedCredits);
-          })
-          .subscribe();
       }
     }
   };
 
+  const fetchSavedDrafts = async (userId) => {
+    const { data: allDrafts, error } = await supabase
+      .from('saved_drafts')
+      .select('id, title, firm, question')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error) {
+      console.error('Error fetching saved drafts:', error);
+      return;
+    }
+
+    setSavedDrafts(allDrafts);
+  };
+
   useEffect(() => {
     fetchUserProfile();
+
+    let profileSubscription;
+    let draftsSubscription;
+
+    const setupSubscriptions = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        profileSubscription = supabase
+          .channel('public:profiles')
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` }, payload => {
+            const updatedCredits = payload.new.credits;
+            setUserCredits(updatedCredits);
+          })
+          .subscribe();
+
+        draftsSubscription = supabase
+          .channel('public:saved_drafts')
+          .on('postgres_changes', 
+            { 
+              event: '*', 
+              schema: 'public', 
+              table: 'saved_drafts', 
+              filter: `user_id=eq.${user.id}`
+            }, 
+            () => {
+              fetchSavedDrafts(user.id);
+            }
+          )
+          .subscribe();
+
+        fetchSavedDrafts(user.id);
+      }
+    };
+
+    setupSubscriptions();
+
+    return () => {
+      if (profileSubscription) profileSubscription.unsubscribe();
+      if (draftsSubscription) draftsSubscription.unsubscribe();
+    };
   }, []);
+
+  useEffect(() => {
+    const currentPath = location.pathname;
+    if (currentPath.startsWith('/generate-draft/')) {
+      const draftId = currentPath.split('/generate-draft/')[1];
+      setSelectedDraftId(draftId);
+    } else if (currentPath === '/generate-draft') {
+      setSelectedDraftId('new');
+    }
+  }, [location]);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -149,8 +211,35 @@ const Layout = () => {
     }
   };
 
+  const handleSelectDraft = (draftId) => {
+    setSelectedDraftId(draftId);
+    navigate(draftId === 'new' ? `/generate-draft` : `/generate-draft/${draftId}`);
+  };
+
+  const renderSavedDrafts = () => {
+    return (
+      <>
+        {savedDrafts.map(draft => (
+          <li
+            key={draft.id}
+            className={`saved-draft ${selectedDraftId === draft.id ? 'active' : ''}`}
+            onClick={() => handleSelectDraft(draft.id)}
+          >
+            <Link to={`/generate-draft/${draft.id}`}>{draft.title}</Link>
+          </li>
+        ))}
+        <li
+          className={`saved-draft ${selectedDraftId === 'new' ? 'active' : ''}`}
+          onClick={() => handleSelectDraft('new')}
+        >
+          <Link to="/generate-draft" className='add-new'>Add New +</Link>
+        </li>
+      </>
+    );
+  };
+
   return (
-    <UserInputProvider> {/* Wrap the entire layout with the UserInputProvider */}
+    <UserInputProvider>
       <div className="layout">
         <div className={`sidebar ${menuOpen ? 'open' : ''}`}>
           <div className="sidebar-content">
@@ -159,8 +248,16 @@ const Layout = () => {
               <ul>
                 <li className="section-title">Tools</li>
                 <div className='seperator'></div>
-                <li className={location.pathname === "/generate-draft" ? "active" : ""}>
-                  <Link to="/generate-draft">Generate Draft</Link>
+                <li className={location.pathname.startsWith("/generate-draft") ? "active" : ""}>
+                  <div className="dropdown-header" onClick={() => setGenerateDraftExpanded(!generateDraftExpanded)}>
+                    <Link to="/generate-draft">Generate Draft</Link>
+                    {generateDraftExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  </div>
+                  {generateDraftExpanded && (
+                    <ul className="dropdown-content">
+                      {renderSavedDrafts()}
+                    </ul>
+                  )}
                 </li>
                 <li className={location.pathname === "/" ? "active" : ""}>
                   <Link to="/">Application Review</Link>
@@ -207,16 +304,7 @@ const Layout = () => {
             <Menu size={24} />
           </button>
           <div className="content-area">
-            <Routes>
-              <Route path="/generate-draft" element={<GenerateDraft />} />
-              <Route path="/" element={<ApplicationReview />} />
-              <Route path="/negotiation-simulator" element={<NegotiationSimulator />} />
-              <Route path="/due-diligence" element={<DueDiligence />} />
-              <Route path="/videos" element={<Videos />} />
-              <Route path="/speak-to-founders" element={<SpeakToFounders />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/ai-usage-policy" element={<AIUsagePolicy />} />
-            </Routes>
+            <Outlet />
           </div>
         </div>
         {showOverlay && (

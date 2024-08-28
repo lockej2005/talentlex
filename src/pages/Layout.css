@@ -244,3 +244,41 @@ a:hover {
   border: none;
   margin-left: 10px;
 }
+
+.dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  list-style-type: none;
+  padding-left: 20px;
+  margin-top: 5px;
+}
+
+.saved-draft {
+  padding: 5px 10px;
+  cursor: pointer;
+  color: #333;
+  font-weight: 500;
+}
+
+.saved-draft.active {
+  background-color: #276D8B !important; /* Highlight color */
+  color: white !important;
+}
+
+.saved-draft a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.saved-draft:hover {
+  background-color: #e6f3f7; /* Hover effect */
+}
+
+.add-new {
+  font-weight: 800;
+}

@@ -44,7 +44,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route
-          path="/"
+          path="/*"  // Changed path to "/*" to handle nested routes
           element={
             <PrivateRoute>
               <Layout />
@@ -53,6 +53,7 @@ function App() {
         >
           <Route index element={<ApplicationReview />} />
           <Route path="generate-draft" element={<GenerateDraft />} />
+          <Route path="generate-draft/:id" element={<GenerateDraft />} /> {/* Nested route under Layout */}
           <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="ai-usage-policy" element={<AIUsagePolicy />} />
           <Route path="negotiation-simulator" element={<NegotiationSimulator />} />
