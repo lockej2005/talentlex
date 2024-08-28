@@ -59,7 +59,7 @@ const FrostedGlassPopup = ({ onClose }) => {
   return (
     <div className="frosted-glass-popup">
       <div className="popup-content">
-        <h2>Next 5 Firms Recruiting</h2>
+        <h2>Next 5 Firms Recruiting - Rolling</h2>
         <div className="firm-countdown-bars">
           {firms.map((firm, index) => (
             <FirmCountdownBar
