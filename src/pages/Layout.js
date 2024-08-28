@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, ChevronDown, ChevronRight } from 'lucide-react';
+import { Menu, ChevronDown, ChevronRight, Trash2 } from 'lucide-react'; // Import Trash2 icon
 import { Routes, Route, Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import ApplicationReview from './ApplicationReview';
@@ -216,6 +216,19 @@ const Layout = () => {
     navigate(draftId === 'new' ? `/generate-draft` : `/generate-draft/${draftId}`);
   };
 
+  const handleDeleteDraft = async (draftId) => {
+    const { error } = await supabase
+      .from('saved_drafts')
+      .delete()
+      .eq('id', draftId);
+
+    if (error) {
+      console.error('Error deleting draft:', error);
+    } else {
+      fetchSavedDrafts(user.id); // Refresh the list after deletion
+    }
+  };
+
   const renderSavedDrafts = () => {
     return (
       <>
@@ -223,9 +236,11 @@ const Layout = () => {
           <li
             key={draft.id}
             className={`saved-draft ${selectedDraftId === draft.id ? 'active' : ''}`}
-            onClick={() => handleSelectDraft(draft.id)}
           >
-            <Link to={`/generate-draft/${draft.id}`}>{draft.title}</Link>
+            <Link to={`/generate-draft/${draft.id}`} onClick={() => handleSelectDraft(draft.id)}>{draft.title}</Link>
+            <button className="delete-draft-btn" onClick={() => handleDeleteDraft(draft.id)}>
+              <Trash2 size={16} />
+            </button>
           </li>
         ))}
         <li
