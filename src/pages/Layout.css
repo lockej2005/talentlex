@@ -302,3 +302,89 @@ a:hover {
   width: 14px;
   height: 14px;
 }
+
+
+/* ... (existing styles) */
+
+.frosted-glass-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+}
+
+.frosted-glass-popup .popup-content {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+}
+
+.frosted-glass-popup h2 {
+  color: #276D8B;
+  margin-bottom: 20px;
+}
+
+.firm-countdown-bars {
+  margin-bottom: 20px;
+}
+
+.firm-countdown-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.firm-name {
+  flex: 1;
+  text-align: left;
+  font-weight: bold;
+}
+
+.progress-bar {
+  flex: 2;
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 0 10px;
+}
+
+.progress {
+  height: 100%;
+  background-color: #276D8B;
+  transition: width 0.3s ease;
+}
+
+.status {
+  flex: 0 0 100px;
+  text-align: right;
+  font-size: 0.9em;
+  color: #276D8B;
+}
+
+.close-button {
+  background-color: #276D8B;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.close-button:hover {
+  background-color: #1c4d62;
+}
