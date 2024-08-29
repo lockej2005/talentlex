@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import './Authentication.css';
@@ -8,6 +8,28 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        const newPassword = prompt('What would you like your new password to be?');
+        if (newPassword) {
+          const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+          if (data) {
+            alert('Password updated successfully!');
+            navigate('/login');  // Redirect to login page or another page after successful update
+          }
+          if (error) {
+            alert('There was an error updating your password.');
+          }
+        }
+      }
+    });
+
+    return () => {
+      authListener?.unsubscribe();
+    };
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +45,7 @@ const Login = () => {
   const handleForgotPassword = async () => {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://talentlex.vercel.app/reset-password',
+        redirectTo: 'https://talentlex.vercel.app/reset-password',  // Change this URL to your production URL when deploying
       });
       if (error) throw error;
       alert('Password reset email sent. Please check your inbox.');
