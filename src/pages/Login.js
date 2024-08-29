@@ -45,8 +45,9 @@ const Login = () => {
 
   const handleForgotPassword = async () => {
     try {
+      const redirectTo = encodeURI('https://talentlex-dev.vercel.app/reset-password');
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://talentlex-dev.vercel.app/reset-password',  // Use your production URL here
+        redirectTo,  // Explicitly use the correct URL
       });
       if (error) throw error;
       alert('Password reset email sent. Please check your inbox.');  // Inform user that reset email has been sent
@@ -54,6 +55,7 @@ const Login = () => {
       setError(error.message);  // Display error message if reset request fails
     }
   };
+  
 
   return (
     <div className="auth-container">
