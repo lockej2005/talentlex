@@ -10,25 +10,14 @@ const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        // Password recovery event detected
-        const newPassword = prompt('What would you like your new password to be?');
-        if (newPassword) {
-          const { data, error } = await supabase.auth.updateUser({ password: newPassword });
-          if (data) {
-            alert('Password updated successfully!');
-            navigate('/login');  // Redirect to login page after successful password update
-          }
-          if (error) {
-            alert('There was an error updating your password.');
-          }
-        }
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        navigate('/');
       }
     });
 
     return () => {
-      authListener?.unsubscribe();  // Clean up the listener on component unmount
+      authListener?.subscription.unsubscribe();
     };
   }, [navigate]);
 
@@ -37,25 +26,26 @@ const Login = () => {
     try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
-      navigate('/');  // Navigate to the home page on successful login
     } catch (error) {
-      setError(error.message);  // Display error message if login fails
+      setError(error.message);
     }
   };
 
   const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Please enter your email address.');
+      return;
+    }
     try {
-      const redirectTo = encodeURI('https://talentlex-dev.vercel.app/reset-password');
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo,  // Explicitly use the correct URL
+        redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
-      alert('Password reset email sent. Please check your inbox.');  // Inform user that reset email has been sent
+      alert('Password reset email sent. Please check your inbox.');
     } catch (error) {
-      setError(error.message);  // Display error message if reset request fails
+      setError(error.message);
     }
   };
-  
 
   return (
     <div className="auth-container">
@@ -77,12 +67,12 @@ const Login = () => {
         />
         <button type="submit" className="auth-button">Login</button>
       </form>
-      {error && <p className="error-message">{error}</p>}  {/* Display error message if exists */}
+      {error && <p className="error-message">{error}</p>}
       <p>
-        Don't have an account? <Link to="/signup">Sign up</Link>  {/* Link to signup page */}
+        Don't have an account? <Link to="/signup">Sign up</Link>
       </p>
       <p>
-        <button onClick={handleForgotPassword} className="forgot-password-link">Forgot Password?</button>  {/* Button to trigger password reset email */}
+        <button onClick={handleForgotPassword} className="forgot-password-link">Forgot Password?</button>
       </p>
     </div>
   );

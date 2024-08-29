@@ -8,32 +8,43 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleAuthStateChange = async () => {
-      supabase.auth.onAuthStateChange(async (event, session) => {
-        if (event === 'PASSWORD_RECOVERY') {
-          const newPassword = prompt('What would you like your new password to be?');
-          if (newPassword) {
-            const { data, error } = await supabase.auth.updateUser({ password: newPassword });
-            if (data) {
-              alert('Password updated successfully!');
-              navigate('/login');  // Redirect to login or any other page after success
-            }
-            if (error) {
-              alert('There was an error updating your password.');
-            }
-          }
-        }
-      });
+    const handlePasswordReset = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (data?.session?.user.aud === 'authenticated') {
+        // User is already authenticated, redirect to home
+        navigate('/');
+      }
     };
 
-    handleAuthStateChange();
+    handlePasswordReset();
   }, [navigate]);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      alert('Password updated successfully!');
+      navigate('/login');
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   return (
-    <div>
+    <div className="auth-container">
       <h2>Reset Password</h2>
-      <p>If prompted, please enter your new password in the pop-up.</p>
-      {error && <p>{error}</p>}
+      <form onSubmit={handleSubmit} className="auth-form">
+        <input
+          type="password"
+          placeholder="New Password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          required
+        />
+        <button type="submit" className="auth-button">Update Password</button>
+      </form>
+      {error && <p className="error-message">{error}</p>}
     </div>
   );
 };
