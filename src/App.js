@@ -6,6 +6,7 @@ import ApplicationReview from './pages/ApplicationReview';
 import GenerateDraft from './pages/GenerateDraft';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import ResetPassword from './pages/ResetPassword'; // Import the new ResetPassword component
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import AIUsagePolicy from './pages/AIUsagePolicy';
 import NegotiationSimulator from './pages/NegotiationSimulator';
@@ -43,8 +44,9 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/reset-password" element={<ResetPassword />} /> {/* New route for Reset Password */}
         <Route
-          path="/*"  // Changed path to "/*" to handle nested routes
+          path="/*"
           element={
             <PrivateRoute>
               <Layout />
@@ -53,7 +55,7 @@ function App() {
         >
           <Route index element={<ApplicationReview />} />
           <Route path="generate-draft" element={<GenerateDraft />} />
-          <Route path="generate-draft/:id" element={<GenerateDraft />} /> {/* Nested route under Layout */}
+          <Route path="generate-draft/:id" element={<GenerateDraft />} />
           <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="ai-usage-policy" element={<AIUsagePolicy />} />
           <Route path="negotiation-simulator" element={<NegotiationSimulator />} />

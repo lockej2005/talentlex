@@ -7,7 +7,6 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
-  const [message, setMessage] = useState(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -22,15 +21,12 @@ const Login = () => {
   };
 
   const handleForgotPassword = async () => {
-    if (!email) {
-      setError('Please enter your email address.');
-      return;
-    }
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'http://localhost:3000/reset-password',
+      });
       if (error) throw error;
-      setMessage('Password reset email sent. Check your inbox.');
-      setError(null);
+      alert('Password reset email sent. Please check your inbox.');
     } catch (error) {
       setError(error.message);
     }
@@ -57,12 +53,11 @@ const Login = () => {
         <button type="submit" className="auth-button">Login</button>
       </form>
       {error && <p className="error-message">{error}</p>}
-      {message && <p className="success-message">{message}</p>}
       <p>
         Don't have an account? <Link to="/signup">Sign up</Link>
       </p>
       <p>
-        <a href="#" onClick={handleForgotPassword}>Forgot Password?</a>
+        <button onClick={handleForgotPassword} className="forgot-password-link">Forgot Password?</button>
       </p>
     </div>
   );
