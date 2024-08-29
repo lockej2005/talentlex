@@ -9,14 +9,18 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if the user is authenticated
-    const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/login');
-      }
+    const handleAuthStateChange = async () => {
+      supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          // Password recovery event detected
+        } else {
+          // If no password recovery event, redirect to login
+          navigate('/login');
+        }
+      });
     };
-    checkAuth();
+
+    handleAuthStateChange();
   }, [navigate]);
 
   const handleSubmit = async (e) => {
