@@ -103,10 +103,10 @@ const SocietyCodeInput = ({ onChange }) => {
 
   return (
     <div>
-      <div className="society-code-input">
+      <div className="society-code-input-auth">
         {code.map((data, index) => (
           <input
-            className="code-input"
+            className="code-input-auth"
             type="text"
             maxLength="1"
             key={index}
@@ -119,7 +119,7 @@ const SocietyCodeInput = ({ onChange }) => {
         ))}
       </div>
       {societyName && (
-        <p className="society-name">{societyName}</p>
+        <p className="society-name-auth">{societyName}</p>
       )}
     </div>
   );

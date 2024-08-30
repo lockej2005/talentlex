@@ -1,189 +1,166 @@
-  /* Auth.css */
-  .auth-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background-color: #E4E4E4;
-    font-family: 'Inter', sans-serif;
+/* Authentication.css */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap');
+
+
+.auth-page-auth {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #99b2bd 0%, #8da9b4 60%, #6395aa 100%);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  flex-direction: column;
+}
+
+.logo-auth {
+  font-size: 36px;
+  color: #276D8B;
+  margin-bottom: 20px;
+  font-weight: bold;
+  font-family: "Roboto Slab", serif;
+}
+
+
+.auth-container-auth {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+.frosted-glass-auth {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.auth-container-auth h2 {
+  color: #ffffff;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.auth-form-auth {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-form-auth input {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.auth-form-auth input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.auth-button-auth {
+  background-color: #276D8B;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.auth-button-auth:hover {
+  background-color: #1e5a73;
+}
+
+.auth-container-auth p {
+  margin-top: 20px;
+  color: #ffffff;
+  text-align: center;
+}
+
+.auth-container-auth a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.auth-container-auth a:hover {
+  text-decoration: underline;
+}
+
+.error-message-auth {
+  color: #ff6b6b;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.success-message-auth {
+  color: #51cf66;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.society-code-input-auth {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.code-input-auth {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  font-size: 18px;
+  border: none;
+  border-radius: 4px;
+  margin: 0 2px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.code-input-auth:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.society-name-auth {
+  color: #ffffff;
+  font-size: 14px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.forgot-password-auth {
+  color: #ffffff;
+  text-align: right;
+  margin-bottom: 15px;
+}
+
+.forgot-password-auth a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: opacity 0.3s ease;
+}
+
+.forgot-password-auth a:hover {
+  opacity: 0.8;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 480px) {
+  .auth-container-auth {
+    width: 90%;
   }
 
-  .auth-container h2 {
-    color: #276D8B;
-    font-size: 2rem;
-    margin-bottom: 20px;
+  .auth-container-auth h2 {
+    font-size: 1.5rem;
   }
-
-  .auth-form {
-    display: flex;
-    flex-direction: column;
-    width: 300px;
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  .auth-form input {
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-  }
-
-  .auth-button {
-    background-color: #276D8B;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-  }
-
-  .auth-button:hover {
-    background-color: #1e5a73;
-  }
-
-  .auth-container p {
-    margin-top: 20px;
-  }
-
-  .auth-container a {
-    color: #276D8B;
-    text-decoration: none;
-    font-weight: bold;
-  }
-
-  .auth-container a:hover {
-    text-decoration: underline;
-  }
-
-  .error-message {
-    color: #ff0000;
-    margin-top: 10px;
-  }
-
-  .success-message {
-    color: #008000;
-    margin-top: 10px;
-  }
-
-  .society-code-input {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
-
-  .code-input {
-    width: 20px;
-    height: 20px;
-    text-align: center;
-    font-size: 18px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin: 0 2px;
-  }
-
-  .code-input:focus {
-    border-color: #276D8B;
-    outline: none;
-  }
-
-  .society-name {
-    color: #888;
-    font-size: 14px;
-    text-decoration: underline;
-    cursor: pointer;
-  }
-
-  .popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-
-  .popup-overlay .auth-container {
-    min-height: auto;
-    background-color: transparent;
-  }
-
-  .join-society {
-    color: #276D8B;
-    cursor: pointer;
-    text-decoration: underline;
-    margin-top: 5px;
-  }
-
-  /* New styles for reset password functionality */
-  .forgot-password {
-    margin-top: 10px;
-    text-align: right;
-  }
-
-  .forgot-password a {
-    color: #276D8B;
-    text-decoration: none;
-    font-size: 0.9rem;
-  }
-
-  .forgot-password a:hover {
-    text-decoration: underline;
-  }
-
-  .reset-password-form {
-    text-align: center;
-  }
-
-  .reset-password-form p {
-    margin-bottom: 20px;
-    color: #555;
-  }
-
-  .reset-password-form .auth-button {
-    margin-top: 10px;
-  }
-
-  /* Responsive design for smaller screens */
-  @media (max-width: 480px) {
-    .auth-form {
-        width: 90%;
-        max-width: 300px;
-    }
-
-    .auth-container h2 {
-        font-size: 1.5rem;
-    }
-  }
-
-  .forgot-password {
-    text-align: right;
-    margin-bottom: 15px;
-  }
-  
-  .forgot-password a {
-    color: #276D8B;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.3s ease;
-  }
-  
-  .forgot-password a:hover {
-    color: #1e5a73;
-    text-decoration: underline;
-  }
-  
-  /* You may need to adjust other styles to accommodate this change */
-  .auth-form input[type="password"] {
-    margin-bottom: 5px; /* Reduced from 15px to make room for the forgot password link */
-  }
+}

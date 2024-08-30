@@ -36,33 +36,37 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-container">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit} className="auth-form">
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <div className="forgot-password">
+    <div className="auth-page-auth">
+    <div className="logo-auth">TalentLex</div>
+      <div className="auth-container-auth">
+        <div className="frosted-glass-auth">
+          <h2>Login</h2>
+          <form onSubmit={handleSubmit} className="auth-form-auth">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <div className="forgot-password-auth">
+              <a href="#" onClick={handleForgotPassword}>Forgot Password?</a>
+            </div>
+            <button type="submit" className="auth-button-auth">Login</button>
+          </form>
+          {error && <p className="error-message-auth">{error}</p>}
+          <p>
+            Don't have an account? <Link to="/signup">Sign up</Link>
+          </p>
         </div>
-        <button type="submit" className="auth-button">Login</button>
-      </form>
-      {error && <p className="error-message">{error}</p>}
-      <p>
-        Don't have an account? <Link to="/signup">Sign up</Link>
-      </p>
-      <a href="#" onClick={handleForgotPassword}>Forgot Password?</a>
-
+      </div>
     </div>
   );
 };

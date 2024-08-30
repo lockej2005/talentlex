@@ -115,6 +115,10 @@
   line-height: 1.5;
 }
 
+.text-auth {
+  color: #FFFFFF;
+}
+
 @media (max-width: 1200px) {
   .info-boxes {
     grid-template-columns: repeat(2, 1fr);
