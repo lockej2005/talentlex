@@ -54,7 +54,6 @@ const Signup = () => {
 
   return (
     <div className="auth-page-auth">
-      <div className="logo-auth">TalentLex</div>
       <div className="auth-container-auth">
         <div className="frosted-glass-auth">
           <h2>Sign Up</h2>
