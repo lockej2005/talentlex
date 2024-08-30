@@ -26,11 +26,10 @@ const Login = () => {
       return;
     }
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
       if (error) throw error;
-      alert('Password reset email sent. Please check your inbox.');
+      alert('Password reset code sent. Please check your email.');
+      navigate('/reset-password', { state: { email } });
     } catch (error) {
       setError(error.message);
     }
