@@ -53,15 +53,16 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        <div className="forgot-password">
+        </div>
         <button type="submit" className="auth-button">Login</button>
       </form>
       {error && <p className="error-message">{error}</p>}
       <p>
         Don't have an account? <Link to="/signup">Sign up</Link>
       </p>
-      <p>
-        <button onClick={handleForgotPassword} className="forgot-password-link">Forgot Password?</button>
-      </p>
+      <a href="#" onClick={handleForgotPassword}>Forgot Password?</a>
+
     </div>
   );
 };
