@@ -11,7 +11,7 @@ import SocietyCodeInput from './SocietyCodeInput';
 import DueDiligence from './DueDiligence';
 import './Layout.css';
 import Videos from './Videos';
-import './Authentication.css';
+import './Authentication2.css';
 import SpeakToFounders from './SpeakToFounders';
 import { UserInputProvider } from '../context/UserInputContext';
 
