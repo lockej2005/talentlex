@@ -8,21 +8,26 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handlePasswordReset = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (data?.session?.user.aud === 'authenticated') {
-        // User is already authenticated, redirect to home
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        // Password recovery event detected, allow the user to set a new password
+      } else if (event === 'SIGNED_IN') {
+        // User is already signed in, redirect to home
         navigate('/');
       }
-    };
+    });
 
-    handlePasswordReset();
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      const { data, error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
       if (error) throw error;
       alert('Password updated successfully!');
       navigate('/login');
