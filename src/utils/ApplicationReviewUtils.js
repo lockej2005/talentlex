@@ -1,5 +1,6 @@
 import { supabase } from '../supabaseClient';
 import { subtractCreditsAndUpdateUser } from './CreditManager';
+import { creditPolice } from './CreditPolice';
 
 export const getCurrentUser = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -84,45 +85,47 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
     throw new Error('Please log in to submit your application.');
   }
 
-  const startTime = Date.now();
-  let localTotalTokens = 0;
+  return await creditPolice(user.id, async () => {
+    const startTime = Date.now();
+    let localTotalTokens = 0;
 
-  const userAgent = navigator.userAgent;
-  const screenSize = `${window.screen.width}x${window.screen.height}`;
+    const userAgent = navigator.userAgent;
+    const screenSize = `${window.screen.width}x${window.screen.height}`;
 
-  const data = await submitApplication({
-    applicationText,
-    firm: selectedFirm.value,
-    question: selectedQuestion.value,
-    email: user.email
+    const data = await submitApplication({
+      applicationText,
+      firm: selectedFirm.value,
+      question: selectedQuestion.value,
+      email: user.email
+    });
+
+    setFeedback(data.feedback);
+
+    localTotalTokens += data.usage.total_tokens;
+    setTotalTokens(localTotalTokens);
+
+    await insertApplication({
+      firm: selectedFirm.value,
+      question: selectedQuestion.value,
+      application_text: applicationText,
+      feedback: data.feedback,
+      email: user.email,
+      device: userAgent,
+      screen_size: screenSize,
+      timestamp: new Date().toISOString()
+    });
+
+    const endTime = Date.now();
+    setResponseTime((endTime - startTime) / 1000);
+
+    const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, localTotalTokens);
+
+    if (!success) {
+      throw new Error(error);
+    }
+
+    return { cost, newBalance };
   });
-
-  setFeedback(data.feedback);
-
-  localTotalTokens += data.usage.total_tokens;
-  setTotalTokens(localTotalTokens);
-
-  await insertApplication({
-    firm: selectedFirm.value,
-    question: selectedQuestion.value,
-    application_text: applicationText,
-    feedback: data.feedback,
-    email: user.email,
-    device: userAgent,
-    screen_size: screenSize,
-    timestamp: new Date().toISOString()
-  });
-
-  const endTime = Date.now();
-  setResponseTime((endTime - startTime) / 1000);
-
-  const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, localTotalTokens);
-
-  if (!success) {
-    throw new Error(error);
-  }
-
-  return { cost, newBalance };
 };
 
 export const saveDraft = async (userId, title, draft, firm, question) => {
@@ -145,64 +148,66 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
     throw new Error('Please log in to generate a draft.');
   }
 
-  let requiredFields;
-  if (selectedFirm.value === "Jones Day") {
-    requiredFields = ['whyLaw', 'whyJonesDay', 'whyYou', 'relevantExperiences'];
-  } else {
-    requiredFields = ['keyReasons', 'relevantExperience', 'relevantInteraction', 'personalInfo'];
-  }
+  return await creditPolice(user.id, async () => {
+    let requiredFields;
+    if (selectedFirm.value === "Jones Day") {
+      requiredFields = ['whyLaw', 'whyJonesDay', 'whyYou', 'relevantExperiences'];
+    } else {
+      requiredFields = ['keyReasons', 'relevantExperience', 'relevantInteraction', 'personalInfo'];
+    }
 
-  const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field]?.trim() !== '');
+    const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field]?.trim() !== '');
 
-  if (!areAllFieldsFilled) {
-    throw new Error('Please fill out all the required information fields before generating a draft.');
-  }
+    if (!areAllFieldsFilled) {
+      throw new Error('Please fill out all the required information fields before generating a draft.');
+    }
 
-  let localTotalTokens = 0;
+    let localTotalTokens = 0;
 
-  const data = await createApplicationDraft({
-    firm: selectedFirm.value,
-    question: selectedQuestion.value,
-    ...additionalInfo
+    const data = await createApplicationDraft({
+      firm: selectedFirm.value,
+      question: selectedQuestion.value,
+      ...additionalInfo
+    });
+
+    localTotalTokens += data.usage.total_tokens;
+    setTotalTokens(localTotalTokens);
+
+    setApplicationText(data.draft);
+
+    const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, localTotalTokens);
+    
+    if (!success) {
+      throw new Error(error);
+    }
+
+    let draftGenerationData;
+    if (selectedFirm.value === "Jones Day") {
+      draftGenerationData = {
+        email: user.email,
+        firm: selectedFirm.value,
+        question: selectedQuestion.value,
+        key_reasons: additionalInfo.whyLaw,
+        relevant_experience: additionalInfo.relevantExperiences,
+        relevant_interaction: additionalInfo.whyJonesDay,
+        personal_info: additionalInfo.whyYou,
+        generated_draft: data.draft
+      };
+    } else {
+      draftGenerationData = {
+        email: user.email,
+        firm: selectedFirm.value,
+        question: selectedQuestion.value,
+        key_reasons: additionalInfo.keyReasons,
+        relevant_experience: additionalInfo.relevantExperience,
+        relevant_interaction: additionalInfo.relevantInteraction,
+        personal_info: additionalInfo.personalInfo,
+        generated_draft: data.draft
+      };
+    }
+
+    await insertDraftGeneration(draftGenerationData);
+
+    return { cost, newBalance };
   });
-
-  localTotalTokens += data.usage.total_tokens;
-  setTotalTokens(localTotalTokens);
-
-  setApplicationText(data.draft);
-
-  const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, localTotalTokens);
-  
-  if (!success) {
-    throw new Error(error);
-  }
-
-  let draftGenerationData;
-  if (selectedFirm.value === "Jones Day") {
-    draftGenerationData = {
-      email: user.email,
-      firm: selectedFirm.value,
-      question: selectedQuestion.value,
-      key_reasons: additionalInfo.whyLaw,
-      relevant_experience: additionalInfo.relevantExperiences,
-      relevant_interaction: additionalInfo.whyJonesDay,
-      personal_info: additionalInfo.whyYou,
-      generated_draft: data.draft
-    };
-  } else {
-    draftGenerationData = {
-      email: user.email,
-      firm: selectedFirm.value,
-      question: selectedQuestion.value,
-      key_reasons: additionalInfo.keyReasons,
-      relevant_experience: additionalInfo.relevantExperience,
-      relevant_interaction: additionalInfo.relevantInteraction,
-      personal_info: additionalInfo.personalInfo,
-      generated_draft: data.draft
-    };
-  }
-
-  await insertDraftGeneration(draftGenerationData);
-
-  return { cost, newBalance };
 };
