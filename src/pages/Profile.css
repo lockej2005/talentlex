@@ -1,0 +1,247 @@
+.profile-container {
+    display: flex;
+    height: 100%;
+    padding: 20px;
+    gap: 20px;
+}
+
+.main-content-profile {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-context-profile {
+    background-color: #276D8B;
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.linkedin-scraper-profile {
+    flex: 1;
+    background-color: rgba(39, 109, 139, 0.6);
+    padding: 10px;
+    border-radius: 10px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-heading {
+    margin: 0 0 20px 0;
+    font-size: 1.2em;
+}
+
+.input-group-profile {
+    margin-bottom: 15px;
+}
+
+.profile-label {
+    display: block;
+    margin-bottom: 5px;
+    color: white;
+}
+
+.profile-input,
+.profile-textarea {
+    padding: 8px;
+    border: none;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #276D8B;
+    resize: vertical;
+    min-height: 38px;
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.profile-input2 {
+    padding: 8px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #276D8B;
+    resize: vertical;
+    min-height: 38px;
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.profile-textarea {
+    min-height: 100px;
+}
+
+.profile-input:focus,
+.profile-textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #1e5a73;
+}
+
+.year-container-profile {
+    background-color: #1d4d62;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.year-header-profile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: #1a4557;
+}
+
+.year-content-profile {
+    padding: 1rem;
+    background-color: #1d4d62;
+}
+
+.subject-input-profile {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    align-items: center;
+}
+
+.subject-input-profile .profile-input {
+    flex: 1;
+    min-height: 38px;
+}
+
+.add-subject-profile,
+.add-year-profile {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    padding: 0.5rem;
+    text-align: left;
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+.add-subject-profile:hover,
+.add-year-profile:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.linkedin-scraper-profile .profile-input {
+    min-height: 38px;
+}
+
+.scrape-button-profile {
+    background-color: #1e5a73;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.scrape-button-profile:hover {
+    background-color: #154456;
+}
+
+.grades-section-profile {
+    margin-bottom: 1.5rem;
+}
+
+.profile-subheading {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+.delete-subject-btn {
+    background: none;
+    border: none;
+    color: #ff6b6b;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-subject-btn:hover {
+    color: #ff4757;
+}
+
+.delete-subject-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+@media (max-width: 768px) {
+    .profile-container {
+        flex-direction: column;
+    }
+
+    .main-content-profile,
+    .linkedin-scraper-profile {
+        width: 100%;
+    }
+
+    .profile-heading {
+        font-size: 1.1em;
+    }
+}
+
+.subcategories-input {
+    min-height: 60px; /* Adjust this value to fit two lines of text */
+    resize: vertical; /* Allows user to resize vertically if needed */
+}
+
+.year-header-profile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+  }
+  
+  .year-name {
+    font-weight: bold;
+  }
+  
+  .year-controls {
+    display: flex;
+    align-items: center;
+  }
+  
+  .delete-year-btn {
+    background: none;
+    border: none;
+    color: #ff6b6b;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+  }
+  
+  .delete-year-btn:hover {
+    color: #ff4757;
+  }
+  
+  .expand-icon {
+    display: inline-flex;
+    align-items: center;
+  }

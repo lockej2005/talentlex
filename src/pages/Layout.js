@@ -372,13 +372,10 @@ const Layout = () => {
                 <li className={location.pathname === "/speak-to-founders" ? "active" : ""}>
                   <Link to="/speak-to-founders">Speak to the Founders</Link>
                 </li>
-                <li className="section-title">Legal</li>
+                <li className="section-title">Profile</li>
                 <div className='seperator'></div>
-                <li className={location.pathname === "/privacy-policy" ? "active" : ""}>
-                  <Link to="/privacy-policy">Privacy Policy</Link>
-                </li>
-                <li className={location.pathname === "/ai-usage-policy" ? "active" : ""}>
-                  <Link to="/ai-usage-policy">AI Data Usage</Link>
+                <li className={location.pathname === "/profile" ? "active" : ""}>
+                  <Link to="/profile">Profile</Link>
                 </li>
                 </ul>
             </nav>

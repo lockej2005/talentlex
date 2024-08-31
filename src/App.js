@@ -6,13 +6,14 @@ import ApplicationReview from './pages/ApplicationReview';
 import GenerateDraft from './pages/GenerateDraft';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import ResetPassword from './pages/ResetPassword'; // Import the new ResetPassword component
+import ResetPassword from './pages/ResetPassword';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import AIUsagePolicy from './pages/AIUsagePolicy';
 import NegotiationSimulator from './pages/NegotiationSimulator';
 import Videos from './pages/Videos';
 import SpeakToFounders from './pages/SpeakToFounders';
 import DueDiligence from './pages/DueDiligence';
+import Profile from './pages/Profile'; // Import the new Profile component
 
 const PrivateRoute = ({ children }) => {
   const [session, setSession] = useState(null);
@@ -44,7 +45,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/reset-password" element={<ResetPassword />} /> {/* New route for Reset Password */}
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route
           path="/*"
           element={
@@ -62,6 +63,7 @@ function App() {
           <Route path="videos" element={<Videos />} />
           <Route path="speak-to-founders" element={<SpeakToFounders />} />
           <Route path="due-diligence" element={<DueDiligence />} />
+          <Route path="profile" element={<Profile />} /> {/* New route for Profile */}
         </Route>
       </Routes>
     </Router>
