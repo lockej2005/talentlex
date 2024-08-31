@@ -1,6 +1,7 @@
 import { supabase } from '../supabaseClient';
 import { subtractCreditsAndUpdateUser } from './CreditManager';
 import { creditPolice } from './CreditPolice';
+import { getProfileContext } from './GetProfileContext';
 
 export const getCurrentUser = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -49,12 +50,14 @@ export const insertDraftGeneration = async (draftData) => {
 };
 
 export const submitApplication = async (applicationData) => {
+  const userProfile = await getProfileContext(applicationData.userId);
+  
   const response = await fetch('/api/submit_application', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(applicationData),
+    body: JSON.stringify({...applicationData, userProfile}),
   });
 
   if (!response.ok) {
@@ -65,12 +68,14 @@ export const submitApplication = async (applicationData) => {
 };
 
 export const createApplicationDraft = async (draftData) => {
+  const userProfile = await getProfileContext(draftData.userId);
+
   const response = await fetch('/api/create_application', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(draftData),
+    body: JSON.stringify({...draftData, userProfile}),
   });
 
   if (!response.ok) {
@@ -93,6 +98,7 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
     const screenSize = `${window.screen.width}x${window.screen.height}`;
 
     const data = await submitApplication({
+      userId: user.id,
       applicationText,
       firm: selectedFirm.value,
       question: selectedQuestion.value,
@@ -165,6 +171,7 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
     let localTotalTokens = 0;
 
     const data = await createApplicationDraft({
+      userId: user.id,
       firm: selectedFirm.value,
       question: selectedQuestion.value,
       ...additionalInfo
