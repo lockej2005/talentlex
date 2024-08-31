@@ -33,6 +33,7 @@ class handler(BaseHTTPRequestHandler):
 
         firm = data.get('firm')
         question = data.get('question')
+        user_profile = data.get('userProfile', '')
 
         if firm == "Jones Day":
             why_law = data.get('whyLaw')
@@ -82,6 +83,10 @@ class handler(BaseHTTPRequestHandler):
                 - Relevant experiences: {relevant_experiences}
 
                 Please create a well-structured, professional application that incorporates all the provided information seamlessly.
+
+                -----------USER PROFILE--------
+                Below is extra context on the user's profile that they entered on an unrelated page. Consider this information in your response.
+                {user_profile}
                 """
             else:
                 prompt = f"""
@@ -95,6 +100,10 @@ class handler(BaseHTTPRequestHandler):
                 - Additional personal information: {personal_info}
 
                 Please create a well-structured, professional application that incorporates all the provided information seamlessly.
+
+                -----------USER PROFILE--------
+                Below is extra context on the user's profile that they entered on an unrelated page. Consider this information in your response.
+                {user_profile}
                 """
 
             completion = client.chat.completions.create(
