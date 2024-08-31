@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { supabase } from '../supabaseClient'; // Adjust the import path as needed
 import './Profile.css';
 
 const Profile = () => {
+  const [userId, setUserId] = useState(null);
   const [education, setEducation] = useState('');
   const [subCategories, setSubCategories] = useState('');
   const [workExperience, setWorkExperience] = useState('');
@@ -14,6 +16,99 @@ const Profile = () => {
       { name: 'Introduction to Legal System', grade: 63 }
     ] }
   ]);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  const fetchUserProfile = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setUserId(user.id);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('education, sub_categories, undergraduate_grades, work_experience')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+      } else if (data) {
+        setEducation(data.education || '');
+        setSubCategories(data.sub_categories || '');
+        setWorkExperience(data.work_experience || '');
+        if (data.undergraduate_grades) {
+          const parsedGrades = parseUndergraduateGrades(data.undergraduate_grades);
+          setYears(parsedGrades);
+        }
+      }
+    }
+  };
+
+  const parseUndergraduateGrades = (gradesString) => {
+    const yearRegex = /Year (\d+) - (.*?)(?=Year \d+|$)/g;
+    const subjectRegex = /\[([^,]+),\s*(\d+)\]/g;
+    const years = [];
+    let match;
+
+    while ((match = yearRegex.exec(gradesString)) !== null) {
+      const yearNumber = parseInt(match[1]);
+      const subjects = [];
+      let subjectMatch;
+
+      while ((subjectMatch = subjectRegex.exec(match[2])) !== null) {
+        subjects.push({
+          name: subjectMatch[1],
+          grade: parseInt(subjectMatch[2])
+        });
+      }
+
+      years.push({
+        id: yearNumber,
+        name: `Year ${yearNumber}`,
+        expanded: false,
+        subjects: subjects
+      });
+    }
+
+    return years.length > 0 ? years : [{ id: 1, name: 'Year 1', expanded: false, subjects: [] }];
+  };
+
+  const formatUndergraduateGrades = () => {
+    return years.map(year => {
+      const subjectsString = year.subjects.map(subject => `[${subject.name}, ${subject.grade}]`).join(', ');
+      return `Year ${year.id} - ${subjectsString}`;
+    }).join(', ');
+  };
+
+  const saveProfile = async () => {
+    if (!userId) return;
+
+    setIsSaving(true);
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({
+          education: education,
+          sub_categories: subCategories,
+          undergraduate_grades: formatUndergraduateGrades(),
+          work_experience: workExperience
+        })
+        .eq('id', userId);
+
+      if (error) {
+        throw error;
+      }
+
+      console.log('Profile saved successfully');
+    } catch (error) {
+      console.error('Error saving profile:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const addYear = () => {
     const newYear = {
@@ -76,7 +171,7 @@ const Profile = () => {
   };
 
   const deleteYear = (yearId, event) => {
-    event.stopPropagation(); // Prevent triggering toggleYearExpansion
+    event.stopPropagation();
     const updatedYears = years.filter(year => year.id !== yearId);
     setYears(updatedYears);
   };
@@ -90,7 +185,16 @@ const Profile = () => {
     <div className="profile-container">
       <div className="main-content-profile">
         <div className="user-context-profile">
-          <h2 className="profile-heading">User Context</h2>
+          <div className="profile-header">
+            <h2 className="profile-heading">User Context</h2>
+            <button 
+              className={`save-profile-btn ${isSaving ? 'saving' : ''}`} 
+              onClick={saveProfile} 
+              disabled={isSaving}
+            >
+              {isSaving ? 'Saving...' : 'Save Profile'}
+            </button>
+          </div>
           <div className="input-group-profile">
             <label className="profile-label">Education:</label>
             <input

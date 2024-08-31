@@ -364,6 +364,11 @@ const Layout = () => {
                 <li className={location.pathname === "/negotiation-simulator" ? "active" : ""}>
                   <Link to="/negotiation-simulator">Negotiation Simulator</Link>
                 </li>
+                <li className="section-title">Personalization</li>
+                <div className='seperator'></div>
+                <li className={location.pathname === "/profile" ? "active" : ""}>
+                  <Link to="/profile">Profile</Link>
+                </li>
                 <li className="section-title">Guide</li>
                 <div className='seperator'></div>
                 <li className={location.pathname === "/videos" ? "active" : ""}>
@@ -371,11 +376,6 @@ const Layout = () => {
                 </li>
                 <li className={location.pathname === "/speak-to-founders" ? "active" : ""}>
                   <Link to="/speak-to-founders">Speak to the Founders</Link>
-                </li>
-                <li className="section-title">Profile</li>
-                <div className='seperator'></div>
-                <li className={location.pathname === "/profile" ? "active" : ""}>
-                  <Link to="/profile">Profile</Link>
                 </li>
                 </ul>
             </nav>

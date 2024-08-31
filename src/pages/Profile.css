@@ -245,3 +245,35 @@
     display: inline-flex;
     align-items: center;
   }
+
+  .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .save-profile-btn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  
+  .save-profile-btn:hover {
+    background-color: #45a049;
+  }
+  
+  .save-profile-btn.saving {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .save-profile-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
