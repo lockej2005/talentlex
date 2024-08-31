@@ -277,7 +277,7 @@ const Profile = () => {
           onChange={(e) => setLinkedInUrl(e.target.value)}
           placeholder="Enter LinkedIn URL"
         />
-        <button className="scrape-button-profile" onClick={handleScrapeLinkedIn}>Scrape LinkedIn</button>
+        <button className="scrape-button-profile" onClick={handleScrapeLinkedIn}>Scrape LinkedIn Coming Soon...</button>
       </div>
     </div>
   );
