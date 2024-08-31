@@ -10,11 +10,7 @@ const Profile = () => {
   const [workExperience, setWorkExperience] = useState('');
   const [linkedInUrl, setLinkedInUrl] = useState('');
   const [years, setYears] = useState([
-    { id: 1, name: 'Year 1', expanded: false, subjects: [] },
-    { id: 2, name: 'Year 2', expanded: true, subjects: [
-      { name: 'Law of Obligations', grade: 60 },
-      { name: 'Introduction to Legal System', grade: 63 }
-    ] }
+    { id: 1, name: 'Year 1', expanded: false, subjects: [{ name: '', grade: '' }] }
   ]);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -72,7 +68,7 @@ const Profile = () => {
       });
     }
 
-    return years.length > 0 ? years : [{ id: 1, name: 'Year 1', expanded: false, subjects: [] }];
+    return years.length > 0 ? years : [{ id: 1, name: 'Year 1', expanded: false, subjects: [{ name: '', grade: '' }] }];
   };
 
   const formatUndergraduateGrades = () => {
@@ -115,7 +111,7 @@ const Profile = () => {
       id: years.length + 1,
       name: `Year ${years.length + 1}`,
       expanded: false,
-      subjects: []
+      subjects: [{ name: '', grade: '' }]
     };
     setYears([...years, newYear]);
   };
