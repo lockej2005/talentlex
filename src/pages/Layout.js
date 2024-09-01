@@ -61,26 +61,20 @@ const FirmCountdownBar = ({ firm, dueDate, openDate }) => {
   useEffect(() => {
     const calculateProgress = () => {
       const now = new Date();
-      if (dueDate) {
-        const due = new Date(dueDate);
-        if (now > due) {
-          setProgress(100);
-          setStatus('Closed');
-        } else {
-          const totalTime = due - new Date(openDate);
-          const timeLeft = due - now;
-          setProgress(((totalTime - timeLeft) / totalTime) * 100);
-          setStatus(`Open, closes on ${due.toLocaleDateString()}`);
-        }
-      } else if (openDate) {
-        const open = new Date(openDate);
-        if (now < open) {
-          setProgress(0);
-          setStatus(`Opening Soon (${open.toLocaleDateString()})`);
-        } else {
-          setProgress(100);
-          setStatus('Open');
-        }
+      const due = new Date(dueDate);
+      const open = new Date(openDate);
+      
+      if (now > due) {
+        setProgress(100);
+        setStatus('Closed');
+      } else if (now < open) {
+        setProgress(0);
+        setStatus(`Opening Soon (${open.toLocaleDateString()})`);
+      } else {
+        const totalTime = due - open;
+        const timeLeft = due - now;
+        setProgress(((totalTime - timeLeft) / totalTime) * 100);
+        setStatus(`Open, closes on ${due.toLocaleDateString()}`);
       }
     };
 
@@ -103,11 +97,11 @@ const FirmCountdownBar = ({ firm, dueDate, openDate }) => {
 
 const FrostedGlassPopup = ({ onClose }) => {
   const firms = [
-    { name: 'Sidley Austin', dueDate: '2024-09-13', openDate: '2024-08-28' },
-    { name: 'Jones Day', openDate: '2024-09-01' },
-    { name: 'Dechert', openDate: '2024-09-01' },
-    { name: 'Willkie Farr & Gallagher', openDate: '2024-09-01' },
-    { name: 'Bryan Cave Leighton Paisner', openDate: '2024-09-01' },
+    { name: 'Sidley Austin', dueDate: '2024-10-31', openDate: '2024-08-28' },
+    { name: 'Jones Day', dueDate: '2024-10-31', openDate: '2024-09-01' },
+    { name: 'Dechert', dueDate: '2024-10-31', openDate: '2024-09-01' },
+    { name: 'Willkie Farr & Gallagher', dueDate: '2024-10-31', openDate: '2024-09-01' },
+    { name: 'Bryan Cave Leighton Paisner', dueDate: '2024-10-31', openDate: '2024-09-01' },
   ];
 
   return (
@@ -145,7 +139,7 @@ const Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [showFrostedGlassPopup, setShowFrostedGlassPopup] = useState(true);
+  const [showFrostedGlassPopup, setShowFrostedGlassPopup] = useState(false);
 
   const fetchUserProfile = async () => {
     const { data: { user } } = await supabase.auth.getUser();
