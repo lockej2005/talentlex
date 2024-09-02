@@ -125,7 +125,10 @@ class handler(BaseHTTPRequestHandler):
             response = json.dumps({
                 "success": True,
                 "feedback": ai_feedback,
-                "usage": usage  # Send back a simplified usage object
+                "usage": usage,
+                "model": model,
+                "system_prompt": system_prompt,
+                "user_prompt": user_prompt
             })
             self.wfile.write(response.encode('utf-8'))
 
