@@ -14,6 +14,7 @@ const QueryPage = () => {
   const [sortBy, setSortBy] = useState({ value: 'newest', label: 'Most Recent' });
   const [showUniqueOnly, setShowUniqueOnly] = useState(false);
   const [displayMode, setDisplayMode] = useState({ value: 'full', label: 'Full View' });
+  const [expandedItem, setExpandedItem] = useState(null);
 
   const tables = [
     { value: 'applications', label: 'Applications' },
@@ -99,23 +100,40 @@ const QueryPage = () => {
     }
   };
 
+  const toggleExpand = (id) => {
+    setExpandedItem(expandedItem === id ? null : id);
+  };
+
   const renderResultItem = (item) => {
     const timestamp = new Date(item.timestamp).toLocaleString();
     const contentSnippet = (item.application_text || item.generated_draft || '').slice(0, 100) + '...';
 
     if (displayMode.value === 'compact') {
       return (
-        <div key={item.id} className="result-item-compact">
-          <p><strong>Email:</strong> {item.email}</p>
-          <p><strong>Timestamp:</strong> {timestamp}</p>
-          <p><strong>Content:</strong> {contentSnippet}</p>
+        <div key={item.id} className={`result-item-compact ${expandedItem === item.id ? 'expanded' : ''}`} onClick={() => toggleExpand(item.id)}>
+          <div className="compact-content">
+            <p><strong>Email:</strong> {item.email}</p>
+            <p><strong>Timestamp:</strong> {timestamp}</p>
+            <p><strong>Content:</strong> {contentSnippet}</p>
+          </div>
+          {expandedItem === item.id && (
+            <div className="expanded-content">
+              {renderFullContent(item)}
+            </div>
+          )}
         </div>
       );
     }
 
+    return renderFullContent(item);
+  };
+
+  const renderFullContent = (item) => {
+    const timestamp = new Date(item.timestamp).toLocaleString();
+
     if (selectedTable.value === 'applications') {
       return (
-        <div key={item.id} className="result-item">
+        <div className="result-item">
           <h4>Application {item.id}</h4>
           <p><strong>Email:</strong> {item.email}</p>
           <p><strong>Application Text:</strong> {item.application_text}</p>
@@ -125,7 +143,7 @@ const QueryPage = () => {
       );
     } else {
       return (
-        <div key={item.id} className="result-item">
+        <div className="result-item">
           <h4>Draft Generation {item.id}</h4>
           <p><strong>Email:</strong> {item.email}</p>
           <p><strong>Key Reasons:</strong> {item.key_reasons}</p>
@@ -177,7 +195,10 @@ const QueryPage = () => {
         />
         <Select
           value={displayMode}
-          onChange={setDisplayMode}
+          onChange={(option) => {
+            setDisplayMode(option);
+            setExpandedItem(null); // Reset expanded item when changing display mode
+          }}
           options={displayOptions}
           styles={customStyles}
           placeholder="Display mode"

@@ -40,6 +40,7 @@
     padding: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
+
   
   .result-item h4 {
     color: #276D8B;
@@ -72,6 +73,11 @@
     padding: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   }
+  .result-item-compact {
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
   
   .filter-checkbox {
     display: flex;
