@@ -41,6 +41,9 @@ class handler(BaseHTTPRequestHandler):
         application_text = data.get('applicationText')
         firm = data.get('firm')
         question = data.get('question')
+        work_experience = data.get('work_experience', '')
+        education = data.get('education', '')
+        sub_category = data.get('sub_category', '')
         
         if not application_text or not firm or not question:
             self.send_error(400, "Missing required data")
@@ -83,12 +86,6 @@ class handler(BaseHTTPRequestHandler):
                 system_prompt = dechert_prompt
                 model = "gpt-4o"
 
-            user_prompt1 = f"""Firm: {firm}
-            Question: {question}
-            New application to be analyzed:
-
-            {application_text}"""
-
             user_prompt = f"""Firm: {firm}
             Question: {question}
             Application decision:
@@ -102,8 +99,6 @@ class handler(BaseHTTPRequestHandler):
 
             Education:
             This applicant studied at {education} for a {sub_category}.
-
-
             """
 
             completion = client.chat.completions.create(
