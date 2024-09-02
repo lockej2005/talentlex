@@ -1,0 +1,152 @@
+.layout-admin {
+    display: flex;
+    min-height: 100vh;
+    background-color: #E4E4E4;
+  }
+  
+  .sidebar-admin {
+    max-width: 250px;
+    min-width: 250px;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  .sidebar-content-admin {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+  
+  .logo-admin {
+    font-size: 24px;
+    font-weight: bold;
+    color: #276D8B;
+    margin-bottom: 20px;
+    font-family: "Inika", serif;
+  }
+  
+  .nav-admin ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .nav-item-admin {
+    padding: 10px 0;
+    cursor: pointer;
+  }
+  
+  .nav-item-admin:hover {
+    color: #276D8B;
+  }
+  
+  .section-title-admin {
+    font-weight: bold;
+    color: #888;
+    margin-top: 15px;
+  }
+  
+  .separator-admin {
+    height: 2px;
+    background-color: #e0e0e0;
+    margin: 10px 0;
+  }
+  
+  .user-info-admin {
+    margin-top: 20px;
+  }
+  
+  .user-name-admin {
+    color: #276D8B;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  
+  .logout-btn-admin {
+    background-color: #276D8B;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 10px 0;
+    cursor: pointer;
+    border-radius: 4px;
+    width: 100%;
+  }
+  
+  .logout-btn-admin:hover {
+    background-color: #d32f2f;
+  }
+  
+  .main-content-admin {
+    flex-grow: 1;
+    position: relative;
+    padding: 20px;
+  }
+  
+  .menu-toggle-admin {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .dropdown-header-admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .page-title-admin {
+    color: #276D8B;
+    margin-bottom: 20px;
+  }
+  
+  .welcome-text-admin {
+    font-size: 16px;
+    color: #333;
+  }
+  
+  @media (max-width: 768px) {
+    .sidebar-admin {
+      position: fixed;
+      left: -250px;
+      top: 0;
+      bottom: 0;
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+  
+    .sidebar-admin.open-admin {
+      left: 0;
+    }
+  
+    .menu-toggle-admin {
+      display: block;
+    }
+  
+    .main-content-admin {
+      padding-top: 50px;
+    }
+  
+    .menu-overlay-admin {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+  }

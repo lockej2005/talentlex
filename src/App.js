@@ -15,6 +15,7 @@ import Videos from './pages/Videos';
 import SpeakToFounders from './pages/SpeakToFounders';
 import DueDiligence from './pages/DueDiligence';
 import Profile from './pages/Profile';
+import Admin from './admin/Admin';
 
 const PrivateRoute = ({ children }) => {
   const [session, setSession] = useState(null);
@@ -48,6 +49,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/talentlex-admin/*" element={<Admin />} />
           <Route
             path="/*"
             element={

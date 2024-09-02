@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Menu, ChevronDown, ChevronRight } from 'lucide-react';
+import { Menu } from 'lucide-react';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import QueryPage from './data-science/QueryPage';
 import './Admin.css';
 
 const Admin = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showOverlay, setShowOverlay] = useState(false);
+  const location = useLocation();
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -25,11 +28,8 @@ const Admin = () => {
             <ul className="nav-list-admin">
               <li className="section-title-admin">Admin Tools</li>
               <div className='separator-admin'></div>
-              <li className="nav-item-admin">
-                <div className="dropdown-header-admin">
-                  <span>Data Science</span>
-                  <ChevronRight size={16} />
-                </div>
+              <li className={`nav-item-admin ${location.pathname === '/talentlex-admin/query' ? 'active-admin' : ''}`}>
+                <Link to="/talentlex-admin/query">Query Page</Link>
               </li>
             </ul>
           </nav>
@@ -44,8 +44,15 @@ const Admin = () => {
           <Menu size={24} />
         </button>
         <div className="content-area-admin">
-          <h1 className="page-title-admin">Admin Dashboard</h1>
-          <p className="welcome-text-admin">Welcome to the TalentLex Admin Dashboard. Select a tool from the sidebar to get started.</p>
+          <Routes>
+            <Route path="/" element={
+              <>
+                <h1 className="page-title-admin">Admin Dashboard</h1>
+                <p className="welcome-text-admin">Welcome to the TalentLex Admin Dashboard. Use the Query Page to access and analyze data.</p>
+              </>
+            } />
+            <Route path="/query" element={<QueryPage />} />
+          </Routes>
         </div>
       </div>
       {showOverlay && (
