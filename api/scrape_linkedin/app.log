@@ -1,0 +1,1152 @@
+2024-09-01 15:46:38,433 - local_server - INFO - Starting the LinkedIn Scraper Server
+2024-09-01 15:46:40,104 - local_server - INFO - Starting the LinkedIn Scraper Server
+2024-09-01 15:46:40,679 - local_server - INFO - Starting the LinkedIn Scraper Server
+2024-09-01 15:46:42,797 - local_server - INFO - Request 1725230802797 received for LinkedIn scraping
+2024-09-01 15:46:42,799 - local_server - INFO - Request 1725230802797: Scraping URL - https://www.linkedin.com/in/lockej2005/
+2024-09-01 15:46:42,800 - local_server - INFO - Request 1725230802797: Initiating JigsawStack AI scrape
+2024-09-01 15:46:43,326 - local_server - ERROR - Request 1725230802797: An error occurred during scraping
+Traceback (most recent call last):
+  File "C:\Users\fired\OneDrive\projects\law-review\api\scrape_linkedin\local_server.py", line 40, in scrape_linkedin
+    result = jigsawstack.web.ai_scrape({
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\web.py", line 100, in ai_scrape
+    ).perform_with_content()
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\request.py", line 106, in perform_with_content
+    resp = self.perform()
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\request.py", line 60, in perform
+    raise_for_code_and_type(
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\exceptions.py", line 209, in raise_for_code_and_type
+    raise JigsawStackError(
+jigsawstack.exceptions.JigsawStackError: Bad request
+2024-09-01 15:47:31,110 - local_server - INFO - Starting the LinkedIn Scraper Server
+2024-09-01 15:47:35,079 - local_server - INFO - Request 1725230855079 received for LinkedIn scraping
+2024-09-01 15:47:35,082 - local_server - INFO - Request 1725230855079: Scraping URL - https://www.linkedin.com/in/lockej2005/
+2024-09-01 15:47:35,084 - local_server - INFO - Request 1725230855079: Initiating JigsawStack AI scrape
+2024-09-01 15:47:35,639 - local_server - ERROR - Request 1725230855079: JigsawStack error - Bad request
+2024-09-01 15:47:43,739 - local_server - INFO - Starting the LinkedIn Scraper Server
+2024-09-01 15:47:44,307 - local_server - INFO - Starting the LinkedIn Scraper Server
+2024-09-01 15:47:46,164 - local_server - INFO - Request 1725230866164 received for LinkedIn scraping
+2024-09-01 15:47:46,166 - local_server - INFO - Request 1725230866164: Scraping URL - https://www.linkedin.com/in/lockej2005/
+2024-09-01 15:47:46,167 - local_server - INFO - Request 1725230866164: Initiating JigsawStack AI scrape
+2024-09-01 15:47:46,753 - local_server - ERROR - Request 1725230866164: JigsawStack error - Bad request
+2024-09-01 15:54:04,840 - local_server - INFO - Starting the LinkedIn Scraper Server
+2024-09-01 15:54:26,166 - local_server - INFO - Starting the LinkedIn Scraper Server
+2024-09-01 15:54:26,742 - local_server - INFO - Starting the LinkedIn Scraper Server
+2024-09-01 15:54:28,857 - local_server - INFO - Request 1725231268857 received for LinkedIn scraping
+2024-09-01 15:54:28,859 - local_server - INFO - Request 1725231268857: Scraping URL - https://www.linkedin.com/in/lockej2005/
+2024-09-01 15:54:28,860 - local_server - INFO - Request 1725231268857: Loaded 33 LinkedIn cookies
+2024-09-01 15:54:28,861 - local_server - INFO - Request 1725231268857: Initiating JigsawStack AI scrape
+2024-09-01 15:54:29,484 - local_server - ERROR - Request 1725231268857: JigsawStack error - Bad request
+2024-09-01 15:55:23,236 - local_server - INFO - Starting the LinkedIn Scraper Server
+2024-09-01 15:55:26,700 - local_server - INFO - Request 1725231326700 received for LinkedIn scraping
+2024-09-01 15:55:26,701 - local_server - DEBUG - Request 1725231326700: Received data: {
+  "linkedin_url": "https://www.linkedin.com/in/lockej2005/"
+}
+2024-09-01 15:55:26,703 - local_server - INFO - Request 1725231326700: Scraping URL - https://www.linkedin.com/in/lockej2005/
+2024-09-01 15:55:26,705 - local_server - DEBUG - Loaded cookies: [
+  {
+    "name": "li_at",
+    "value": "AQEDATt-aMwE6FW0AAABkaDDh04AAAGRxNALTlYAVPfwgjEglMlMS-Y6Y7vyyqrBp4R-h2MYnQMv64FD2yad6ydEZ2w_TMCqptNUbuVqW_7MI0HIWYdCqosMST5cYOcpVrY16Rgwp9Qdyjd2IUi9hhh7",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "JSESSIONID",
+    "value": "ajax:1775883395949397744",
+    "domain": ".www.linkedin.com"
+  },
+  {
+    "name": "bcookie",
+    "value": "v=2&94866dd8-e870-4c0c-864c-14afbd4351c8",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "bscookie",
+    "value": "v=1&202304140137267b5f4380-41e3-4b1f-85cb-10908aaeed8eAQHmP26gby6iPidII7K8IoeLCJTBXT7y",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_rm",
+    "value": "AQHuVn1mnVboAwAAAYd9aTjZ1HaN-4ytY6Ejd-LEhpZnprZwMNsVAYIFNn0YnEsIaila7QSWGdBxseAWNjWtQXMsQBOVUMjONpYQw-DoO8S9HJ1OaP6fQYYY",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_theme",
+    "value": "light",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_theme_set",
+    "value": "app",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_sugr",
+    "value": "3456339a-ad1b-48ab-a617-7fc88c9e5381",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "aam_uuid",
+    "value": "67367793907303238811088347058387837403",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "liap",
+    "value": "true",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "timezone",
+    "value": "America/Los_Angeles",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "_guid",
+    "value": "c5010db7-1197-44ac-ba15-3ed2724dc877",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "lang",
+    "value": "v=2&lang=en-us",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "AMCVS_14215E3D5995C57C0A495C55%40AdobeOrg",
+    "value": "1",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "PLAY_SESSION",
+    "value": "eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7ImZsb3dUcmFja2luZ0lkIjoicXdJSGVWc2RReUcraENNTS8vdkFhZz09In0sIm5iZiI6MTcyNDk3ODgzOSwiaWF0IjoxNzI0OTc4ODM5fQ.6nAUULfqLJD-EUVbYGZBoBpRFg8exZ0Q3MAneMpV4ME",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "_gcl_au",
+    "value": "1.1.1594573252.1724979015",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "gpv_pn",
+    "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_plt",
+    "value": "3.06",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_pltp",
+    "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_ips",
+    "value": "911",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_cc",
+    "value": "true",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_tslv",
+    "value": "1724989311698",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_sq",
+    "value": "lnkdprod%3D%2526c.%2526a.%2526activitymap.%2526page%253Dwww.linkedin.com%25252Fcompany%25252Fid-redacted%25252Fadmin%25252Fdashboard%25252F%2526link%253D1%2525201%252520new%252520notification%252520Notifications%2526region%253Dglobal-nav%2526pageIDType%253D1%2526.activitymap%2526.a%2526.c%2526pid%253Dwww.linkedin.com%25252Fcompany%25252Fid-redacted%25252Fadmin%25252Fdashboard%25252F%2526pidt%253D1%2526oid%253Dhttps%25253A%25252F%25252Fwww.linkedin.com%25252Fnotifications%25252F%25253F%2526ot%253DA",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_tp",
+    "value": "999",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_ppv",
+    "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F%2C164%2C91%2C1642%2C1%2C1",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "fptctx2",
+    "value": "taBcrIH61PuCVH7eNCyH0B9zcK90d%252bIeoo1r5v7Zc26MpIFZAkJ9ROVov5rxzvZme96%252bhCLvG01ORd1%252fl%252f4m95jsQj1vVqF%252bwbm95MWbWQ%252b%252bHyvWB%252bM1fPALMWzYZ5BO4HsEvswGt1tosUigGOiAVrmDhklmNngMelFGz1MZzwoqcqrqeJPCxMEMBui6JqQ9cE5GnKVk26UCtV5FNiyAuvRnt992p%252fHk9rWUF2Zz6twTOJEzlCnWV%252bxNabEMkpq2ebPCBs8rtkucgBL%252ftEn0G0q1OIs30phY8Y051Yfwxc7mtwQWOTqr3fczNeMFyegX%252fLjhuKCWuQAW8mrI4w8X66POxltPzM6gi1RWLns5uLQ%253d",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "AnalyticsSyncHistory",
+    "value": "AQLb4cr7yt7aJAAAAZGvsCwlbZvl_TE6_DYvhqIdDvm0eTvJ8BivhUoVShQLWdZiyEIzDHAZhabKvk5LfY_B3g",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "lms_ads",
+    "value": "AQHKJupDx4nZRwAAAZGvsC0XDfXHeu3uuFzSumu7KwAupOGblLIMnre63HfFigIqQ-g_LnPXKf8CaYThCOHg43JScbZbA0BF",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "lms_analytics",
+    "value": "AQHKJupDx4nZRwAAAZGvsC0XDfXHeu3uuFzSumu7KwAupOGblLIMnre63HfFigIqQ-g_LnPXKf8CaYThCOHg43JScbZbA0BF",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "UserMatchHistory",
+    "value": "AQKWPRsoWAGKbwAAAZGvv8meZK1JUHqmS1gZr04-XRs0zTPfBcC1gi89XINiFbdgp3GXd_5hx72DHa306tIOulgY5EJnj6WTXP4-ZGfWFjwzRgeav_vtILlQU0pdA0LErIv6cRKtuVKh6ITc5LnDY9oA5uiOR7fSS8U2Wsy1n9fj4CuhJ0sPkjttZdIbQyPdW1zCD5u2pidFfjAbm63ZVV-81mLeYDZxsyaRiSudyYLpEBP5JnEZYrQ5O5WyXqoV6aoxD9ChAF17wbyiWhssr21AXrJ1U2hYJSFZTtXiVJGDgaflZJgHcO8ZjV567scrZOSbdhIujozreCUib9l1yJLQSu7fJkQzfpuMZBtBlF6Xt66rjFVQP6QRK7V84qc8ppIWYKMl_w",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "lidc",
+    "value": "b=OB08:s=O:r=O:a=O:p=O:g=4805:u=500:x=1:i=1725230469:t=1725298899:v=2:sig=AQESB8wDhtEcjvIU3E9Eeqr2V-Jr4DDP",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "AMCV_14215E3D5995C57C0A495C55%40AdobeOrg",
+    "value": "-637568504%7CMCIDTS%7C19967%7CMCMID%7C67517293616770386901141023545996775952%7CMCAAMLH-1725835270%7C9%7CMCAAMB-1725835270%7C6G1ynYcLPuiQxYZrsz_pkqfLG9yMXBpb2zX5dvJdYQJzPXImdj0y%7CMCOPTOUT-1725237670s%7CNONE%7CvVersion%7C5.1.1%7CMCCIDH%7C811046517",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_mc",
+    "value": "MTsyMTsxNzI1MjMwNjQ3OzE7MDIxbyO6115CPqOgoFGEJttMm3u3WBjayRIy4d3hsYovZxs=",
+    "domain": ".linkedin.com"
+  }
+]
+2024-09-01 15:55:26,738 - local_server - INFO - Request 1725231326700: Loaded 33 LinkedIn cookies
+2024-09-01 15:55:26,739 - local_server - INFO - Request 1725231326700: Initiating JigsawStack AI scrape
+2024-09-01 15:55:26,740 - local_server - DEBUG - Request 1725231326700: Scrape config: {
+  "url": "https://www.linkedin.com/in/lockej2005/",
+  "element_prompts": [
+    "Education (name of school)",
+    "Qualification (e.g. Bachelor's, Master's)",
+    "Work Experience (company name and role)"
+  ],
+  "advance_config": {
+    "wait_for": {
+      "mode": "selector",
+      "value": "#experience-section"
+    },
+    "timeout": 30000,
+    "cookies": [
+      {
+        "name": "li_at",
+        "value": "AQEDATt-aMwE6FW0AAABkaDDh04AAAGRxNALTlYAVPfwgjEglMlMS-Y6Y7vyyqrBp4R-h2MYnQMv64FD2yad6ydEZ2w_TMCqptNUbuVqW_7MI0HIWYdCqosMST5cYOcpVrY16Rgwp9Qdyjd2IUi9hhh7",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "JSESSIONID",
+        "value": "ajax:1775883395949397744",
+        "domain": ".www.linkedin.com"
+      },
+      {
+        "name": "bcookie",
+        "value": "v=2&94866dd8-e870-4c0c-864c-14afbd4351c8",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "bscookie",
+        "value": "v=1&202304140137267b5f4380-41e3-4b1f-85cb-10908aaeed8eAQHmP26gby6iPidII7K8IoeLCJTBXT7y",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_rm",
+        "value": "AQHuVn1mnVboAwAAAYd9aTjZ1HaN-4ytY6Ejd-LEhpZnprZwMNsVAYIFNn0YnEsIaila7QSWGdBxseAWNjWtQXMsQBOVUMjONpYQw-DoO8S9HJ1OaP6fQYYY",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_theme",
+        "value": "light",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_theme_set",
+        "value": "app",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_sugr",
+        "value": "3456339a-ad1b-48ab-a617-7fc88c9e5381",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "aam_uuid",
+        "value": "67367793907303238811088347058387837403",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "liap",
+        "value": "true",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "timezone",
+        "value": "America/Los_Angeles",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "_guid",
+        "value": "c5010db7-1197-44ac-ba15-3ed2724dc877",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "lang",
+        "value": "v=2&lang=en-us",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "AMCVS_14215E3D5995C57C0A495C55%40AdobeOrg",
+        "value": "1",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "PLAY_SESSION",
+        "value": "eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7ImZsb3dUcmFja2luZ0lkIjoicXdJSGVWc2RReUcraENNTS8vdkFhZz09In0sIm5iZiI6MTcyNDk3ODgzOSwiaWF0IjoxNzI0OTc4ODM5fQ.6nAUULfqLJD-EUVbYGZBoBpRFg8exZ0Q3MAneMpV4ME",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "_gcl_au",
+        "value": "1.1.1594573252.1724979015",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "gpv_pn",
+        "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_plt",
+        "value": "3.06",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_pltp",
+        "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_ips",
+        "value": "911",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_cc",
+        "value": "true",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_tslv",
+        "value": "1724989311698",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_sq",
+        "value": "lnkdprod%3D%2526c.%2526a.%2526activitymap.%2526page%253Dwww.linkedin.com%25252Fcompany%25252Fid-redacted%25252Fadmin%25252Fdashboard%25252F%2526link%253D1%2525201%252520new%252520notification%252520Notifications%2526region%253Dglobal-nav%2526pageIDType%253D1%2526.activitymap%2526.a%2526.c%2526pid%253Dwww.linkedin.com%25252Fcompany%25252Fid-redacted%25252Fadmin%25252Fdashboard%25252F%2526pidt%253D1%2526oid%253Dhttps%25253A%25252F%25252Fwww.linkedin.com%25252Fnotifications%25252F%25253F%2526ot%253DA",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_tp",
+        "value": "999",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_ppv",
+        "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F%2C164%2C91%2C1642%2C1%2C1",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "fptctx2",
+        "value": "taBcrIH61PuCVH7eNCyH0B9zcK90d%252bIeoo1r5v7Zc26MpIFZAkJ9ROVov5rxzvZme96%252bhCLvG01ORd1%252fl%252f4m95jsQj1vVqF%252bwbm95MWbWQ%252b%252bHyvWB%252bM1fPALMWzYZ5BO4HsEvswGt1tosUigGOiAVrmDhklmNngMelFGz1MZzwoqcqrqeJPCxMEMBui6JqQ9cE5GnKVk26UCtV5FNiyAuvRnt992p%252fHk9rWUF2Zz6twTOJEzlCnWV%252bxNabEMkpq2ebPCBs8rtkucgBL%252ftEn0G0q1OIs30phY8Y051Yfwxc7mtwQWOTqr3fczNeMFyegX%252fLjhuKCWuQAW8mrI4w8X66POxltPzM6gi1RWLns5uLQ%253d",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "AnalyticsSyncHistory",
+        "value": "AQLb4cr7yt7aJAAAAZGvsCwlbZvl_TE6_DYvhqIdDvm0eTvJ8BivhUoVShQLWdZiyEIzDHAZhabKvk5LfY_B3g",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "lms_ads",
+        "value": "AQHKJupDx4nZRwAAAZGvsC0XDfXHeu3uuFzSumu7KwAupOGblLIMnre63HfFigIqQ-g_LnPXKf8CaYThCOHg43JScbZbA0BF",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "lms_analytics",
+        "value": "AQHKJupDx4nZRwAAAZGvsC0XDfXHeu3uuFzSumu7KwAupOGblLIMnre63HfFigIqQ-g_LnPXKf8CaYThCOHg43JScbZbA0BF",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "UserMatchHistory",
+        "value": "AQKWPRsoWAGKbwAAAZGvv8meZK1JUHqmS1gZr04-XRs0zTPfBcC1gi89XINiFbdgp3GXd_5hx72DHa306tIOulgY5EJnj6WTXP4-ZGfWFjwzRgeav_vtILlQU0pdA0LErIv6cRKtuVKh6ITc5LnDY9oA5uiOR7fSS8U2Wsy1n9fj4CuhJ0sPkjttZdIbQyPdW1zCD5u2pidFfjAbm63ZVV-81mLeYDZxsyaRiSudyYLpEBP5JnEZYrQ5O5WyXqoV6aoxD9ChAF17wbyiWhssr21AXrJ1U2hYJSFZTtXiVJGDgaflZJgHcO8ZjV567scrZOSbdhIujozreCUib9l1yJLQSu7fJkQzfpuMZBtBlF6Xt66rjFVQP6QRK7V84qc8ppIWYKMl_w",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "lidc",
+        "value": "b=OB08:s=O:r=O:a=O:p=O:g=4805:u=500:x=1:i=1725230469:t=1725298899:v=2:sig=AQESB8wDhtEcjvIU3E9Eeqr2V-Jr4DDP",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "AMCV_14215E3D5995C57C0A495C55%40AdobeOrg",
+        "value": "-637568504%7CMCIDTS%7C19967%7CMCMID%7C67517293616770386901141023545996775952%7CMCAAMLH-1725835270%7C9%7CMCAAMB-1725835270%7C6G1ynYcLPuiQxYZrsz_pkqfLG9yMXBpb2zX5dvJdYQJzPXImdj0y%7CMCOPTOUT-1725237670s%7CNONE%7CvVersion%7C5.1.1%7CMCCIDH%7C811046517",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_mc",
+        "value": "MTsyMTsxNzI1MjMwNjQ3OzE7MDIxbyO6115CPqOgoFGEJttMm3u3WBjayRIy4d3hsYovZxs=",
+        "domain": ".linkedin.com"
+      }
+    ]
+  }
+}
+2024-09-01 15:55:27,354 - local_server - ERROR - Request 1725231326700: JigsawStack error - Bad request
+2024-09-01 15:55:27,356 - local_server - DEBUG - Request 1725231326700: JigsawStack error traceback:
+Traceback (most recent call last):
+  File "C:\Users\fired\OneDrive\projects\law-review\api\scrape_linkedin\local_server.py", line 80, in scrape_linkedin
+    result = jigsawstack.web.ai_scrape(scrape_config)
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\web.py", line 100, in ai_scrape
+    ).perform_with_content()
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\request.py", line 106, in perform_with_content
+    resp = self.perform()
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\request.py", line 60, in perform
+    raise_for_code_and_type(
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\exceptions.py", line 209, in raise_for_code_and_type
+    raise JigsawStackError(
+jigsawstack.exceptions.JigsawStackError: Bad request
+
+2024-09-01 16:17:26,694 - local_server - INFO - Starting the LinkedIn Scraper Server
+2024-09-01 16:17:27,250 - local_server - INFO - Starting the LinkedIn Scraper Server
+2024-09-01 16:17:51,515 - local_server - INFO - Request 1725232671515 received for LinkedIn scraping
+2024-09-01 16:17:51,516 - local_server - DEBUG - Request 1725232671515: Received data: {
+  "linkedin_url": "https://www.linkedin.com/in/lockej2005/"
+}
+2024-09-01 16:17:51,517 - local_server - INFO - Request 1725232671515: Scraping URL - https://www.linkedin.com/in/lockej2005/
+2024-09-01 16:17:51,519 - local_server - DEBUG - Loaded cookies: [
+  {
+    "name": "li_at",
+    "value": "AQEDATt-aMwE6FW0AAABkaDDh04AAAGRxNALTlYAVPfwgjEglMlMS-Y6Y7vyyqrBp4R-h2MYnQMv64FD2yad6ydEZ2w_TMCqptNUbuVqW_7MI0HIWYdCqosMST5cYOcpVrY16Rgwp9Qdyjd2IUi9hhh7",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "JSESSIONID",
+    "value": "ajax:1775883395949397744",
+    "domain": ".www.linkedin.com"
+  },
+  {
+    "name": "bcookie",
+    "value": "v=2&94866dd8-e870-4c0c-864c-14afbd4351c8",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "bscookie",
+    "value": "v=1&202304140137267b5f4380-41e3-4b1f-85cb-10908aaeed8eAQHmP26gby6iPidII7K8IoeLCJTBXT7y",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_rm",
+    "value": "AQHuVn1mnVboAwAAAYd9aTjZ1HaN-4ytY6Ejd-LEhpZnprZwMNsVAYIFNn0YnEsIaila7QSWGdBxseAWNjWtQXMsQBOVUMjONpYQw-DoO8S9HJ1OaP6fQYYY",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_theme",
+    "value": "light",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_theme_set",
+    "value": "app",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_sugr",
+    "value": "3456339a-ad1b-48ab-a617-7fc88c9e5381",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "aam_uuid",
+    "value": "67367793907303238811088347058387837403",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "liap",
+    "value": "true",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "timezone",
+    "value": "America/Los_Angeles",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "_guid",
+    "value": "c5010db7-1197-44ac-ba15-3ed2724dc877",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "lang",
+    "value": "v=2&lang=en-us",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "AMCVS_14215E3D5995C57C0A495C55%40AdobeOrg",
+    "value": "1",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "PLAY_SESSION",
+    "value": "eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7ImZsb3dUcmFja2luZ0lkIjoicXdJSGVWc2RReUcraENNTS8vdkFhZz09In0sIm5iZiI6MTcyNDk3ODgzOSwiaWF0IjoxNzI0OTc4ODM5fQ.6nAUULfqLJD-EUVbYGZBoBpRFg8exZ0Q3MAneMpV4ME",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "_gcl_au",
+    "value": "1.1.1594573252.1724979015",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "gpv_pn",
+    "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_plt",
+    "value": "3.06",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_pltp",
+    "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_ips",
+    "value": "911",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_cc",
+    "value": "true",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_tslv",
+    "value": "1724989311698",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_sq",
+    "value": "lnkdprod%3D%2526c.%2526a.%2526activitymap.%2526page%253Dwww.linkedin.com%25252Fcompany%25252Fid-redacted%25252Fadmin%25252Fdashboard%25252F%2526link%253D1%2525201%252520new%252520notification%252520Notifications%2526region%253Dglobal-nav%2526pageIDType%253D1%2526.activitymap%2526.a%2526.c%2526pid%253Dwww.linkedin.com%25252Fcompany%25252Fid-redacted%25252Fadmin%25252Fdashboard%25252F%2526pidt%253D1%2526oid%253Dhttps%25253A%25252F%25252Fwww.linkedin.com%25252Fnotifications%25252F%25253F%2526ot%253DA",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_tp",
+    "value": "999",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_ppv",
+    "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F%2C164%2C91%2C1642%2C1%2C1",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "fptctx2",
+    "value": "taBcrIH61PuCVH7eNCyH0B9zcK90d%252bIeoo1r5v7Zc26MpIFZAkJ9ROVov5rxzvZme96%252bhCLvG01ORd1%252fl%252f4m95jsQj1vVqF%252bwbm95MWbWQ%252b%252bHyvWB%252bM1fPALMWzYZ5BO4HsEvswGt1tosUigGOiAVrmDhklmNngMelFGz1MZzwoqcqrqeJPCxMEMBui6JqQ9cE5GnKVk26UCtV5FNiyAuvRnt992p%252fHk9rWUF2Zz6twTOJEzlCnWV%252bxNabEMkpq2ebPCBs8rtkucgBL%252ftEn0G0q1OIs30phY8Y051Yfwxc7mtwQWOTqr3fczNeMFyegX%252fLjhuKCWuQAW8mrI4w8X66POxltPzM6gi1RWLns5uLQ%253d",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "AnalyticsSyncHistory",
+    "value": "AQLb4cr7yt7aJAAAAZGvsCwlbZvl_TE6_DYvhqIdDvm0eTvJ8BivhUoVShQLWdZiyEIzDHAZhabKvk5LfY_B3g",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "lms_ads",
+    "value": "AQHKJupDx4nZRwAAAZGvsC0XDfXHeu3uuFzSumu7KwAupOGblLIMnre63HfFigIqQ-g_LnPXKf8CaYThCOHg43JScbZbA0BF",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "lms_analytics",
+    "value": "AQHKJupDx4nZRwAAAZGvsC0XDfXHeu3uuFzSumu7KwAupOGblLIMnre63HfFigIqQ-g_LnPXKf8CaYThCOHg43JScbZbA0BF",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "UserMatchHistory",
+    "value": "AQKWPRsoWAGKbwAAAZGvv8meZK1JUHqmS1gZr04-XRs0zTPfBcC1gi89XINiFbdgp3GXd_5hx72DHa306tIOulgY5EJnj6WTXP4-ZGfWFjwzRgeav_vtILlQU0pdA0LErIv6cRKtuVKh6ITc5LnDY9oA5uiOR7fSS8U2Wsy1n9fj4CuhJ0sPkjttZdIbQyPdW1zCD5u2pidFfjAbm63ZVV-81mLeYDZxsyaRiSudyYLpEBP5JnEZYrQ5O5WyXqoV6aoxD9ChAF17wbyiWhssr21AXrJ1U2hYJSFZTtXiVJGDgaflZJgHcO8ZjV567scrZOSbdhIujozreCUib9l1yJLQSu7fJkQzfpuMZBtBlF6Xt66rjFVQP6QRK7V84qc8ppIWYKMl_w",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "lidc",
+    "value": "b=OB08:s=O:r=O:a=O:p=O:g=4805:u=500:x=1:i=1725230469:t=1725298899:v=2:sig=AQESB8wDhtEcjvIU3E9Eeqr2V-Jr4DDP",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "AMCV_14215E3D5995C57C0A495C55%40AdobeOrg",
+    "value": "-637568504%7CMCIDTS%7C19967%7CMCMID%7C67517293616770386901141023545996775952%7CMCAAMLH-1725835270%7C9%7CMCAAMB-1725835270%7C6G1ynYcLPuiQxYZrsz_pkqfLG9yMXBpb2zX5dvJdYQJzPXImdj0y%7CMCOPTOUT-1725237670s%7CNONE%7CvVersion%7C5.1.1%7CMCCIDH%7C811046517",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_mc",
+    "value": "MTsyMTsxNzI1MjMwNjQ3OzE7MDIxbyO6115CPqOgoFGEJttMm3u3WBjayRIy4d3hsYovZxs=",
+    "domain": ".linkedin.com"
+  }
+]
+2024-09-01 16:17:51,537 - local_server - INFO - Request 1725232671515: Loaded 33 LinkedIn cookies
+2024-09-01 16:17:51,537 - local_server - INFO - Request 1725232671515: Initiating JigsawStack AI scrape
+2024-09-01 16:17:51,539 - local_server - DEBUG - Request 1725232671515: Scrape config: {
+  "url": "https://www.linkedin.com/in/lockej2005/",
+  "element_prompts": [
+    "Education (name of school)",
+    "Qualification (e.g. Bachelor's, Master's)",
+    "Work Experience (company name and role)"
+  ],
+  "advance_config": {
+    "wait_for": {
+      "mode": "networkidle0"
+    },
+    "timeout": 30000,
+    "cookies": [
+      {
+        "name": "li_at",
+        "value": "AQEDATt-aMwE6FW0AAABkaDDh04AAAGRxNALTlYAVPfwgjEglMlMS-Y6Y7vyyqrBp4R-h2MYnQMv64FD2yad6ydEZ2w_TMCqptNUbuVqW_7MI0HIWYdCqosMST5cYOcpVrY16Rgwp9Qdyjd2IUi9hhh7",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "JSESSIONID",
+        "value": "ajax:1775883395949397744",
+        "domain": ".www.linkedin.com"
+      },
+      {
+        "name": "bcookie",
+        "value": "v=2&94866dd8-e870-4c0c-864c-14afbd4351c8",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "bscookie",
+        "value": "v=1&202304140137267b5f4380-41e3-4b1f-85cb-10908aaeed8eAQHmP26gby6iPidII7K8IoeLCJTBXT7y",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_rm",
+        "value": "AQHuVn1mnVboAwAAAYd9aTjZ1HaN-4ytY6Ejd-LEhpZnprZwMNsVAYIFNn0YnEsIaila7QSWGdBxseAWNjWtQXMsQBOVUMjONpYQw-DoO8S9HJ1OaP6fQYYY",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_theme",
+        "value": "light",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_theme_set",
+        "value": "app",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_sugr",
+        "value": "3456339a-ad1b-48ab-a617-7fc88c9e5381",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "aam_uuid",
+        "value": "67367793907303238811088347058387837403",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "liap",
+        "value": "true",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "timezone",
+        "value": "America/Los_Angeles",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "_guid",
+        "value": "c5010db7-1197-44ac-ba15-3ed2724dc877",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "lang",
+        "value": "v=2&lang=en-us",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "AMCVS_14215E3D5995C57C0A495C55%40AdobeOrg",
+        "value": "1",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "PLAY_SESSION",
+        "value": "eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7ImZsb3dUcmFja2luZ0lkIjoicXdJSGVWc2RReUcraENNTS8vdkFhZz09In0sIm5iZiI6MTcyNDk3ODgzOSwiaWF0IjoxNzI0OTc4ODM5fQ.6nAUULfqLJD-EUVbYGZBoBpRFg8exZ0Q3MAneMpV4ME",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "_gcl_au",
+        "value": "1.1.1594573252.1724979015",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "gpv_pn",
+        "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_plt",
+        "value": "3.06",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_pltp",
+        "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_ips",
+        "value": "911",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_cc",
+        "value": "true",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_tslv",
+        "value": "1724989311698",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_sq",
+        "value": "lnkdprod%3D%2526c.%2526a.%2526activitymap.%2526page%253Dwww.linkedin.com%25252Fcompany%25252Fid-redacted%25252Fadmin%25252Fdashboard%25252F%2526link%253D1%2525201%252520new%252520notification%252520Notifications%2526region%253Dglobal-nav%2526pageIDType%253D1%2526.activitymap%2526.a%2526.c%2526pid%253Dwww.linkedin.com%25252Fcompany%25252Fid-redacted%25252Fadmin%25252Fdashboard%25252F%2526pidt%253D1%2526oid%253Dhttps%25253A%25252F%25252Fwww.linkedin.com%25252Fnotifications%25252F%25253F%2526ot%253DA",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_tp",
+        "value": "999",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_ppv",
+        "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F%2C164%2C91%2C1642%2C1%2C1",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "fptctx2",
+        "value": "taBcrIH61PuCVH7eNCyH0B9zcK90d%252bIeoo1r5v7Zc26MpIFZAkJ9ROVov5rxzvZme96%252bhCLvG01ORd1%252fl%252f4m95jsQj1vVqF%252bwbm95MWbWQ%252b%252bHyvWB%252bM1fPALMWzYZ5BO4HsEvswGt1tosUigGOiAVrmDhklmNngMelFGz1MZzwoqcqrqeJPCxMEMBui6JqQ9cE5GnKVk26UCtV5FNiyAuvRnt992p%252fHk9rWUF2Zz6twTOJEzlCnWV%252bxNabEMkpq2ebPCBs8rtkucgBL%252ftEn0G0q1OIs30phY8Y051Yfwxc7mtwQWOTqr3fczNeMFyegX%252fLjhuKCWuQAW8mrI4w8X66POxltPzM6gi1RWLns5uLQ%253d",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "AnalyticsSyncHistory",
+        "value": "AQLb4cr7yt7aJAAAAZGvsCwlbZvl_TE6_DYvhqIdDvm0eTvJ8BivhUoVShQLWdZiyEIzDHAZhabKvk5LfY_B3g",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "lms_ads",
+        "value": "AQHKJupDx4nZRwAAAZGvsC0XDfXHeu3uuFzSumu7KwAupOGblLIMnre63HfFigIqQ-g_LnPXKf8CaYThCOHg43JScbZbA0BF",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "lms_analytics",
+        "value": "AQHKJupDx4nZRwAAAZGvsC0XDfXHeu3uuFzSumu7KwAupOGblLIMnre63HfFigIqQ-g_LnPXKf8CaYThCOHg43JScbZbA0BF",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "UserMatchHistory",
+        "value": "AQKWPRsoWAGKbwAAAZGvv8meZK1JUHqmS1gZr04-XRs0zTPfBcC1gi89XINiFbdgp3GXd_5hx72DHa306tIOulgY5EJnj6WTXP4-ZGfWFjwzRgeav_vtILlQU0pdA0LErIv6cRKtuVKh6ITc5LnDY9oA5uiOR7fSS8U2Wsy1n9fj4CuhJ0sPkjttZdIbQyPdW1zCD5u2pidFfjAbm63ZVV-81mLeYDZxsyaRiSudyYLpEBP5JnEZYrQ5O5WyXqoV6aoxD9ChAF17wbyiWhssr21AXrJ1U2hYJSFZTtXiVJGDgaflZJgHcO8ZjV567scrZOSbdhIujozreCUib9l1yJLQSu7fJkQzfpuMZBtBlF6Xt66rjFVQP6QRK7V84qc8ppIWYKMl_w",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "lidc",
+        "value": "b=OB08:s=O:r=O:a=O:p=O:g=4805:u=500:x=1:i=1725230469:t=1725298899:v=2:sig=AQESB8wDhtEcjvIU3E9Eeqr2V-Jr4DDP",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "AMCV_14215E3D5995C57C0A495C55%40AdobeOrg",
+        "value": "-637568504%7CMCIDTS%7C19967%7CMCMID%7C67517293616770386901141023545996775952%7CMCAAMLH-1725835270%7C9%7CMCAAMB-1725835270%7C6G1ynYcLPuiQxYZrsz_pkqfLG9yMXBpb2zX5dvJdYQJzPXImdj0y%7CMCOPTOUT-1725237670s%7CNONE%7CvVersion%7C5.1.1%7CMCCIDH%7C811046517",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_mc",
+        "value": "MTsyMTsxNzI1MjMwNjQ3OzE7MDIxbyO6115CPqOgoFGEJttMm3u3WBjayRIy4d3hsYovZxs=",
+        "domain": ".linkedin.com"
+      }
+    ]
+  }
+}
+2024-09-01 16:17:52,291 - local_server - ERROR - Request 1725232671515: JigsawStack error - Bad request
+2024-09-01 16:17:52,297 - local_server - DEBUG - Request 1725232671515: JigsawStack error traceback:
+Traceback (most recent call last):
+  File "C:\Users\fired\OneDrive\projects\law-review\api\scrape_linkedin\local_server.py", line 79, in scrape_linkedin
+    result = jigsawstack.web.ai_scrape(scrape_config)
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\web.py", line 100, in ai_scrape
+    ).perform_with_content()
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\request.py", line 106, in perform_with_content
+    resp = self.perform()
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\request.py", line 60, in perform
+    raise_for_code_and_type(
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\exceptions.py", line 209, in raise_for_code_and_type
+    raise JigsawStackError(
+jigsawstack.exceptions.JigsawStackError: Bad request
+
+2024-09-01 17:21:31,475 - local_server - INFO - Request 1725236491475 received for LinkedIn scraping
+2024-09-01 17:21:31,478 - local_server - DEBUG - Request 1725236491475: Received data: {
+  "linkedin_url": "https://www.linkedin.com/in/lockej2005/"
+}
+2024-09-01 17:21:31,479 - local_server - INFO - Request 1725236491475: Scraping URL - https://www.linkedin.com/in/lockej2005/
+2024-09-01 17:21:31,481 - local_server - DEBUG - Loaded cookies: [
+  {
+    "name": "li_at",
+    "value": "AQEDATt-aMwE6FW0AAABkaDDh04AAAGRxNALTlYAVPfwgjEglMlMS-Y6Y7vyyqrBp4R-h2MYnQMv64FD2yad6ydEZ2w_TMCqptNUbuVqW_7MI0HIWYdCqosMST5cYOcpVrY16Rgwp9Qdyjd2IUi9hhh7",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "JSESSIONID",
+    "value": "ajax:1775883395949397744",
+    "domain": ".www.linkedin.com"
+  },
+  {
+    "name": "bcookie",
+    "value": "v=2&94866dd8-e870-4c0c-864c-14afbd4351c8",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "bscookie",
+    "value": "v=1&202304140137267b5f4380-41e3-4b1f-85cb-10908aaeed8eAQHmP26gby6iPidII7K8IoeLCJTBXT7y",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_rm",
+    "value": "AQHuVn1mnVboAwAAAYd9aTjZ1HaN-4ytY6Ejd-LEhpZnprZwMNsVAYIFNn0YnEsIaila7QSWGdBxseAWNjWtQXMsQBOVUMjONpYQw-DoO8S9HJ1OaP6fQYYY",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_theme",
+    "value": "light",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_theme_set",
+    "value": "app",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_sugr",
+    "value": "3456339a-ad1b-48ab-a617-7fc88c9e5381",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "aam_uuid",
+    "value": "67367793907303238811088347058387837403",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "liap",
+    "value": "true",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "timezone",
+    "value": "America/Los_Angeles",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "_guid",
+    "value": "c5010db7-1197-44ac-ba15-3ed2724dc877",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "lang",
+    "value": "v=2&lang=en-us",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "AMCVS_14215E3D5995C57C0A495C55%40AdobeOrg",
+    "value": "1",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "PLAY_SESSION",
+    "value": "eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7ImZsb3dUcmFja2luZ0lkIjoicXdJSGVWc2RReUcraENNTS8vdkFhZz09In0sIm5iZiI6MTcyNDk3ODgzOSwiaWF0IjoxNzI0OTc4ODM5fQ.6nAUULfqLJD-EUVbYGZBoBpRFg8exZ0Q3MAneMpV4ME",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "_gcl_au",
+    "value": "1.1.1594573252.1724979015",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "gpv_pn",
+    "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_plt",
+    "value": "3.06",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_pltp",
+    "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_ips",
+    "value": "911",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_cc",
+    "value": "true",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_tslv",
+    "value": "1724989311698",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_sq",
+    "value": "lnkdprod%3D%2526c.%2526a.%2526activitymap.%2526page%253Dwww.linkedin.com%25252Fcompany%25252Fid-redacted%25252Fadmin%25252Fdashboard%25252F%2526link%253D1%2525201%252520new%252520notification%252520Notifications%2526region%253Dglobal-nav%2526pageIDType%253D1%2526.activitymap%2526.a%2526.c%2526pid%253Dwww.linkedin.com%25252Fcompany%25252Fid-redacted%25252Fadmin%25252Fdashboard%25252F%2526pidt%253D1%2526oid%253Dhttps%25253A%25252F%25252Fwww.linkedin.com%25252Fnotifications%25252F%25253F%2526ot%253DA",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_tp",
+    "value": "999",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "s_ppv",
+    "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F%2C164%2C91%2C1642%2C1%2C1",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "fptctx2",
+    "value": "taBcrIH61PuCVH7eNCyH0B9zcK90d%252bIeoo1r5v7Zc26MpIFZAkJ9ROVov5rxzvZme96%252bhCLvG01ORd1%252fl%252f4m95jsQj1vVqF%252bwbm95MWbWQ%252b%252bHyvWB%252bM1fPALMWzYZ5BO4HsEvswGt1tosUigGOiAVrmDhklmNngMelFGz1MZzwoqcqrqeJPCxMEMBui6JqQ9cE5GnKVk26UCtV5FNiyAuvRnt992p%252fHk9rWUF2Zz6twTOJEzlCnWV%252bxNabEMkpq2ebPCBs8rtkucgBL%252ftEn0G0q1OIs30phY8Y051Yfwxc7mtwQWOTqr3fczNeMFyegX%252fLjhuKCWuQAW8mrI4w8X66POxltPzM6gi1RWLns5uLQ%253d",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "AnalyticsSyncHistory",
+    "value": "AQLb4cr7yt7aJAAAAZGvsCwlbZvl_TE6_DYvhqIdDvm0eTvJ8BivhUoVShQLWdZiyEIzDHAZhabKvk5LfY_B3g",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "lms_ads",
+    "value": "AQHKJupDx4nZRwAAAZGvsC0XDfXHeu3uuFzSumu7KwAupOGblLIMnre63HfFigIqQ-g_LnPXKf8CaYThCOHg43JScbZbA0BF",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "lms_analytics",
+    "value": "AQHKJupDx4nZRwAAAZGvsC0XDfXHeu3uuFzSumu7KwAupOGblLIMnre63HfFigIqQ-g_LnPXKf8CaYThCOHg43JScbZbA0BF",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "UserMatchHistory",
+    "value": "AQKWPRsoWAGKbwAAAZGvv8meZK1JUHqmS1gZr04-XRs0zTPfBcC1gi89XINiFbdgp3GXd_5hx72DHa306tIOulgY5EJnj6WTXP4-ZGfWFjwzRgeav_vtILlQU0pdA0LErIv6cRKtuVKh6ITc5LnDY9oA5uiOR7fSS8U2Wsy1n9fj4CuhJ0sPkjttZdIbQyPdW1zCD5u2pidFfjAbm63ZVV-81mLeYDZxsyaRiSudyYLpEBP5JnEZYrQ5O5WyXqoV6aoxD9ChAF17wbyiWhssr21AXrJ1U2hYJSFZTtXiVJGDgaflZJgHcO8ZjV567scrZOSbdhIujozreCUib9l1yJLQSu7fJkQzfpuMZBtBlF6Xt66rjFVQP6QRK7V84qc8ppIWYKMl_w",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "lidc",
+    "value": "b=OB08:s=O:r=O:a=O:p=O:g=4805:u=500:x=1:i=1725230469:t=1725298899:v=2:sig=AQESB8wDhtEcjvIU3E9Eeqr2V-Jr4DDP",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "AMCV_14215E3D5995C57C0A495C55%40AdobeOrg",
+    "value": "-637568504%7CMCIDTS%7C19967%7CMCMID%7C67517293616770386901141023545996775952%7CMCAAMLH-1725835270%7C9%7CMCAAMB-1725835270%7C6G1ynYcLPuiQxYZrsz_pkqfLG9yMXBpb2zX5dvJdYQJzPXImdj0y%7CMCOPTOUT-1725237670s%7CNONE%7CvVersion%7C5.1.1%7CMCCIDH%7C811046517",
+    "domain": ".linkedin.com"
+  },
+  {
+    "name": "li_mc",
+    "value": "MTsyMTsxNzI1MjMwNjQ3OzE7MDIxbyO6115CPqOgoFGEJttMm3u3WBjayRIy4d3hsYovZxs=",
+    "domain": ".linkedin.com"
+  }
+]
+2024-09-01 17:21:31,496 - local_server - INFO - Request 1725236491475: Loaded 33 LinkedIn cookies
+2024-09-01 17:21:31,497 - local_server - INFO - Request 1725236491475: Initiating JigsawStack AI scrape
+2024-09-01 17:21:31,498 - local_server - DEBUG - Request 1725236491475: Scrape config: {
+  "url": "https://www.linkedin.com/in/lockej2005/",
+  "element_prompts": [
+    "Education (name of school)",
+    "Qualification (e.g. Bachelor's, Master's)",
+    "Work Experience (company name and role)"
+  ],
+  "advance_config": {
+    "wait_for": {
+      "mode": "networkidle0"
+    },
+    "timeout": 30000,
+    "cookies": [
+      {
+        "name": "li_at",
+        "value": "AQEDATt-aMwE6FW0AAABkaDDh04AAAGRxNALTlYAVPfwgjEglMlMS-Y6Y7vyyqrBp4R-h2MYnQMv64FD2yad6ydEZ2w_TMCqptNUbuVqW_7MI0HIWYdCqosMST5cYOcpVrY16Rgwp9Qdyjd2IUi9hhh7",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "JSESSIONID",
+        "value": "ajax:1775883395949397744",
+        "domain": ".www.linkedin.com"
+      },
+      {
+        "name": "bcookie",
+        "value": "v=2&94866dd8-e870-4c0c-864c-14afbd4351c8",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "bscookie",
+        "value": "v=1&202304140137267b5f4380-41e3-4b1f-85cb-10908aaeed8eAQHmP26gby6iPidII7K8IoeLCJTBXT7y",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_rm",
+        "value": "AQHuVn1mnVboAwAAAYd9aTjZ1HaN-4ytY6Ejd-LEhpZnprZwMNsVAYIFNn0YnEsIaila7QSWGdBxseAWNjWtQXMsQBOVUMjONpYQw-DoO8S9HJ1OaP6fQYYY",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_theme",
+        "value": "light",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_theme_set",
+        "value": "app",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_sugr",
+        "value": "3456339a-ad1b-48ab-a617-7fc88c9e5381",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "aam_uuid",
+        "value": "67367793907303238811088347058387837403",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "liap",
+        "value": "true",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "timezone",
+        "value": "America/Los_Angeles",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "_guid",
+        "value": "c5010db7-1197-44ac-ba15-3ed2724dc877",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "lang",
+        "value": "v=2&lang=en-us",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "AMCVS_14215E3D5995C57C0A495C55%40AdobeOrg",
+        "value": "1",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "PLAY_SESSION",
+        "value": "eyJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7ImZsb3dUcmFja2luZ0lkIjoicXdJSGVWc2RReUcraENNTS8vdkFhZz09In0sIm5iZiI6MTcyNDk3ODgzOSwiaWF0IjoxNzI0OTc4ODM5fQ.6nAUULfqLJD-EUVbYGZBoBpRFg8exZ0Q3MAneMpV4ME",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "_gcl_au",
+        "value": "1.1.1594573252.1724979015",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "gpv_pn",
+        "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_plt",
+        "value": "3.06",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_pltp",
+        "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_ips",
+        "value": "911",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_cc",
+        "value": "true",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_tslv",
+        "value": "1724989311698",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_sq",
+        "value": "lnkdprod%3D%2526c.%2526a.%2526activitymap.%2526page%253Dwww.linkedin.com%25252Fcompany%25252Fid-redacted%25252Fadmin%25252Fdashboard%25252F%2526link%253D1%2525201%252520new%252520notification%252520Notifications%2526region%253Dglobal-nav%2526pageIDType%253D1%2526.activitymap%2526.a%2526.c%2526pid%253Dwww.linkedin.com%25252Fcompany%25252Fid-redacted%25252Fadmin%25252Fdashboard%25252F%2526pidt%253D1%2526oid%253Dhttps%25253A%25252F%25252Fwww.linkedin.com%25252Fnotifications%25252F%25253F%2526ot%253DA",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_tp",
+        "value": "999",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "s_ppv",
+        "value": "www.linkedin.com%2Fcompany%2Fid-redacted%2Fadmin%2Fdashboard%2F%2C164%2C91%2C1642%2C1%2C1",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "fptctx2",
+        "value": "taBcrIH61PuCVH7eNCyH0B9zcK90d%252bIeoo1r5v7Zc26MpIFZAkJ9ROVov5rxzvZme96%252bhCLvG01ORd1%252fl%252f4m95jsQj1vVqF%252bwbm95MWbWQ%252b%252bHyvWB%252bM1fPALMWzYZ5BO4HsEvswGt1tosUigGOiAVrmDhklmNngMelFGz1MZzwoqcqrqeJPCxMEMBui6JqQ9cE5GnKVk26UCtV5FNiyAuvRnt992p%252fHk9rWUF2Zz6twTOJEzlCnWV%252bxNabEMkpq2ebPCBs8rtkucgBL%252ftEn0G0q1OIs30phY8Y051Yfwxc7mtwQWOTqr3fczNeMFyegX%252fLjhuKCWuQAW8mrI4w8X66POxltPzM6gi1RWLns5uLQ%253d",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "AnalyticsSyncHistory",
+        "value": "AQLb4cr7yt7aJAAAAZGvsCwlbZvl_TE6_DYvhqIdDvm0eTvJ8BivhUoVShQLWdZiyEIzDHAZhabKvk5LfY_B3g",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "lms_ads",
+        "value": "AQHKJupDx4nZRwAAAZGvsC0XDfXHeu3uuFzSumu7KwAupOGblLIMnre63HfFigIqQ-g_LnPXKf8CaYThCOHg43JScbZbA0BF",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "lms_analytics",
+        "value": "AQHKJupDx4nZRwAAAZGvsC0XDfXHeu3uuFzSumu7KwAupOGblLIMnre63HfFigIqQ-g_LnPXKf8CaYThCOHg43JScbZbA0BF",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "UserMatchHistory",
+        "value": "AQKWPRsoWAGKbwAAAZGvv8meZK1JUHqmS1gZr04-XRs0zTPfBcC1gi89XINiFbdgp3GXd_5hx72DHa306tIOulgY5EJnj6WTXP4-ZGfWFjwzRgeav_vtILlQU0pdA0LErIv6cRKtuVKh6ITc5LnDY9oA5uiOR7fSS8U2Wsy1n9fj4CuhJ0sPkjttZdIbQyPdW1zCD5u2pidFfjAbm63ZVV-81mLeYDZxsyaRiSudyYLpEBP5JnEZYrQ5O5WyXqoV6aoxD9ChAF17wbyiWhssr21AXrJ1U2hYJSFZTtXiVJGDgaflZJgHcO8ZjV567scrZOSbdhIujozreCUib9l1yJLQSu7fJkQzfpuMZBtBlF6Xt66rjFVQP6QRK7V84qc8ppIWYKMl_w",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "lidc",
+        "value": "b=OB08:s=O:r=O:a=O:p=O:g=4805:u=500:x=1:i=1725230469:t=1725298899:v=2:sig=AQESB8wDhtEcjvIU3E9Eeqr2V-Jr4DDP",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "AMCV_14215E3D5995C57C0A495C55%40AdobeOrg",
+        "value": "-637568504%7CMCIDTS%7C19967%7CMCMID%7C67517293616770386901141023545996775952%7CMCAAMLH-1725835270%7C9%7CMCAAMB-1725835270%7C6G1ynYcLPuiQxYZrsz_pkqfLG9yMXBpb2zX5dvJdYQJzPXImdj0y%7CMCOPTOUT-1725237670s%7CNONE%7CvVersion%7C5.1.1%7CMCCIDH%7C811046517",
+        "domain": ".linkedin.com"
+      },
+      {
+        "name": "li_mc",
+        "value": "MTsyMTsxNzI1MjMwNjQ3OzE7MDIxbyO6115CPqOgoFGEJttMm3u3WBjayRIy4d3hsYovZxs=",
+        "domain": ".linkedin.com"
+      }
+    ]
+  }
+}
+2024-09-01 17:21:32,283 - local_server - ERROR - Request 1725236491475: JigsawStack error - Bad request
+2024-09-01 17:21:32,284 - local_server - DEBUG - Request 1725236491475: JigsawStack error traceback:
+Traceback (most recent call last):
+  File "C:\Users\fired\OneDrive\projects\law-review\api\scrape_linkedin\local_server.py", line 79, in scrape_linkedin
+    result = jigsawstack.web.ai_scrape(scrape_config)
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\web.py", line 100, in ai_scrape
+    ).perform_with_content()
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\request.py", line 106, in perform_with_content
+    resp = self.perform()
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\request.py", line 60, in perform
+    raise_for_code_and_type(
+  File "C:\Users\fired\AppData\Local\Programs\Python\Python310\lib\site-packages\jigsawstack\exceptions.py", line 209, in raise_for_code_and_type
+    raise JigsawStackError(
+jigsawstack.exceptions.JigsawStackError: Bad request
+

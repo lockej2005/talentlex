@@ -61,7 +61,7 @@ class handler(BaseHTTPRequestHandler):
         try:
             if firm == "Goodwin":
                 system_prompt = goodwin_prompt
-                model = "gpt-4o"
+                model = "ft:gpt-4o-mini-2024-07-18:personal:goodwinwithprofile:A2tAS04E"
             elif firm == "White & Case":
                 system_prompt = white_and_case_prompt
                 model = "gpt-4o"
@@ -83,11 +83,28 @@ class handler(BaseHTTPRequestHandler):
                 system_prompt = dechert_prompt
                 model = "gpt-4o"
 
-            user_prompt = f"""Firm: {firm}
+            user_prompt1 = f"""Firm: {firm}
             Question: {question}
             New application to be analyzed:
 
             {application_text}"""
+
+            user_prompt = f"""Firm: {firm}
+            Question: {question}
+            Application decision:
+            This application was rejected.
+
+            Open-Text Question:
+            {application_text}
+
+            Work Experience:
+            {work_experience}
+
+            Education:
+            This applicant studied at {education} for a {sub_category}.
+
+
+            """
 
             completion = client.chat.completions.create(
                 model=model,

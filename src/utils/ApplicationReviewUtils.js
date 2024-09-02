@@ -57,7 +57,13 @@ export const submitApplication = async (applicationData) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({...applicationData, userProfile}),
+    body: JSON.stringify({
+      ...applicationData,
+      userProfile,
+      education: userProfile.education,
+      sub_category: userProfile.sub_categories,
+      work_experience: userProfile.work_experience
+    }),
   });
 
   if (!response.ok) {

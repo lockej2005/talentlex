@@ -1,111 +1,118 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.common.by import By
-from bs4 import BeautifulSoup
+from jigsawstack import JigsawStack
+from jigsawstack.exceptions import JigsawStackError
+import os
 import logging
+from logging.handlers import RotatingFileHandler
 import time
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+import json
+import traceback
 
 app = Flask(__name__)
 CORS(app)
 
-def set_cookies(driver, cookies):
-    logger.info("Setting cookies...")
-    for cookie in cookies:
-        driver.add_cookie(cookie)
-    logger.info("Cookies set successfully.")
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+handler = RotatingFileHandler('app.log', maxBytes=100000, backupCount=5)
+handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+app.logger.addHandler(handler)
+app.logger.setLevel(logging.DEBUG)
 
-def scrape_linkedin_profile(driver, profile_url):
+# Initialize JigsawStack client
+jigsawstack = JigsawStack(api_key="sk_0cbf9d0b8bb72b6fd6b37b7ccbcd6ed0ce3dd4071085339a22446da533c9b924a416f333d14c22ce374fc49e07bfbed5ccb59a5cf33929ae48f8b71074bf8acc0240FLHWDqEs4KLg1S4Ua")
+
+def load_linkedin_cookies():
     try:
-        logger.info(f"Navigating to LinkedIn profile: {profile_url}")
-        driver.get(profile_url)
-        
-        # Wait for the page to load
-        time.sleep(5)
-        
-        logger.info("Extracting page source...")
-        page_source = driver.page_source
-        
-        # Optional: Save the page source to a file for inspection
-        with open("linkedin_profile.html", "w", encoding="utf-8") as file:
-            file.write(page_source)
-        
-        soup = BeautifulSoup(page_source, 'html.parser')
-        
-        logger.info("Extracting profile data...")
-        name_element = soup.find('li', {'class': 'inline t-24 t-black t-normal break-words'})
-        headline_element = soup.find('h2', {'class': 'mt1 t-18 t-black t-normal break-words'})
-        
-        # Check if elements are found before accessing text
-        name = name_element.text.strip() if name_element else "Name not found"
-        headline = headline_element.text.strip() if headline_element else "Headline not found"
-        
-        # Example: Extract additional data as needed
-        experience_section = soup.find('section', {'id': 'experience-section'})
-        experience = []
-        if experience_section:
-            positions = experience_section.find_all('li', {'class': 'pv-entity__position-group-pager'})
-            for position in positions:
-                company = position.find('p', {'class': 'pv-entity__secondary-title'}).text.strip() if position.find('p', {'class': 'pv-entity__secondary-title'}) else "Company not found"
-                role = position.find('h3', {'class': 't-16 t-black t-bold'}).text.strip() if position.find('h3', {'class': 't-16 t-black t-bold'}) else "Role not found"
-                experience.append({"company": company, "role": role})
-        
-        # Return extracted data
-        profile_data = {
-            "name": name,
-            "headline": headline,
-            "experience": experience
-        }
-        logger.info(f"Profile data extracted: {profile_data}")
-        return profile_data
-    except Exception as e:
-        logger.error(f"Failed to scrape profile: {str(e)}")
-        raise
+        with open('linkedin_cookies.json', 'r') as f:
+            cookies = json.load(f)
+        app.logger.debug(f"Loaded cookies: {json.dumps(cookies, indent=2)}")
+        return cookies
+    except FileNotFoundError:
+        app.logger.error("LinkedIn cookies file not found")
+        return []
+    except json.JSONDecodeError:
+        app.logger.error("Error decoding LinkedIn cookies JSON")
+        return []
 
-@app.route('/api/scrape_linkedin', methods=['POST'])
-def handle_scrape():
+@app.route('/scrape-linkedin', methods=['POST'])
+def scrape_linkedin():
+    start_time = time.time()
+    request_id = str(int(start_time * 1000))
+    app.logger.info(f"Request {request_id} received for LinkedIn scraping")
+
     data = request.json
-    profile_url = data.get('url')
+    app.logger.debug(f"Request {request_id}: Received data: {json.dumps(data, indent=2)}")
+
+    linkedin_url = data.get('linkedin_url')
     
-    if not profile_url:
-        return jsonify({"error": "URL is required"}), 400
+    if not linkedin_url:
+        app.logger.warning(f"Request {request_id} failed: LinkedIn URL is missing")
+        return jsonify({"error": "LinkedIn URL is required"}), 400
 
-    # Example session cookies (replace with your actual cookies)
-    cookies = [
-        {"name": "li_at", "value": "YOUR_SESSION_COOKIE", "domain": ".linkedin.com"},
-        # Add other relevant cookies if needed
-    ]
+    app.logger.info(f"Request {request_id}: Scraping URL - {linkedin_url}")
 
-    driver = None
     try:
-        logger.info("Starting Chrome driver...")
-        chrome_service = ChromeService(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=chrome_service)
-        
-        # Navigate to LinkedIn to set the cookies
-        driver.get('https://www.linkedin.com')
-        set_cookies(driver, cookies)
-        
-        # Navigate to the profile after setting cookies
-        profile_data = scrape_linkedin_profile(driver, profile_url)
-        
-        return jsonify(profile_data)
+        linkedin_cookies = load_linkedin_cookies()
+        app.logger.info(f"Request {request_id}: Loaded {len(linkedin_cookies)} LinkedIn cookies")
 
+        app.logger.info(f"Request {request_id}: Initiating JigsawStack AI scrape")
+        scrape_config = {
+            "url": linkedin_url,
+            "element_prompts": [
+                "Education (name of school)",
+                "Qualification (e.g. Bachelor's, Master's)",
+                "Work Experience (company name and role)"
+            ],
+            "advance_config": {
+                "wait_for": {
+                    "mode": "networkidle0"
+                },
+                "timeout": 30000,
+                "cookies": linkedin_cookies
+            }
+        }
+        app.logger.debug(f"Request {request_id}: Scrape config: {json.dumps(scrape_config, indent=2)}")
+
+        result = jigsawstack.web.ai_scrape(scrape_config)
+
+        app.logger.debug(f"Request {request_id}: Raw JigsawStack response: {json.dumps(result, indent=2)}")
+
+        if result.get('success'):
+            app.logger.info(f"Request {request_id}: Scraping successful")
+            scraped_data = result.get('data', {})
+            formatted_data = {
+                "Education": scraped_data.get("Education (name of school)", "Not found"),
+                "Qualification": scraped_data.get("Qualification (e.g. Bachelor's, Master's)", "Not found"),
+                "Work Experience": scraped_data.get("Work Experience (company name and role)", "Not found")
+            }
+            app.logger.info(f"Request {request_id}: Formatted data - {json.dumps(formatted_data, indent=2)}")
+            
+            end_time = time.time()
+            duration = end_time - start_time
+            app.logger.info(f"Request {request_id} completed in {duration:.2f} seconds")
+            
+            return jsonify(formatted_data), 200
+        else:
+            app.logger.error(f"Request {request_id}: Scraping failed - {json.dumps(result, indent=2)}")
+            return jsonify({"error": "Scraping failed", "details": result}), 500
+
+    except JigsawStackError as jse:
+        app.logger.error(f"Request {request_id}: JigsawStack error - {str(jse)}")
+        app.logger.debug(f"Request {request_id}: JigsawStack error traceback:\n{traceback.format_exc()}")
+        return jsonify({"error": "JigsawStack error", "details": str(jse)}), 400
     except Exception as e:
-        logger.error(f"Error during scraping: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        app.logger.exception(f"Request {request_id}: An unexpected error occurred during scraping")
+        app.logger.debug(f"Request {request_id}: Unexpected error traceback:\n{traceback.format_exc()}")
+        return jsonify({"error": "Unexpected error", "details": str(e)}), 500
 
-    finally:
-        if driver:
-            logger.info("Closing browser...")
-            driver.quit()
+@app.route('/health', methods=['GET'])
+def health_check():
+    app.logger.info("Health check endpoint accessed")
+    return jsonify({"status": "healthy"}), 200
 
 if __name__ == '__main__':
-    logger.info("Starting Flask app...")
+    app.logger.info("Starting the LinkedIn Scraper Server")
     app.run(debug=True)

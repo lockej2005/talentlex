@@ -13,6 +13,9 @@ const Profile = () => {
     { id: 1, name: 'Year 1', expanded: false, subjects: [{ name: '', grade: '' }] }
   ]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isScrapingLinkedIn, setIsScrapingLinkedIn] = useState(false);
+  const [scrapedLinkedInData, setScrapedLinkedInData] = useState(null);
+  const [scrapeError, setScrapeError] = useState(null);
 
   useEffect(() => {
     fetchUserProfile();
@@ -172,9 +175,37 @@ const Profile = () => {
     setYears(updatedYears);
   };
 
-  const handleScrapeLinkedIn = () => {
-    // Implement LinkedIn scraping logic here
-    console.log('Scraping LinkedIn profile:', linkedInUrl);
+  const handleScrapeLinkedIn = async () => {
+    if (!linkedInUrl) {
+      setScrapeError("Please enter a LinkedIn URL");
+      return;
+    }
+
+    setIsScrapingLinkedIn(true);
+    setScrapeError(null);
+    setScrapedLinkedInData(null);
+
+    try {
+      const response = await fetch('http://localhost:5000/scrape-linkedin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ linkedin_url: linkedInUrl }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to scrape LinkedIn profile');
+      }
+
+      const data = await response.json();
+      setScrapedLinkedInData(data);
+    } catch (error) {
+      console.error('Error scraping LinkedIn:', error);
+      setScrapeError(error.message);
+    } finally {
+      setIsScrapingLinkedIn(false);
+    }
   };
 
   return (
@@ -277,7 +308,22 @@ const Profile = () => {
           onChange={(e) => setLinkedInUrl(e.target.value)}
           placeholder="Enter LinkedIn URL"
         />
-        <button className="scrape-button-profile" onClick={handleScrapeLinkedIn}>Scrape LinkedIn Coming Soon...</button>
+        <button 
+          className="scrape-button-profile" 
+          onClick={handleScrapeLinkedIn}
+          disabled={isScrapingLinkedIn}
+        >
+          {isScrapingLinkedIn ? 'Scraping...' : 'Scrape LinkedIn'}
+        </button>
+        {scrapeError && <p className="scrape-error">{scrapeError}</p>}
+        {scrapedLinkedInData && (
+          <div className="scraped-data">
+            <h4>Scraped LinkedIn Data:</h4>
+            <p><strong>Education:</strong> {scrapedLinkedInData.Education}</p>
+            <p><strong>Qualification:</strong> {scrapedLinkedInData.Qualification}</p>
+            <p><strong>Work Experience:</strong> {scrapedLinkedInData.WorkExperience}</p>
+          </div>
+        )}
       </div>
     </div>
   );
