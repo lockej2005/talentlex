@@ -223,7 +223,7 @@ const Profile = () => {
             </button>
           </div>
           <div className="input-group-profile">
-            <label className="profile-label">Education:</label>
+            <label className="profile-label">University at Undergraduate Level:</label>
             <input
               type="text"
               className="profile-input"
@@ -233,7 +233,7 @@ const Profile = () => {
             />
           </div>
           <div className="input-group-profile">
-            <label className="profile-label">Sub Categories: Undergraduate, Masters or Both</label>
+            <label className="profile-label">Degree/Field Studied</label>
             <textarea
               className="profile-input profile-textarea subcategories-input"
               value={subCategories}
@@ -289,7 +289,7 @@ const Profile = () => {
             <button className="add-year-profile" onClick={addYear}>+ Add Year</button>
           </div>
           <div className="input-group-profile">
-            <label className="profile-label">Work Experience:</label>
+            <label className="profile-label">Work Experience (Bullet Point format):</label>
             <textarea
               className="profile-textarea"
               value={workExperience}
