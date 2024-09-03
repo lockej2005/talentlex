@@ -63,17 +63,20 @@ const QueryPage = () => {
   };
 
   useEffect(() => {
-    if (selectedFirm && selectedQuestion) {
-      fetchQueryResults();
-    }
+    fetchQueryResults();
   }, [selectedFirm, selectedQuestion, selectedTable, sortBy, showUniqueOnly]);
 
   const fetchQueryResults = async () => {
     let query = supabase
       .from(selectedTable.value)
-      .select('*', { count: 'exact' })
-      .eq('firm', selectedFirm.value)
-      .eq('question', selectedQuestion.value);
+      .select('*', { count: 'exact' });
+
+    if (selectedFirm) {
+      query = query.eq('firm', selectedFirm.value);
+    }
+    if (selectedQuestion) {
+      query = query.eq('question', selectedQuestion.value);
+    }
 
     if (sortBy.value === 'newest') {
       query = query.order('timestamp', { ascending: false });
@@ -134,7 +137,7 @@ const QueryPage = () => {
     if (selectedTable.value === 'applications') {
       return (
         <div className="result-item">
-          <h4>Application {item.id}</h4>
+          <h4>Application {item.id} | {item.firm} | {item.question}</h4>
           <p><strong>Email:</strong> {item.email}</p>
           <p><strong>Application Text:</strong> {item.application_text}</p>
           <p><strong>Feedback:</strong> {item.feedback}</p>
@@ -144,7 +147,7 @@ const QueryPage = () => {
     } else {
       return (
         <div className="result-item">
-          <h4>Draft Generation {item.id}</h4>
+          <h4>Draft Generation {item.id} | {item.firm} | {item.question}</h4>
           <p><strong>Email:</strong> {item.email}</p>
           <p><strong>Key Reasons:</strong> {item.key_reasons}</p>
           <p><strong>Relevant Experience:</strong> {item.relevant_experience}</p>
@@ -176,7 +179,8 @@ const QueryPage = () => {
           }}
           options={firms}
           styles={customStyles}
-          placeholder="Select firm"
+          placeholder="Select firm (optional)"
+          isClearable
         />
         <Select
           value={selectedQuestion}
@@ -184,7 +188,8 @@ const QueryPage = () => {
           options={selectedFirm ? questions[selectedFirm.value] : []}
           styles={customStyles}
           isDisabled={!selectedFirm}
-          placeholder="Select question"
+          placeholder="Select question (optional)"
+          isClearable
         />
         <Select
           value={sortBy}
