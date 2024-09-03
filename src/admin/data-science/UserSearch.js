@@ -7,6 +7,7 @@ const UserSearch = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [contributions, setContributions] = useState({});
+  const [activities, setActivities] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const searchInputRef = useRef(null);
@@ -24,6 +25,7 @@ const UserSearch = () => {
   useEffect(() => {
     if (selectedUser) {
       fetchUserContributions(selectedUser.email);
+      fetchUserActivities(selectedUser.email);
     }
   }, [selectedUser]);
 
@@ -43,8 +45,8 @@ const UserSearch = () => {
   const fetchSuggestions = async () => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, name')
-      .ilike('name', `%${searchTerm}%`)
+      .select('id, name, email')
+      .or(`name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%`)
       .limit(5);
 
     if (error) {
@@ -97,6 +99,43 @@ const UserSearch = () => {
     });
 
     setContributions(contributionsByDate);
+    setIsLoading(false);
+  };
+
+  const fetchUserActivities = async (email) => {
+    setIsLoading(true);
+    
+    const [draftsResponse, applicationsResponse] = await Promise.all([
+      supabase
+        .from('draft_generations')
+        .select('*')
+        .eq('email', email)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('applications')
+        .select('*')
+        .eq('email', email)
+        .order('timestamp', { ascending: false }),
+    ]);
+
+    const draftsData = draftsResponse.data || [];
+    const applicationsData = applicationsResponse.data || [];
+
+    const allActivities = [
+      ...draftsData.map(item => ({
+        ...item,
+        type: 'Draft',
+        date: new Date(item.created_at),
+      })),
+      ...applicationsData.map(item => ({
+        ...item,
+        type: 'Application Review',
+        date: new Date(item.timestamp),
+      })),
+    ];
+
+    allActivities.sort((a, b) => b.date - a.date);
+    setActivities(allActivities);
     setIsLoading(false);
   };
 
@@ -218,6 +257,60 @@ const UserSearch = () => {
     );
   };
 
+  const renderActivityAccordion = () => {
+    if (!activities || activities.length === 0) return <p>No activities found for this user.</p>;
+
+    const truncate = (str, n) => {
+      if (!str) return ''; // Return empty string if str is null or undefined
+      return (str.length > n) ? str.substr(0, n-1) + '...' : str;
+    };
+
+    return (
+      <div className="activity-accordion">
+        <h3>User Activities</h3>
+        {activities.map((activity, index) => (
+          <details key={index} className="activity-item">
+            <summary>
+              <span className="activity-date">
+                {activity.date.toLocaleString('en-US', {
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  second: 'numeric',
+                  hour12: true,
+                  weekday: 'short',
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit'
+                })}
+              </span>
+              <span className="activity-type">{activity.type}</span>
+            </summary>
+            <div className="activity-details">
+              {activity.type === 'Draft' ? (
+                <>
+                  <p><strong>Question:</strong> {truncate(activity.question, 100)}</p>
+                  <p><strong>Key Reasons:</strong> {truncate(activity.key_reasons, 100)}</p>
+                  <p><strong>Relevant Experience:</strong> {truncate(activity.relevant_experience, 100)}</p>
+                  <p><strong>Relevant Interests:</strong> {truncate(activity.relevant_interests, 100)}</p>
+                  <p><strong>Personal Info:</strong> {truncate(activity.personal_info, 100)}</p>
+                  <p><strong>Generated Draft:</strong> {activity.generated_draft}</p>
+                </>
+              ) : (
+                <>
+                  <p><strong>Question:</strong> {activity.question}</p>
+                  <p><strong>Feedback:</strong> {activity.feedback}</p>
+                  <p><strong>Device:</strong> {activity.device || 'N/A'}</p>
+                  <p><strong>Screen Size:</strong> {activity.screen_size || 'N/A'}</p>
+                  <p><strong>Application Text:</strong> {activity.application_text}</p>
+                </>
+              )}
+            </div>
+          </details>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="user-search-admin">
       <h2>User Search</h2>
@@ -227,14 +320,14 @@ const UserSearch = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onFocus={() => setShowDropdown(true)}
-          placeholder="Search by name"
+          placeholder="Search by name or email"
           className="search-input"
         />
         {showDropdown && suggestions.length > 0 && (
           <ul className="suggestions-list">
             {suggestions.map((user) => (
               <li key={user.id} onClick={() => handleSelectUser(user)}>
-                {user.name}
+                {user.name} | {user.email}
               </li>
             ))}
           </ul>
@@ -247,6 +340,7 @@ const UserSearch = () => {
           <div className="user-details">
             {renderUserProfile()}
             {renderContributionHistory()}
+            {renderActivityAccordion()}
           </div>
         )
       )}

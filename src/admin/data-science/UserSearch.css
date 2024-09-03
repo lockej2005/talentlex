@@ -1,13 +1,25 @@
-.user-search-admin {
+:root {
+    --primary-color: #276D8B;
+    --background-color: #E4E4E4;
+    --sidebar-color: #f0f0f0;
+    --text-color: #333;
+    --border-color: #e0e0e0;
+    --hover-color: #d32f2f;
+  }
+  
+  .user-search-admin {
     padding: 20px;
-    background-color: #f6f8fa;
+    background-color: var(--background-color);
     min-height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    color: var(--text-color);
   }
   
   .user-search-admin h2 {
-    color: #24292e;
+    color: var(--primary-color);
     margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
   }
   
   .search-container {
@@ -19,8 +31,8 @@
     width: 100%;
     padding: 10px;
     font-size: 16px;
-    border: 1px solid #e1e4e8;
-    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
     background-color: #ffffff;
   }
   
@@ -30,9 +42,9 @@
     left: 0;
     right: 0;
     background-color: #ffffff;
-    border: 1px solid #e1e4e8;
+    border: 1px solid var(--border-color);
     border-top: none;
-    border-radius: 0 0 6px 6px;
+    border-radius: 0 0 4px 4px;
     list-style-type: none;
     padding: 0;
     margin: 0;
@@ -47,7 +59,7 @@
   }
   
   .suggestions-list li:hover {
-    background-color: #f6f8fa;
+    background-color: var(--sidebar-color);
   }
   
   .user-details {
@@ -55,35 +67,36 @@
     border-radius: 6px;
     padding: 20px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    margin-bottom: 20px;
   }
   
   .user-profile h2 {
-    color: #24292e;
+    color: var(--primary-color);
     margin-bottom: 15px;
   }
   
   .user-profile p {
     margin: 10px 0;
-    color: #586069;
+    color: var(--text-color);
   }
   
   .contribution-history {
     margin-top: 30px;
     max-width: 900px;
-
+    margin-left: auto;
+    margin-right: auto;
   }
   
   .contribution-history h3 {
-    color: #24292e;
+    color: var(--primary-color);
     margin-bottom: 15px;
   }
   
   .contribution-graph {
     display: flex;
-    border: 1px solid #e1e4e8;
+    border: 1px solid var(--border-color);
     border-radius: 3px;
     overflow: hidden;
-    padding-top: 20px;
   }
   
   .graph-labels {
@@ -91,14 +104,14 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 10px 5px;
-    background-color: #f6f8fa;
-    border-right: 1px solid #e1e4e8;
+    background-color: var(--sidebar-color);
+    border-right: 1px solid var(--border-color);
   }
   
   .day-label {
     height: 15px;
     font-size: 9px;
-    color: #767676;
+    color: var(--text-color);
     text-align: right;
     line-height: 15px;
   }
@@ -129,7 +142,7 @@
     bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #24292e;
+    background-color: var(--primary-color);
     color: #ffffff;
     padding: 5px 10px;
     border-radius: 3px;
@@ -151,7 +164,7 @@
     justify-content: space-between;
     padding: 5px 20px;
     font-size: 10px;
-    color: #767676;
+    color: var(--text-color);
   }
   
   .contribution-summary {
@@ -160,7 +173,7 @@
     justify-content: flex-end;
     margin-top: 16px;
     font-size: 11px;
-    color: #767676;
+    color: var(--text-color);
   }
   
   .contribution-scale {
@@ -177,10 +190,70 @@
   }
   
   .level-0 { background-color: #ebedf0; }
-  .level-1 { background-color: #9be9a8; }
-  .level-2 { background-color: #40c463; }
-  .level-3 { background-color: #30a14e; }
-  .level-4 { background-color: #216e39; }
+  .level-1 { background-color: #c6e48b; }
+  .level-2 { background-color: #7bc96f; }
+  .level-3 { background-color: #239a3b; }
+  .level-4 { background-color: #196127; }
+  
+  /* Activity Accordion Styles */
+  .activity-accordion {
+    margin-top: 30px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .activity-accordion h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+  }
+  
+  .activity-item {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  
+  .activity-item summary {
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--sidebar-color);
+    transition: background-color 0.3s ease;
+  }
+  
+  .activity-item summary:hover {
+    background-color: #e1e1e1;
+  }
+  
+  .activity-item[open] summary {
+    background-color: var(--primary-color);
+    color: #ffffff;
+  }
+  
+  .activity-date {
+    font-weight: bold;
+  }
+  
+  .activity-type {
+    font-style: italic;
+  }
+  
+  .activity-details {
+    padding: 15px;
+    background-color: #ffffff;
+  }
+  
+  .activity-details p {
+    margin: 10px 0;
+  }
+  
+  .activity-details strong {
+    color: var(--primary-color);
+  }
   
   /* Tooltip arrow */
   .contribution-day::before {
@@ -191,7 +264,7 @@
     transform: translateX(-50%);
     border-width: 5px;
     border-style: solid;
-    border-color: transparent transparent #24292e transparent;
+    border-color: transparent transparent var(--primary-color) transparent;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.2s, visibility 0.2s;
@@ -204,7 +277,8 @@
   
   /* Responsive adjustments */
   @media (max-width: 768px) {
-    .contribution-history {
+    .contribution-history,
+    .activity-accordion {
       max-width: 100%;
       overflow-x: auto;
     }
@@ -225,11 +299,21 @@
     .month-labels {
       font-size: 9px;
     }
+  
+    .activity-item summary {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .activity-type {
+      margin-top: 5px;
+    }
   }
   
   /* Accessibility improvements */
-  .contribution-day:focus {
-    outline: 2px solid #0366d6;
+  .contribution-day:focus,
+  .activity-item summary:focus {
+    outline: 2px solid var(--primary-color);
     outline-offset: 2px;
   }
   
@@ -239,12 +323,22 @@
       background-color: #ffffff;
     }
   
-    .contribution-graph {
+    .contribution-graph,
+    .activity-accordion {
       page-break-inside: avoid;
     }
   
     .contribution-day::after,
     .contribution-day::before {
       display: none;
+    }
+  
+    .activity-item summary {
+      background-color: var(--sidebar-color) !important;
+      color: var(--text-color) !important;
+    }
+  
+    .activity-item[open] summary {
+      border-bottom: 1px solid var(--border-color);
     }
   }
