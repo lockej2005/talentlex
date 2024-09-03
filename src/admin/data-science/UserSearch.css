@@ -83,8 +83,7 @@
   .contribution-history {
     margin-top: 30px;
     max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
+
   }
   
   .contribution-history h3 {
@@ -195,10 +194,8 @@
   .level-3 { background-color: #239a3b; }
   .level-4 { background-color: #196127; }
   
-  /* Activity Accordion Styles */
   .activity-accordion {
     margin-top: 30px;
-    max-width: 900px;
     margin-left: auto;
     margin-right: auto;
   }
@@ -218,9 +215,6 @@
   .activity-item summary {
     padding: 15px;
     cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     background-color: var(--sidebar-color);
     transition: background-color 0.3s ease;
   }
@@ -230,8 +224,14 @@
   }
   
   .activity-item[open] summary {
-    background-color: var(--primary-color);
-    color: #ffffff;
+    background-color: #0b3a4e;
+    color: #ffffff !important;
+  }
+  
+  .activity-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   
   .activity-date {
@@ -240,6 +240,13 @@
   
   .activity-type {
     font-style: italic;
+  }
+  
+  .activity-snippet {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #666;
+    line-height: 1.4;
   }
   
   .activity-details {
@@ -300,13 +307,17 @@
       font-size: 9px;
     }
   
-    .activity-item summary {
+    .activity-summary-row {
       flex-direction: column;
       align-items: flex-start;
     }
   
     .activity-type {
       margin-top: 5px;
+    }
+  
+    .activity-snippet {
+      margin-top: 10px;
     }
   }
   

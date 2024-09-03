@@ -178,18 +178,18 @@ const UserSearch = () => {
 
   const renderContributionHistory = () => {
     if (!contributions || Object.keys(contributions).length === 0) return <p>No activity found for this user.</p>;
-
+  
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
+  
     const contributionDays = Object.keys(contributions).map(date => ({
       date: new Date(date),
       count: contributions[date],
     }));
-
+  
     const firstDate = new Date(contributionDays[0].date);
     firstDate.setDate(firstDate.getDate() - firstDate.getDay() + 1); // Start from Monday
-
+  
     const weeks = [];
     for (let i = 0; i < 53; i++) {
       const week = [];
@@ -204,7 +204,7 @@ const UserSearch = () => {
       }
       weeks.push(week);
     }
-
+  
     const getContributionLevel = (count) => {
       if (count === 0) return 0;
       if (count < 5) return 1;
@@ -212,12 +212,12 @@ const UserSearch = () => {
       if (count < 15) return 3;
       return 4;
     };
-
+  
     const formatDate = (date) => {
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
       return date.toLocaleDateString(undefined, options);
     };
-
+  
     return (
       <div className="contribution-history">
         <h3>Activity History</h3>
@@ -262,7 +262,21 @@ const UserSearch = () => {
 
     const truncate = (str, n) => {
       if (!str) return ''; // Return empty string if str is null or undefined
-      return (str.length > n) ? str.substr(0, n-1) + '...' : str;
+      const words = str.split(' ');
+      return words.length > n ? words.slice(0, n).join(' ') + '...' : str;
+    };
+
+    const getSnippet = (activity) => {
+      if (activity.type === 'Application Review') {
+        return truncate(activity.application_text, 50);
+      } else {
+        return [
+          truncate(activity.key_reasons, 25),
+          truncate(activity.relevant_experience, 25),
+          truncate(activity.relevant_interests, 25),
+          truncate(activity.personal_info, 25)
+        ].join(' | ');
+      }
     };
 
     return (
@@ -271,28 +285,31 @@ const UserSearch = () => {
         {activities.map((activity, index) => (
           <details key={index} className="activity-item">
             <summary>
-              <span className="activity-date">
-                {activity.date.toLocaleString('en-US', {
-                  hour: 'numeric',
-                  minute: 'numeric',
-                  second: 'numeric',
-                  hour12: true,
-                  weekday: 'short',
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit'
-                })}
-              </span>
-              <span className="activity-type">{activity.type}</span>
+              <div className="activity-summary-row">
+                <span className="activity-date">
+                  {activity.date.toLocaleString('en-US', {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric',
+                    hour12: true,
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                  })}
+                </span>
+                <span className="activity-type">{activity.type}</span>
+              </div>
+              <div className="activity-snippet">{getSnippet(activity)}</div>
             </summary>
             <div className="activity-details">
               {activity.type === 'Draft' ? (
                 <>
-                  <p><strong>Question:</strong> {truncate(activity.question, 100)}</p>
-                  <p><strong>Key Reasons:</strong> {truncate(activity.key_reasons, 100)}</p>
-                  <p><strong>Relevant Experience:</strong> {truncate(activity.relevant_experience, 100)}</p>
-                  <p><strong>Relevant Interests:</strong> {truncate(activity.relevant_interests, 100)}</p>
-                  <p><strong>Personal Info:</strong> {truncate(activity.personal_info, 100)}</p>
+                  <p><strong>Question:</strong> {activity.question}</p>
+                  <p><strong>Key Reasons:</strong> {activity.key_reasons}</p>
+                  <p><strong>Relevant Experience:</strong> {activity.relevant_experience}</p>
+                  <p><strong>Relevant Interests:</strong> {activity.relevant_interests}</p>
+                  <p><strong>Personal Info:</strong> {activity.personal_info}</p>
                   <p><strong>Generated Draft:</strong> {activity.generated_draft}</p>
                 </>
               ) : (
