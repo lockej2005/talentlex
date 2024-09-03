@@ -129,8 +129,159 @@
 .welcome-text-admin {
   font-size: 16px;
   color: #333;
+  margin-bottom: 30px;
 }
 
+/* Contribution History Styles */
+.contribution-history-admin {
+  margin-top: 30px;
+  max-width: 900px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.contribution-history-admin h3 {
+  color: #276D8B;
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+.contribution-graph-admin {
+  display: flex;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+  padding-top: 20px;
+}
+
+.graph-labels-admin {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 5px;
+  background-color: #f0f0f0;
+  border-right: 1px solid #e0e0e0;
+}
+
+.day-label-admin {
+  height: 15px;
+  font-size: 9px;
+  color: #333;
+  text-align: right;
+  line-height: 15px;
+}
+
+.graph-body-admin {
+  display: flex;
+  flex-grow: 1;
+  padding: 5px;
+}
+
+.graph-week-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contribution-day-admin {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin: 1px;
+  position: relative;
+}
+
+.contribution-day-admin::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #276D8B;
+  color: #ffffff;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  z-index: 1000;
+}
+
+.contribution-day-admin:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ... (previous styles remain the same) ... */
+
+.month-labels-admin {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 20px;
+  font-size: 10px;
+  color: #333;
+}
+
+.contribution-summary-admin {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 16px;
+  font-size: 11px;
+  color: #333;
+}
+
+.contribution-scale-admin {
+  display: flex;
+  list-style-type: none;
+  margin: 0 8px;
+  padding: 0;
+}
+
+.contribution-scale-admin li {
+  width: 10px;
+  height: 10px;
+  margin-right: 2px;
+}
+
+.level-0-admin { background-color: #ebedf0; }
+.level-1-admin { background-color: #c6e48b; }
+.level-2-admin { background-color: #7bc96f; }
+.level-3-admin { background-color: #239a3b; }
+.level-4-admin { background-color: #196127; }
+
+.today-signups-admin {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #276D8B;
+  font-weight: bold;
+}
+
+/* Tooltip arrow */
+.contribution-day-admin::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #276D8B transparent;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+.contribution-day-admin:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .sidebar-admin {
     position: fixed;
@@ -161,5 +312,60 @@
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 999;
+  }
+
+  .contribution-history-admin {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .contribution-graph-admin {
+    min-width: 700px;
+  }
+
+  .contribution-day-admin {
+    width: 8px;
+    height: 8px;
+  }
+
+  .day-label-admin {
+    font-size: 8px;
+  }
+
+  .month-labels-admin {
+    font-size: 9px;
+  }
+}
+
+/* Accessibility improvements */
+.contribution-day-admin:focus,
+.nav-item-admin a:focus,
+.logout-btn-admin:focus,
+.menu-toggle-admin:focus {
+  outline: 2px solid #276D8B;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .layout-admin {
+    display: block;
+  }
+
+  .sidebar-admin {
+    display: none;
+  }
+
+  .main-content-admin {
+    padding: 0;
+  }
+
+  .contribution-history-admin {
+    page-break-inside: avoid;
+  }
+
+  .contribution-day-admin::after,
+  .contribution-day-admin::before {
+    display: none;
   }
 }
