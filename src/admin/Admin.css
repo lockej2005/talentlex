@@ -166,11 +166,11 @@
 }
 
 .day-label-admin {
-  height: 15px;
+  height: 14px;
   font-size: 9px;
   color: #333;
   text-align: right;
-  line-height: 15px;
+  line-height: 0px;
 }
 
 .graph-body-admin {

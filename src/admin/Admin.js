@@ -12,10 +12,14 @@ const Admin = () => {
   const [showOverlay, setShowOverlay] = useState(false);
   const [signupData, setSignupData] = useState({});
   const [todaySignups, setTodaySignups] = useState(0);
+  const [applicationData, setApplicationData] = useState({});
+  const [todayApplications, setTodayApplications] = useState(0);
+  const [todayDraftGenerations, setTodayDraftGenerations] = useState(0);
   const location = useLocation();
 
   useEffect(() => {
     fetchSignupData();
+    fetchApplicationData();
   }, []);
 
   const getDateString = (date) => {
@@ -62,10 +66,73 @@ const Admin = () => {
       }
     });
 
-    console.log('Signup data:', signupsByDate); // For debugging
-
     setSignupData(signupsByDate);
     setTodaySignups(todayCount);
+  };
+
+  const fetchApplicationData = async () => {
+    const now = new Date();
+    const endDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
+    const startDate = new Date(endDate);
+    startDate.setUTCDate(startDate.getUTCDate() - 365);
+
+    const { data: applicationData, error: applicationError } = await supabase
+      .from('applications')
+      .select('created_at')
+      .gte('created_at', startDate.toISOString())
+      .lte('created_at', endDate.toISOString());
+
+    const { data: draftGenerationData, error: draftGenerationError } = await supabase
+      .from('applications')
+      .select('timestamp')
+      .gte('timestamp', startDate.toISOString())
+      .lte('timestamp', endDate.toISOString());
+
+    if (applicationError || draftGenerationError) {
+      console.error('Error fetching application data:', applicationError || draftGenerationError);
+      return;
+    }
+
+    const applicationsByDate = {};
+    let todayApplicationCount = 0;
+    let todayDraftGenerationCount = 0;
+    const todayPDT = getDateString(new Date(now.getTime() - 7 * 60 * 60 * 1000));
+
+    // Initialize applicationsByDate with all dates in the range
+    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+      const pdtDate = getDateString(new Date(d.getTime() - 7 * 60 * 60 * 1000));
+      applicationsByDate[pdtDate] = { applications: 0, draftGenerations: 0 };
+    }
+
+    // Count applications for each day
+    applicationData.forEach(item => {
+      const pdtDate = getDateString(new Date(new Date(item.created_at).getTime() - 7 * 60 * 60 * 1000));
+      
+      if (applicationsByDate[pdtDate] !== undefined) {
+        applicationsByDate[pdtDate].applications++;
+      }
+      
+      if (pdtDate === todayPDT) {
+        todayApplicationCount++;
+      }
+    });
+
+    // Count draft generations for each day
+    draftGenerationData.forEach(item => {
+      const pdtDate = getDateString(new Date(new Date(item.timestamp).getTime() - 7 * 60 * 60 * 1000));
+      
+      if (applicationsByDate[pdtDate] !== undefined) {
+        applicationsByDate[pdtDate].draftGenerations++;
+      }
+      
+      if (pdtDate === todayPDT) {
+        todayDraftGenerationCount++;
+      }
+    });
+
+    setApplicationData(applicationsByDate);
+    setTodayApplications(todayApplicationCount);
+    setTodayDraftGenerations(todayDraftGenerationCount);
   };
 
   const toggleMenu = () => {
@@ -78,20 +145,23 @@ const Admin = () => {
     setShowOverlay(false);
   };
 
-  const renderContributionHistory = () => {
-    if (!signupData || Object.keys(signupData).length === 0) return null;
+  const renderContributionHistory = (data, title, todayCount, countType) => {
+    if (!data || Object.keys(data).length === 0) return null;
 
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    const contributionDays = Object.keys(signupData).map(date => ({
-      date: new Date(date),
-      count: signupData[date],
+    const contributionDays = Object.keys(data).map(date => ({
+      date: new Date(date + 1),
+      count: countType ? data[date][countType] : data[date],
     }));
+
+    // Sort contributionDays by date
+    contributionDays.sort((a, b) => a.date - b.date);
 
     const lastDate = new Date(contributionDays[contributionDays.length - 1].date);
     const firstDate = new Date(lastDate);
-    firstDate.setDate(firstDate.getDate() - 357); // 51 weeks + 1 day to ensure we have 52 weeks
+    firstDate.setDate(firstDate.getDate() - 358); // 51 weeks + 1 day to ensure we have 52 weeks
 
     const weeks = [];
     for (let i = 0; i < 52; i++) {
@@ -102,7 +172,7 @@ const Admin = () => {
         const dateString = getDateString(currentDate);
         week.push({
           date: currentDate,
-          count: signupData[dateString] || 0,
+          count: countType ? (data[dateString] ? data[dateString][countType] : 0) : (data[dateString] || 0),
         });
       }
       weeks.push(week);
@@ -123,7 +193,7 @@ const Admin = () => {
 
     return (
       <div className="contribution-history-admin">
-        <h3>Sign Ups</h3>
+        <h3>{title}</h3>
         <div className="contribution-graph-admin">
           <div className="graph-labels-admin">
             {days.map(day => <div key={day} className="day-label-admin">{day}</div>)}
@@ -135,7 +205,7 @@ const Admin = () => {
                   <div
                     key={dayIndex}
                     className={`contribution-day-admin level-${getContributionLevel(day.count)}-admin`}
-                    data-tooltip={`${day.count} ${day.count === 1 ? 'signup' : 'signups'} on ${formatDate(day.date)}`}
+                    data-tooltip={`${day.count} ${day.count === 1 ? countType || 'item' : (countType + 's') || 'items'} on ${formatDate(day.date)}`}
                   />
                 ))}
               </div>
@@ -156,7 +226,7 @@ const Admin = () => {
           </ul>
           <span>More</span>
         </div>
-        <p className="today-signups-admin">{todaySignups} signups today so far</p>
+        <p className="today-signups-admin">{todayCount} {countType || 'items'} today so far</p>
       </div>
     );
   };
@@ -200,7 +270,8 @@ const Admin = () => {
               <>
                 <h1 className="page-title-admin">Admin Dashboard</h1>
                 <p className="welcome-text-admin">Welcome to the TalentLex Admin Dashboard. Use the Query Page to access and analyze data, the User Search to find and view user profiles, or check the User Leaderboard to see top contributors.</p>
-                {renderContributionHistory()}
+                {renderContributionHistory(signupData, "Sign Ups", todaySignups)}
+                {renderContributionHistory(applicationData, "Applications and Draft Generations", `${todayApplications} applications, ${todayDraftGenerations} draft generations`, "applications")}
               </>
             } />
             <Route path="/query" element={<QueryPage />} />
