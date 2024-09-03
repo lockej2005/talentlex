@@ -67,6 +67,8 @@ const QueryPage = () => {
   }, [selectedFirm, selectedQuestion, selectedTable, sortBy, showUniqueOnly]);
 
   const fetchQueryResults = async () => {
+    const timeColumn = selectedTable.value === 'applications' ? 'timestamp' : 'created_at';
+    
     let query = supabase
       .from(selectedTable.value)
       .select('*', { count: 'exact' });
@@ -79,9 +81,9 @@ const QueryPage = () => {
     }
 
     if (sortBy.value === 'newest') {
-      query = query.order('timestamp', { ascending: false });
+      query = query.order(timeColumn, { ascending: false });
     } else {
-      query = query.order('timestamp', { ascending: true });
+      query = query.order(timeColumn, { ascending: true });
     }
 
     let { data, error, count } = await query;
@@ -108,7 +110,7 @@ const QueryPage = () => {
   };
 
   const renderResultItem = (item) => {
-    const timestamp = new Date(item.timestamp).toLocaleString();
+    const timestamp = new Date(item.timestamp || item.created_at).toLocaleString();
     const contentSnippet = (item.application_text || item.generated_draft || '').slice(0, 100) + '...';
 
     if (displayMode.value === 'compact') {
@@ -132,7 +134,7 @@ const QueryPage = () => {
   };
 
   const renderFullContent = (item) => {
-    const timestamp = new Date(item.timestamp).toLocaleString();
+    const timestamp = new Date(item.timestamp || item.created_at).toLocaleString();
 
     if (selectedTable.value === 'applications') {
       return (
