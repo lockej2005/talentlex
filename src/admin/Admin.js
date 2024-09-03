@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import QueryPage from './data-science/QueryPage';
 import UserSearch from './data-science/UserSearch';
 import UserLeaderboard from './UserLeaderboard';
@@ -15,12 +16,15 @@ const Admin = () => {
   const [activityData, setActivityData] = useState({});
   const [todayApplications, setTodayApplications] = useState(0);
   const [todayDraftGenerations, setTodayDraftGenerations] = useState(0);
+  const [firmPopularityData, setFirmPopularityData] = useState([]);
+  const [timeRange, setTimeRange] = useState('total');
   const location = useLocation();
 
   useEffect(() => {
     fetchSignupData();
     fetchActivityData();
-  }, []);
+    fetchFirmPopularityData();
+  }, [timeRange]);
 
   const getDateString = (date) => {
     return date.toISOString().split('T')[0];
@@ -135,6 +139,71 @@ const Admin = () => {
     setTodayDraftGenerations(todayDraftGenerationCount);
   };
 
+  const fetchFirmPopularityData = async () => {
+    let startDate;
+    const now = new Date();
+    const endDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
+
+    switch (timeRange) {
+      case 'today':
+        startDate = new Date(endDate);
+        startDate.setUTCHours(0, 0, 0, 0);
+        break;
+      case 'week':
+        startDate = new Date(endDate);
+        startDate.setDate(startDate.getDate() - 7);
+        break;
+      case 'month':
+        startDate = new Date(endDate);
+        startDate.setMonth(startDate.getMonth() - 1);
+        break;
+      case 'total':
+      default:
+        startDate = null;
+        break;
+    }
+
+    const draftQuery = supabase
+      .from('draft_generations')
+      .select('firm')
+      .not('firm', 'is', null);
+
+    const applicationsQuery = supabase
+      .from('applications')
+      .select('firm')
+      .not('firm', 'is', null);
+
+    if (startDate) {
+      draftQuery.gte('created_at', startDate.toISOString());
+      applicationsQuery.gte('timestamp', startDate.toISOString());
+    }
+
+    draftQuery.lte('created_at', endDate.toISOString());
+    applicationsQuery.lte('timestamp', endDate.toISOString());
+
+    const [{ data: draftData, error: draftError }, { data: applicationsData, error: applicationsError }] = await Promise.all([
+      draftQuery,
+      applicationsQuery
+    ]);
+
+    if (draftError || applicationsError) {
+      console.error('Error fetching firm popularity data:', draftError || applicationsError);
+      return;
+    }
+
+    const firmCounts = {};
+    [...draftData, ...applicationsData].forEach(item => {
+      firmCounts[item.firm] = (firmCounts[item.firm] || 0) + 1;
+    });
+
+    const sortedData = Object.entries(firmCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10)
+      .map(([firm, count]) => ({ firm, count }));
+
+    setFirmPopularityData(sortedData);
+  };
+
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
     setShowOverlay(!menuOpen);
@@ -233,6 +302,28 @@ const Admin = () => {
     );
   };
 
+  const renderFirmPopularityTracker = () => {
+    return (
+      <div className="firm-popularity-tracker-admin">
+        <h3>Firm Popularity Tracker</h3>
+        <div className="time-range-selector-admin">
+          <button onClick={() => setTimeRange('today')} className={timeRange === 'today' ? 'active-admin' : ''}>Today</button>
+          <button onClick={() => setTimeRange('week')} className={timeRange === 'week' ? 'active-admin' : ''}>This Week</button>
+          <button onClick={() => setTimeRange('month')} className={timeRange === 'month' ? 'active-admin' : ''}>This Month</button>
+          <button onClick={() => setTimeRange('total')} className={timeRange === 'total' ? 'active-admin' : ''}>Total</button>
+        </div>
+        <ResponsiveContainer width="100%" height={400}>
+          <BarChart data={firmPopularityData}>
+            <XAxis dataKey="firm" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="count" fill="#276D8B" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  };
+
   return (
     <div className="layout-admin">
       <div className={`sidebar-admin ${menuOpen ? 'open-admin' : ''}`}>
@@ -274,6 +365,7 @@ const Admin = () => {
                 <p className="welcome-text-admin">Welcome to the TalentLex Admin Dashboard. Use the Query Page to access and analyze data, the User Search to find and view user profiles, or check the User Leaderboard to see top contributors.</p>
                 {renderContributionHistory(signupData, "Sign Ups", `${todaySignups} signups today so far`)}
                 {renderContributionHistory(activityData, "Applications and Draft Generations", `${todayApplications + todayDraftGenerations} total items today (${todayApplications} applications, ${todayDraftGenerations} draft generations)`, true)}
+                {renderFirmPopularityTracker()}
               </>
             } />
             <Route path="/query" element={<QueryPage />} />
