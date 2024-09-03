@@ -12,14 +12,14 @@ const Admin = () => {
   const [showOverlay, setShowOverlay] = useState(false);
   const [signupData, setSignupData] = useState({});
   const [todaySignups, setTodaySignups] = useState(0);
-  const [applicationData, setApplicationData] = useState({});
+  const [activityData, setActivityData] = useState({});
   const [todayApplications, setTodayApplications] = useState(0);
   const [todayDraftGenerations, setTodayDraftGenerations] = useState(0);
   const location = useLocation();
 
   useEffect(() => {
     fetchSignupData();
-    fetchApplicationData();
+    fetchActivityData();
   }, []);
 
   const getDateString = (date) => {
@@ -45,17 +45,17 @@ const Admin = () => {
 
     const signupsByDate = {};
     let todayCount = 0;
-    const todayPDT = getDateString(new Date(now.getTime() - 7 * 60 * 60 * 1000));
+    const todayPDT = getDateString(new Date(now.getTime() + 16 * 60 * 60 * 1000));
 
     // Initialize signupsByDate with all dates in the range
     for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-      const pdtDate = getDateString(new Date(d.getTime() - 7 * 60 * 60 * 1000));
+      const pdtDate = getDateString(new Date(d.getTime() + 16 * 60 * 60 * 1000));
       signupsByDate[pdtDate] = 0;
     }
 
     // Count signups for each day
     data.forEach(item => {
-      const pdtDate = getDateString(new Date(new Date(item.created_at).getTime() - 7 * 60 * 60 * 1000));
+      const pdtDate = getDateString(new Date(new Date(item.created_at).getTime() + 16 * 60 * 60 * 1000));
       
       if (signupsByDate[pdtDate] !== undefined) {
         signupsByDate[pdtDate]++;
@@ -70,7 +70,7 @@ const Admin = () => {
     setTodaySignups(todayCount);
   };
 
-  const fetchApplicationData = async () => {
+  const fetchActivityData = async () => {
     const now = new Date();
     const endDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
     const startDate = new Date(endDate);
@@ -78,38 +78,38 @@ const Admin = () => {
 
     const { data: applicationData, error: applicationError } = await supabase
       .from('applications')
-      .select('created_at')
-      .gte('created_at', startDate.toISOString())
-      .lte('created_at', endDate.toISOString());
-
-    const { data: draftGenerationData, error: draftGenerationError } = await supabase
-      .from('applications')
       .select('timestamp')
       .gte('timestamp', startDate.toISOString())
       .lte('timestamp', endDate.toISOString());
 
+    const { data: draftGenerationData, error: draftGenerationError } = await supabase
+      .from('draft_generations')
+      .select('created_at')
+      .gte('created_at', startDate.toISOString())
+      .lte('created_at', endDate.toISOString());
+
     if (applicationError || draftGenerationError) {
-      console.error('Error fetching application data:', applicationError || draftGenerationError);
+      console.error('Error fetching activity data:', applicationError || draftGenerationError);
       return;
     }
 
-    const applicationsByDate = {};
+    const activityByDate = {};
     let todayApplicationCount = 0;
     let todayDraftGenerationCount = 0;
-    const todayPDT = getDateString(new Date(now.getTime() - 7 * 60 * 60 * 1000));
+    const todayPDT = getDateString(new Date(now.getTime() + 16 * 60 * 60 * 1000));
 
-    // Initialize applicationsByDate with all dates in the range
+    // Initialize activityByDate with all dates in the range
     for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-      const pdtDate = getDateString(new Date(d.getTime() - 7 * 60 * 60 * 1000));
-      applicationsByDate[pdtDate] = { applications: 0, draftGenerations: 0 };
+      const pdtDate = getDateString(new Date(d.getTime() + 16 * 60 * 60 * 1000));
+      activityByDate[pdtDate] = { applications: 0, draftGenerations: 0 };
     }
 
     // Count applications for each day
     applicationData.forEach(item => {
-      const pdtDate = getDateString(new Date(new Date(item.created_at).getTime() - 7 * 60 * 60 * 1000));
+      const pdtDate = getDateString(new Date(new Date(item.timestamp).getTime() + 16 * 60 * 60 * 1000));
       
-      if (applicationsByDate[pdtDate] !== undefined) {
-        applicationsByDate[pdtDate].applications++;
+      if (activityByDate[pdtDate] !== undefined) {
+        activityByDate[pdtDate].applications++;
       }
       
       if (pdtDate === todayPDT) {
@@ -119,10 +119,10 @@ const Admin = () => {
 
     // Count draft generations for each day
     draftGenerationData.forEach(item => {
-      const pdtDate = getDateString(new Date(new Date(item.timestamp).getTime() - 7 * 60 * 60 * 1000));
+      const pdtDate = getDateString(new Date(new Date(item.created_at).getTime() + 16 * 60 * 60 * 1000));
       
-      if (applicationsByDate[pdtDate] !== undefined) {
-        applicationsByDate[pdtDate].draftGenerations++;
+      if (activityByDate[pdtDate] !== undefined) {
+        activityByDate[pdtDate].draftGenerations++;
       }
       
       if (pdtDate === todayPDT) {
@@ -130,7 +130,7 @@ const Admin = () => {
       }
     });
 
-    setApplicationData(applicationsByDate);
+    setActivityData(activityByDate);
     setTodayApplications(todayApplicationCount);
     setTodayDraftGenerations(todayDraftGenerationCount);
   };
@@ -145,15 +145,15 @@ const Admin = () => {
     setShowOverlay(false);
   };
 
-  const renderContributionHistory = (data, title, todayCount, countType) => {
+  const renderContributionHistory = (data, title, todayCount, isActivity = false) => {
     if (!data || Object.keys(data).length === 0) return null;
 
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     const contributionDays = Object.keys(data).map(date => ({
-      date: new Date(date + 1),
-      count: countType ? data[date][countType] : data[date],
+      date: new Date(date),
+      count: isActivity ? (data[date].applications + data[date].draftGenerations) : data[date],
     }));
 
     // Sort contributionDays by date
@@ -172,7 +172,9 @@ const Admin = () => {
         const dateString = getDateString(currentDate);
         week.push({
           date: currentDate,
-          count: countType ? (data[dateString] ? data[dateString][countType] : 0) : (data[dateString] || 0),
+          count: isActivity ? 
+                 (data[dateString] ? data[dateString].applications + data[dateString].draftGenerations : 0) :
+                 (data[dateString] || 0),
         });
       }
       weeks.push(week);
@@ -205,7 +207,7 @@ const Admin = () => {
                   <div
                     key={dayIndex}
                     className={`contribution-day-admin level-${getContributionLevel(day.count)}-admin`}
-                    data-tooltip={`${day.count} ${day.count === 1 ? countType || 'item' : (countType + 's') || 'items'} on ${formatDate(day.date)}`}
+                    data-tooltip={`${day.count} ${day.count === 1 ? 'item' : 'items'} on ${formatDate(day.date)}`}
                   />
                 ))}
               </div>
@@ -226,7 +228,7 @@ const Admin = () => {
           </ul>
           <span>More</span>
         </div>
-        <p className="today-signups-admin">{todayCount} {countType || 'items'} today so far</p>
+        <p className="today-signups-admin">{todayCount}</p>
       </div>
     );
   };
@@ -270,8 +272,8 @@ const Admin = () => {
               <>
                 <h1 className="page-title-admin">Admin Dashboard</h1>
                 <p className="welcome-text-admin">Welcome to the TalentLex Admin Dashboard. Use the Query Page to access and analyze data, the User Search to find and view user profiles, or check the User Leaderboard to see top contributors.</p>
-                {renderContributionHistory(signupData, "Sign Ups", todaySignups)}
-                {renderContributionHistory(applicationData, "Applications and Draft Generations", `${todayApplications} applications, ${todayDraftGenerations} draft generations`, "applications")}
+                {renderContributionHistory(signupData, "Sign Ups", `${todaySignups} signups today so far`)}
+                {renderContributionHistory(activityData, "Applications and Draft Generations", `${todayApplications + todayDraftGenerations} total items today (${todayApplications} applications, ${todayDraftGenerations} draft generations)`, true)}
               </>
             } />
             <Route path="/query" element={<QueryPage />} />
