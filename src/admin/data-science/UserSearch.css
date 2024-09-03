@@ -1,0 +1,250 @@
+.user-search-admin {
+    padding: 20px;
+    background-color: #f6f8fa;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  }
+  
+  .user-search-admin h2 {
+    color: #24292e;
+    margin-bottom: 20px;
+  }
+  
+  .search-container {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .search-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    background-color: #ffffff;
+  }
+  
+  .suggestions-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #e1e4e8;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+  }
+  
+  .suggestions-list li {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .suggestions-list li:hover {
+    background-color: #f6f8fa;
+  }
+  
+  .user-details {
+    background-color: #ffffff;
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  }
+  
+  .user-profile h2 {
+    color: #24292e;
+    margin-bottom: 15px;
+  }
+  
+  .user-profile p {
+    margin: 10px 0;
+    color: #586069;
+  }
+  
+  .contribution-history {
+    margin-top: 30px;
+    max-width: 900px;
+
+  }
+  
+  .contribution-history h3 {
+    color: #24292e;
+    margin-bottom: 15px;
+  }
+  
+  .contribution-graph {
+    display: flex;
+    border: 1px solid #e1e4e8;
+    border-radius: 3px;
+    overflow: hidden;
+    padding-top: 20px;
+  }
+  
+  .graph-labels {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px 5px;
+    background-color: #f6f8fa;
+    border-right: 1px solid #e1e4e8;
+  }
+  
+  .day-label {
+    height: 15px;
+    font-size: 9px;
+    color: #767676;
+    text-align: right;
+    line-height: 15px;
+  }
+  
+  .graph-body {
+    display: flex;
+    flex-grow: 1;
+    padding: 5px;
+  }
+  
+  .graph-week {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .contribution-day {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin: 1px;
+    position: relative;
+  }
+  
+  .contribution-day::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #24292e;
+    color: #ffffff;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    z-index: 1000;
+  }
+  
+  .contribution-day:hover::after {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .month-labels {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 20px;
+    font-size: 10px;
+    color: #767676;
+  }
+  
+  .contribution-summary {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 16px;
+    font-size: 11px;
+    color: #767676;
+  }
+  
+  .contribution-scale {
+    display: flex;
+    list-style-type: none;
+    margin: 0 8px;
+    padding: 0;
+  }
+  
+  .contribution-scale li {
+    width: 10px;
+    height: 10px;
+    margin-right: 2px;
+  }
+  
+  .level-0 { background-color: #ebedf0; }
+  .level-1 { background-color: #9be9a8; }
+  .level-2 { background-color: #40c463; }
+  .level-3 { background-color: #30a14e; }
+  .level-4 { background-color: #216e39; }
+  
+  /* Tooltip arrow */
+  .contribution-day::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #24292e transparent;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+  }
+  
+  .contribution-day:hover::before {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .contribution-history {
+      max-width: 100%;
+      overflow-x: auto;
+    }
+  
+    .contribution-graph {
+      min-width: 700px;
+    }
+  
+    .contribution-day {
+      width: 8px;
+      height: 8px;
+    }
+  
+    .day-label {
+      font-size: 8px;
+    }
+  
+    .month-labels {
+      font-size: 9px;
+    }
+  }
+  
+  /* Accessibility improvements */
+  .contribution-day:focus {
+    outline: 2px solid #0366d6;
+    outline-offset: 2px;
+  }
+  
+  /* Print styles */
+  @media print {
+    .user-search-admin {
+      background-color: #ffffff;
+    }
+  
+    .contribution-graph {
+      page-break-inside: avoid;
+    }
+  
+    .contribution-day::after,
+    .contribution-day::before {
+      display: none;
+    }
+  }

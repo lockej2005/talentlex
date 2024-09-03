@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Menu } from 'lucide-react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import QueryPage from './data-science/QueryPage';
+import UserSearch from './data-science/UserSearch';
 import './Admin.css';
 
 const Admin = () => {
@@ -31,6 +32,9 @@ const Admin = () => {
               <li className={`nav-item-admin ${location.pathname === '/talentlex-admin/query' ? 'active-admin' : ''}`}>
                 <Link to="/talentlex-admin/query">Query Page</Link>
               </li>
+              <li className={`nav-item-admin ${location.pathname === '/talentlex-admin/users' ? 'active-admin' : ''}`}>
+                <Link to="/talentlex-admin/users">User Search</Link>
+              </li>
             </ul>
           </nav>
         </div>
@@ -48,10 +52,11 @@ const Admin = () => {
             <Route path="/" element={
               <>
                 <h1 className="page-title-admin">Admin Dashboard</h1>
-                <p className="welcome-text-admin">Welcome to the TalentLex Admin Dashboard. Use the Query Page to access and analyze data.</p>
+                <p className="welcome-text-admin">Welcome to the TalentLex Admin Dashboard. Use the Query Page to access and analyze data, or use the User Search to find and view user profiles.</p>
               </>
             } />
             <Route path="/query" element={<QueryPage />} />
+            <Route path="/users" element={<UserSearch />} />
           </Routes>
         </div>
       </div>
