@@ -29,6 +29,9 @@ const Admin = () => {
             <ul className="nav-list-admin">
               <li className="section-title-admin">Admin Tools</li>
               <div className='separator-admin'></div>
+              <li className={`nav-item-admin ${location.pathname === '/talentlex-admin' ? 'active-admin' : ''}`}>
+                <Link to="/talentlex-admin">Home</Link>
+              </li>
               <li className={`nav-item-admin ${location.pathname === '/talentlex-admin/query' ? 'active-admin' : ''}`}>
                 <Link to="/talentlex-admin/query">Query Page</Link>
               </li>
