@@ -14,6 +14,7 @@ import Videos from './Videos';
 import './Authentication2.css';
 import SpeakToFounders from './SpeakToFounders';
 import { UserInputProvider } from '../context/UserInputContext';
+import FirmRanks from './FirmRanks';
 
 const PopupSocietyJoin = ({ onClose, onJoin }) => {
   const [societyCode, setSocietyCode] = useState('');
@@ -351,6 +352,9 @@ const Layout = () => {
                 </li>
                 <li className={location.pathname === "/" ? "active" : ""}>
                   <Link to="/">Application Review</Link>
+                </li>
+                <li className={location.pathname === "/firm-ranks" ? "active" : ""}>
+                  <Link to="/firm-ranks">Firm Ranks</Link>
                 </li>
                 <li className="section-title">Personalization</li>
                 <div className='seperator'></div>

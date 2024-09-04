@@ -16,6 +16,7 @@ import SpeakToFounders from './pages/SpeakToFounders';
 import DueDiligence from './pages/DueDiligence';
 import Profile from './pages/Profile';
 import Admin from './admin/Admin';
+import FirmRanks from './pages/FirmRanks'; // Import the new FirmRanks component
 
 const PrivateRoute = ({ children }) => {
   const [session, setSession] = useState(null);
@@ -68,6 +69,7 @@ function App() {
             <Route path="speak-to-founders" element={<SpeakToFounders />} />
             <Route path="due-diligence" element={<DueDiligence />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="firm-ranks" element={<FirmRanks />} />
           </Route>
         </Routes>
       </Router>
