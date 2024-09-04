@@ -54,71 +54,52 @@ const PopupSocietyDetails = ({ society, onClose }) => {
   );
 };
 
-const FirmCountdownBar = ({ firm, dueDate, openDate }) => {
-  const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState('');
+const HowDidYouHearPopup = ({ onClose, onSubmit }) => {
+  const [selectedOption, setSelectedOption] = useState('');
+  const [otherText, setOtherText] = useState('');
 
-  useEffect(() => {
-    const calculateProgress = () => {
-      const now = new Date();
-      const due = new Date(dueDate);
-      const open = new Date(openDate);
-      
-      if (now > due) {
-        setProgress(100);
-        setStatus('Closed');
-      } else if (now < open) {
-        setProgress(0);
-        setStatus(`Opening Soon (${open.toLocaleDateString()})`);
-      } else {
-        const totalTime = due - open;
-        const timeLeft = due - now;
-        setProgress(((totalTime - timeLeft) / totalTime) * 100);
-        setStatus(`Open, closes on ${due.toLocaleDateString()}`);
-      }
-    };
-
-    calculateProgress();
-    const timer = setInterval(calculateProgress, 60000); // Update every minute
-
-    return () => clearInterval(timer);
-  }, [dueDate, openDate]);
-
-  return (
-    <div className="firm-countdown-bar">
-      <div className="firm-name">{firm}</div>
-      <div className="progress-bar">
-        <div className="progress" style={{ width: `${progress}%` }}></div>
-      </div>
-      <div className="status">{status}</div>
-    </div>
-  );
-};
-
-const FrostedGlassPopup = ({ onClose }) => {
-  const firms = [
-    { name: 'Sidley Austin', dueDate: '2024-10-31', openDate: '2024-08-28' },
-    { name: 'Jones Day', dueDate: '2024-10-31', openDate: '2024-09-01' },
-    { name: 'Dechert', dueDate: '2024-10-31', openDate: '2024-09-01' },
-    { name: 'Willkie Farr & Gallagher', dueDate: '2024-10-31', openDate: '2024-09-01' },
-    { name: 'Bryan Cave Leighton Paisner', dueDate: '2024-10-31', openDate: '2024-09-01' },
-  ];
+  const handleSubmit = () => {
+    if (selectedOption && (selectedOption !== 'Other' || otherText.length >= 3)) {
+      onSubmit(selectedOption === 'Other' ? otherText : selectedOption);
+      onClose();
+    }
+  };
 
   return (
     <div className="frosted-glass-popup">
       <div className="popup-content">
-        <h2 className='h2-popup'>Next 5 Firms Recruiting - Rolling</h2>
-        <div className="firm-countdown-bars">
-          {firms.map((firm, index) => (
-            <FirmCountdownBar
-              key={index}
-              firm={firm.name}
-              dueDate={firm.dueDate}
-              openDate={firm.openDate}
-            />
+        <h2>How did you hear about us?</h2>
+        <div className="options-container">
+          {['Word of Mouth', 'LinkedIn', 'Affiliated Society', 'Other'].map((option) => (
+            <div key={option} className={`option ${selectedOption === option ? 'selected' : ''}`}>
+              <input
+                type="radio"
+                id={option}
+                name="hearAboutUs"
+                value={option}
+                checked={selectedOption === option}
+                onChange={(e) => setSelectedOption(e.target.value)}
+              />
+              <label htmlFor={option}>{option}</label>
+            </div>
           ))}
+          {selectedOption === 'Other' && (
+            <input
+              type="text"
+              value={otherText}
+              onChange={(e) => setOtherText(e.target.value)}
+              placeholder="Please specify (min 3 characters)"
+              className="other-input"
+            />
+          )}
         </div>
-        <button onClick={onClose} className="close-button">Close</button>
+        <button 
+          onClick={handleSubmit} 
+          className="submit-button" 
+          disabled={!selectedOption || (selectedOption === 'Other' && otherText.length < 3)}
+        >
+          Done
+        </button>
       </div>
     </div>
   );
@@ -139,7 +120,7 @@ const Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [showFrostedGlassPopup, setShowFrostedGlassPopup] = useState(false);
+  const [showHowDidYouHearPopup, setShowHowDidYouHearPopup] = useState(false);
 
   const fetchUserProfile = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -147,7 +128,7 @@ const Layout = () => {
       setUser(user);
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('name, society, credits')
+        .select('name, society, credits, reference')
         .eq('id', user.id)
         .single();
 
@@ -156,6 +137,10 @@ const Layout = () => {
       } else if (profileData) {
         setUserName(profileData.name || 'User');
         setUserCredits(profileData.credits || 0);
+
+        if (profileData.reference === null) {
+          setShowHowDidYouHearPopup(true);
+        }
 
         if (profileData.society) {
           const { data: societyData, error: societyError } = await supabase
@@ -324,8 +309,20 @@ const Layout = () => {
     );
   };
 
-  const closeFrostedGlassPopup = () => {
-    setShowFrostedGlassPopup(false);
+  const handleHowDidYouHearSubmit = async (response) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ reference: response })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating user profile:', error);
+      } else {
+        setShowHowDidYouHearPopup(false);
+      }
+    }
   };
 
   return (
@@ -365,7 +362,7 @@ const Layout = () => {
                 <li className={location.pathname === "/speak-to-founders" ? "active" : ""}>
                   <Link to="/speak-to-founders">Speak to the Founders</Link>
                 </li>
-                </ul>
+              </ul>
             </nav>
           </div>
           <div className="user-info">
@@ -386,15 +383,12 @@ const Layout = () => {
           </button>
           <div className="content-area">
             <Outlet />
-            {showFrostedGlassPopup && (
-              <FrostedGlassPopup onClose={closeFrostedGlassPopup} />
-            )}
           </div>
         </div>
         {showOverlay && (
           <div className="menu-overlay" onClick={closeMenu}></div>
         )}
-        {showJoinPopup && (
+{showJoinPopup && (
           <PopupSocietyJoin 
             onClose={() => setShowJoinPopup(false)}
             onJoin={handleJoinSociety}
@@ -404,6 +398,12 @@ const Layout = () => {
           <PopupSocietyDetails 
             society={societyDetails}
             onClose={() => setShowSocietyDetailsPopup(false)}
+          />
+        )}
+        {showHowDidYouHearPopup && (
+          <HowDidYouHearPopup
+            onClose={() => setShowHowDidYouHearPopup(false)}
+            onSubmit={handleHowDidYouHearSubmit}
           />
         )}
       </div>
