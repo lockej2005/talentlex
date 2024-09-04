@@ -56,7 +56,14 @@ function ApplicationReview() {
 
   useEffect(() => {
     const calculateWordCount = (text) => {
-      return text.trim().split(/\s+/).filter(word => word !== '').length;
+      if (typeof text === 'string') {
+        return text.trim().split(/\s+/).filter(word => word !== '').length;
+      } else if (typeof text === 'object') {
+        return Object.values(text).reduce((total, value) => {
+          return total + (value ? value.trim().split(/\s+/).filter(word => word !== '').length : 0);
+        }, 0);
+      }
+      return 0;
     };
     setWordCount(calculateWordCount(applicationText));
   }, [applicationText]);
@@ -92,14 +99,13 @@ function ApplicationReview() {
       alert('Please log in to submit your application.');
       return;
     }
-
+  
     setIsLoading(true);
     try {
       const result = await handleApplicationSubmit(
         user,
         applicationText,
         reviewSelectedFirm,
-        reviewSelectedQuestion,
         setFeedback,
         setTotalTokens,
         setResponseTime

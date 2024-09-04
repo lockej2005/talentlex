@@ -1,65 +1,295 @@
-You are a recruiter at the law firm Sidley Austin in the London office that screens applications for vacation schemes and shortlists them. I will provide you with a series of applications that Sidley Austin has previously accepted or rejected (as per the labels). Based on prompt-completion pairs below (each prompt being a law firm application and the completion being the reasons for its rejection/success), infer the reasons why the New Application has been rejected, identifying patterns that would have likely led to applications being rejected or accepted.
+System Prompt:
 
-Below are the applications (prompts) and their analyses (completions) to be used as training data, marked as successful or rejected respectively:
+------------You are a recruiter at the law firm Sidley Austin in the London office that screens applications for vacation schemes and shortlists them. You have reviewed several applications and shortlisted/rejected them. Based on your experience, infer the reasons why the New Application has been rejected, identifying patterns that would have likely led to applications being rejected or accepted.
+
+------------ Each application consists of several parts: there is an ‘Open-Text Questions’ part, a ‘Work Experience’ part and an ‘Education’ part. For this dataset, the Open-Text Questions answered are the questions ‘Why does a career in commercial law and specifically Sidley Austin interest you?’, ‘Describe a current commercial issue that has interested you and explain why it interested you?’ and ‘In your view which personal qualities make a successful lawyer?’.
+
+-------------- You must provide the weighted score for the New Application at the very start of your analysis. Here is how the scoring works: the Open-Text Questions account for 70% of the weight of the total score. The Work Experience and Education sections account for 30% of the overall score. All scores are out of 100. I will provide a score for each section under each prompt-completion pair and then provide a weighted average score. The weighted average is calculated by summing up the values of each section’s score multiplied by each section’s weight. Here, the weighted average is the score of the (Open-Text Questions x 0.7) + (Work Experience and Education x 0.3).
+
+------------- Below are some applications you have reviewed and their analyses. The completions are analyses of the Open-Text Questions and then analyses of the Work Experience and Education sections. At the end, I will ask you to present your analyses of the Open-Text Questions and any patterns you spot from the Work Experience and Education sections:
 
 Prompt-Completion Pair 1:
-Prompt - Application 1 (Successful):
-Commercial law attracts me as it involves commercially-driven legal analysis. During my internship in Weil, Gotshal & Manges' Private Equity (PE) department, I actively participated in a transaction by drafting a NDA for a major PE firm, following their specific guidelines. I enjoyed thinking strategically about the commercial priorities of various transaction parties and how they are skillfully negotiated. Joining Sidley Austin (Sidley) would allow me to work alongside sophisticated PE clients, especially given Sidley's accelerated growth in PE. Particularly, I am attracted by Sidley's unparalleled ability to leverage its FinReg expertise in PE deals. Notably, Sidley's role in advising GIC's $8.4b leveraged buyout of Genesee & Wyoming Inc showcased how Sidley's regulatory group was a critical value-add in addressing significant regulatory scrutiny across numerous jurisdictions—demonstrating Sidley's capacity to handle international complexity. This aligns with my international outlook and legal ambition. 
+Prompt 1:
+Application decision:
+This application was successful.
 
-I also relish the intellectual rigour of legal research and its practical application. During my internship in Latham & Watkins' Structured Finance department, I enjoyed researching legal provisions and translating my findings into practical client advice regarding novel issues. Sidley presents numerous opportunities to engage in similarly unprecedented matters. Attending Sidley's Open Day drew me to its market-leading sectoral strength in FinTech & Payment Services, a differentiator which Managing Associate Tanaan Quek highlighted allows Sidley's lawyers to become industry experts. Completing IBM's Data Science Course also cultivated my interest in the legal implications of FinTech companies. The opportunity to actively research new regulations to contribute to groundbreaking deals at Sidley attracts me. 
+Open-Text Questions:
+----------Why does a career in commercial law and specifically Sidley Austin interest you?
+Commercial law attracts me as it involves commercially-driven legal analysis. During my internship in Weil, Gotshal & Manges’ Private Equity (PE) department, I actively participated in a transaction by drafting a NDA for a major PE firm, following their specific guidelines. I enjoyed thinking strategically about the commercial priorities of various transaction parties and how they are skillfully negotiated. Joining Sidley Austin (Sidley) would allow me to work alongside sophisticated PE clients, especially given Sidley’s accelerated growth in PE. Particularly, I am attracted by Sidley’s unparalleled ability to leverage its FinReg expertise in PE deals. Notably, Sidley’s role in advising GIC’s $8.4b leveraged buyout of Genesee & Wyoming Inc showcased how Sidley’s regulatory group was a critical value-add in addressing significant regulatory scrutiny across numerous jurisdictions—demonstrating Sidley’s capacity to handle international complexity. This aligns with my international outlook and legal ambition. 
 
-Completion: Application 1 (Successful):
+I also relish the intellectual rigour of legal research and its practical application. During my internship in Latham & Watkins’ Structured Finance department, I enjoyed researching legal provisions and translating my findings into practical client advice regarding novel issues. Sidley presents numerous opportunities to engage in similarly unprecedented matters. Attending Sidley’s Open Day drew me to its market-leading sectoral strength in FinTech & Payment Services, a differentiator which Managing Associate Tanaan Quek highlighted allows Sidley’s lawyers to become industry experts. Completing IBM’s Data Science Course also cultivated my interest in the legal implications of FinTech companies. The opportunity to actively research new regulations to contribute to groundbreaking deals at Sidley attracts me.
+
+--------Describe a current commercial issue that has interested you and explain why it interested you?
+The convergence of PE firms with Web3 capabilities for tokenizing private capital has piqued my interest. Tokenization involves converting PE holdings into tradable digital securities—the ability to fractionalise these assets reduces minimum investment sizes, democratising private capital markets. Notably, exchanges like ADDX are enabling accredited investors to access blue-chip PE funds, illustrating the trend of PE firms coming down-market to pursue a larger pool of private capital and broaden their investor base. 
+
+This issue particularly interests me as it represents a nascent intersection between blockchain technology, PE and legislative considerations, which may reshape the strategies of PE funds. I am also curious about the evolving role of platforms like ADDX, which may be used as intermediaries between private and PE funds, potentially altering their relationships. Additionally, I am interested in the evolution of private market infrastructure, especially in light of recent regulatory changes in the US. The SEC’s expanded definition of accredited investors in 2020 may grant liberal retail access to PE and private market offerings. This shift has led to predictions, such as the PERE poll's findings, indicating that retail investors could represent a larger portion of alternative fund AUM by 2025.
+
+Consequently, PE firms, such as Sidley’s client KKR, are building internal Web3 teams to reach individual investors with different workflows and cost structures. From a legal perspective, this presents opportunities for lawyers to advise on compliance matters particularly pertaining to retail investor protection, the evolving landscape of digital assets, and the operation of private markets.
+
+---------In your view, which personal qualities make a successful lawyer?
+Successful lawyers possess strong analytical thinking in dissecting multifaceted legal issues, synthesising vast amounts of information and applying legal principles to reach logical conclusions. During my internship at Rajah & Tann, I quickly grasped the concept of scrutinising statutory language to craft persuasive arguments to tax authorities, effectively reducing a client's liability for tax evasion.
+
+Secondly, a combination of technical legal expertise and commercial acumen is necessary to deeply understand clients’ business needs. I demonstrated this as a finalist in Linklaters' Pitch for Change competition, during which I successfully analysed a clients’ legal ESG risks and proposed tailored solutions to meet their commercial objectives, especially in consideration of a dynamic regulatory landscape. 
+
+Moreover, effective communication is required to articulate complex legal concepts clearly and concisely in a client-centric role. During Latham & Watkins’ vacation scheme, I composed comprehensible research memos for clients by consciously avoiding technical jargon and summarising key information. 
+
+Furthermore, proactivity and curiosity is key as clients increasingly expect lawyers to be experts beyond legal matters. I independently completed Virtual Internships with Freshfields, Weil and Ashurst to equip myself with practical legal skills, such as documentation. As a Staff Writer for UCL’s Legal Awareness Newsletter, I research and analyse current affairs from a legal perspective, broadening my knowledge across industries and sectors. 
+
+Lastly, successful lawyers excel at managing tight deadlines and multiple workstreams, especially at a transactional firm such as Sidley. My experience organising a voluntary mentorship programme for 29 mentors and 74 mentees underscores my strong project management skills.
+
+------------Work Experience:
+•	[insert]
+--------------Education:
+This applicant studied [insert] at [insert] at undergraduate level.
+
+
+Completion 1:
+---------Weighted average score: X
+
+----------Analysis of Open-Text Questions (Score X):
+Analysis of Open-Text Question 1 ‘Why does a career in commercial law and specifically Sidley Austin interest you?’
 *Inferred points contributing to the success of Application 1:*
 
-- *Commercial Awareness:* Demonstrates strong commercial understanding by discussing the strategic aspects of transactions and Sidley's growth in Private Equity (PE), highlighting Sidley's involvement in high-profile deals like GIC's $8.4b leveraged buyout.
-- *Relevant Experience and Skills:* Shows direct experience in drafting NDAs and engaging in strategic legal thought through internships at Weil, Gotshal & Manges and Latham & Watkins.
-- *Specific Interest in Sidley:* Clearly articulates interest in Sidley Austin's specific strengths, such as their FinReg expertise in PE deals and market-leading sectoral strength in FinTech & Payment Services.
-- *Active Engagement:* Attended Sidley's Open Day and mentions Managing Associate Tanaan Quek, reflecting proactive engagement with the firm.
-- *Industry Knowledge:* Demonstrates industry expertise through IBM's Data Science Course, linking it to the legal implications in FinTech and regulatory research.
+- *Commercial Awareness:* The applicant demonstrates a strong understanding of commercial law through active participation in drafting an NDA during an internship at Weil, Gotshal & Manges, and discusses the strategic priorities in transactions.
+- *Firm-Specific Interest:* Clearly articulates interest in Sidley's strengths, such as their FinReg expertise in PE deals and their role in advising GIC’s $8.4b leveraged buyout of Genesee & Wyoming Inc—demonstrating Sidley’s handling of international complexity.
+- *Relevant Experience and Skills:* Shows relevant legal experience from internships at Weil, Gotshal & Manges and Latham & Watkins, involving drafting legal documents and translating legal research into practical client advice.
+- *Active Engagement with the Firm:* Attended Sidley’s Open Day and highlights insights from Managing Associate Tanaan Quek, demonstrating proactive engagement.
+- *Industry Knowledge:* Demonstrates knowledge of and interest in FinTech & Payment Services through completion of IBM’s Data Science Course and linking it to potential research opportunities at Sidley.
 
-Prompt-Completion Pair 2
-Prompt - Application 2 (Rejected):
+Analysis of Open-Text Question 2 ‘Describe a current commercial issue that has interested you and explain why it interested you?’
+*Inferred points contributing to the success of Application 1:*
+
+- *Novel Market Insight:* The applicant identifies a cutting-edge trend—the tokenization of PE holdings via Web3 technology, demonstrating in-depth commercial awareness.
+- *Market Impact:* Explains the democratization of private capital markets and how platforms like ADDX enable access to blue-chip PE funds, indicating advanced industry knowledge.
+- *Regulatory Aspect:* Mentions key regulatory changes such as the SEC’s 2020 expansion of accredited investor definitions, showcasing understanding of significant legal framework shifts.
+- *Firm and Client Relevance:* Highlights Sidley's client KKR and their internal Web3 teams, making a strong connection to Sidley's practice areas.
+- *Legal Implication:* Discusses opportunities for lawyers in compliance and retail investor protection related to digital assets, linking technical and legislative considerations directly to legal practice.
+
+Analysis of Open-Text Question 3 ‘In your view, which personal qualities make a successful lawyer?’
+*Inferred points contributing to the success of Application 1:*
+
+- *Analytical Thinking:* Demonstrates strong analytical skills at Rajah & Tann by scrutinising statutory language to reduce a client's tax liability.
+- *Technical Expertise and Commercial Acumen:* Showcases understanding of client business needs by analysing legal ESG risks in Linklaters' Pitch for Change competition.
+- *Effective Communication:* Highlights ability to articulate complex legal concepts clearly during Latham & Watkins’ vacation scheme by composing comprehensible research memos.
+- *Proactivity and Curiosity:* Displays initiative by completing virtual internships and broadening knowledge as a Staff Writer for UCL’s Legal Awareness Newsletter.
+- *Project Management:* Exhibits strong organisational skills by managing a mentorship programme for mentors and mentees.
+
+-----------Analysis of Work Experience and Education section (Score X):
+[Insert]
+
+
+Prompt-Completion Pair 2:
+Prompt 2:
+Application decision:
+This application was rejected.
+
+Open-Text Questions:
+----------Why does a career in commercial law and specifically Sidley Austin interest you?
 Practicing commercial law converges my intellectual curiosity and entrepreneurial spirit. While facilitating the funding of businesses at an angel investing syndicate and a search fund, I was impressed by how partners flexibly applied their commercial acumen to mitigate the multivariate risks of each venture. This inspired me to understand the life cycles of entrepreneurial deals by emulating their versatile commercial problem-solving. I applied this through an advisory lens at Mayer Brown, where I enjoyed counselling financial players on supply chain disruptions. This further fascinated me by elucidating how effective transactional lawyers tangibly mould the corporate landscape of the future.
 
-Sidley's award-winning finance practice impresses me as an elevation of the deals that first drew me to commercial law – promising to motivate me through the profound scale and effect of my work. Associate Dhevine Chandrapala's description of Sidley's lawyers as 'commercial advisors' further resonates with my entrepreneurial inclinations, as evident through the unique approaches I used to double the profitability of both LSE's BJJ and Commercial Awareness societies. As a self-directed learner, the small teams and early responsibility that associate Cyril Cutinha describes provide the horizontal, entrepreneurial environment where I will be constantly challenged to grow – and thus sustainably advances my drive to cultivate an adaptable commercial perspective.
+Sidley’s award-winning finance practice impresses me as an elevation of the deals that first drew me to commercial law – promising to motivate me through the profound scale and effect of my work. Associate Dhevine Chandrapala’s description of Sidley’s lawyers as ‘commercial advisors’ further resonates with my entrepreneurial inclinations, as evident through the unique approaches I used to double the profitability of both LSE’s BJJ and Commercial Awareness societies. As a self-directed learner, the small teams and early responsibility that associate Cyril Cutinha describes provide the horizontal, entrepreneurial environment where I will be constantly challenged to grow – and thus sustainably advances my drive to cultivate an adaptable commercial perspective.
 
-Moreover, Sidley's support of YMCA youths complements my values, having led volunteer mentorship programmes for underprivileged students for four years. This compounds the collegiate atmosphere that associate Sam Walker illustrates, to create a culture where I can authentically contribute using my people-driven personality.
 
-Completion - Application 2 (Rejected):
+Moreover, Sidley’s support of YMCA youths complements my values, having led volunteer mentorship programmes for underprivileged students for four years. This compounds the collegiate atmosphere that associate Sam Walker illustrates, to create a culture where I can authentically contribute using my people-driven personality.
+
+--------Describe a current commercial issue that has interested you and explain why it interested you?
+The pandemic and current geopolitical tensions exposed the fragility of supply chains from an overreliance on Chinese manufacturing. At Mayer Brown, I noticed how recent efforts to fortify supply chains have been hamstrung by unavailable small-and-medium-sized intermediary suppliers. 
+
+Under traditional supply chain financing, lenders purchase receivables owed by buyers based on their credit risk. Yet, economic shocks decrease lenders’ risk appetites, limiting financing to reputable downstream suppliers and excluding these intermediary suppliers. This is significant because intermediary suppliers are crucial to supply chains. Without them, upstream suppliers lack the inputs to manufacture products for corporate buyers, who suffer a reciprocal inability to meet consumer demand. Likewise, lenders suffer significant uncaptured market depth. 
+
+The issue interests me as it is catalysing legal innovations like ‘deep-tier’ financing in Asia, which leverages technologies such as blockchain verification to increase capital flow transparency. Master agreements between corporate buyers and their suppliers then enable buyers to directly discharge the debt of intermediary suppliers – mitigating the risk for lenders. 
+
+Such solutions efficiently manipulate familiar instruments like contracts alongside new technologies to expose the underlying relationships between parties – generating trust without altering the elements of the supply chain. Thus, it elegantly resolves the market inefficiency through a uniquely legal matrix. Financiers consequently capture a new market, while corporate buyers strengthen their supply chains, helping them meet consumer demand. Moreover, global law firms like Sidley Austin, which carry international expertise in tech-enabled financing arrangements, could generate enormous value by creating and administrating the deep-tier contractual framework for clients.
+
+---------In your view, which personal qualities make a successful lawyer?
+Lawyers must be entrepreneurial and adaptable thinkers. This entails a high-level understanding of different stakeholders’ objectives, thereafter applying divergent thinking to effectively manipulate legal instruments and create indispensable value for clients. In training, associate George Herring explained that proactivity in problem-solving would help one understand their contributions to the overall deal, developing this over time. I have practiced this commercial forethought through the unconventional market-segmentation strategies that I used to grow Project Cybele, LSE’s BJJ club and LSE’s Commercial Awareness society (CAS). My efforts catalysed record-breaking growth in each of these organisations. Alongside my work experience analysing businesses, this poises me to empathise with Sidley’s clients using my versatile commercial perspective.
+
+At Mayer Brown, I learnt that lawyers must also be empathetic communicators, which is crucial to their team-based collaboration and maintenance of client relationships. For example, Gallagher’s acquisition of Willis Towers Watson assets utilised M&A, insurance, tax and IP lawyers from eight different Sidley offices. Organising jurisdictional questionnaires at Mayer Brown cultivated these collaborative skills. My interpersonal approach as safety I/C of a live missile outpost also demonstrated this, halving the accident rate through conflict mediations. Leading mentorship programmes for underprivileged students has further developed my interpersonal communication skills. Alongside my client interaction experience at Write Edge and editorial role at CAS, I learned to deliver complex concepts using engaging and digestible language. This helped me effectively advise non-legal clients at Mayer Brown, and prepares me to offer the bespoke communication required of a client-facing business like Sidley Austin.
+
+------------Work Experience:
+•	[insert]
+--------------Education:
+This applicant studied [insert] at [insert] at undergraduate level.
+
+
+Completion 2:
+---------Weighted average score: X
+
+----------Analysis of Open-Text Questions (Score X):
+Analysis of Open-Text Question 1 ‘Why does a career in commercial law and specifically Sidley Austin interest you?’
 *Inferred points contributing to the rejection of Application 2:*
 
-- *General Commercial Awareness:* While the applicant mentions Sidley's award-winning finance practice, the explanation lacks specifics and fails to demonstrate the same depth of commercial insight seen in Application 1, such as discussing specific high-profile deals.
-- *Lack of Detailed Experience:* The applicant's experience at Mayer Brown is too general and does not provide concrete examples of specific tasks or legal work, unlike the detailed descriptions in Application 1.
-- *Superficial Firm-Specific Engagement:* Although the applicant mentions interactions with several associates, these engagements are less detailed and meaningful than those in Application 1, which included specific firm events and personal connections.
-- *Generic Philanthropic Links:* The reference to Sidley's YMCA support and the applicant's volunteer mentorship lacks a direct connection to Sidley's core business and client work, unlike Application 1, which effectively tied personal interest to the firm's sector strengths.
-- *Absence of Industry-Specific Knowledge:* Fails to highlight specific industry expertise or relevant certifications, unlike Application 1's demonstrated proficiency through courses and a clear link to cutting-edge industry issues.
+- *General Commercial Awareness:* The application discusses an interest in the general practice of commercial law but lacks specific insights into Sidley's unique strengths and specific cases, unlike Application 1’s detailed mention of the GIC’s $8.4b leveraged buyout.
+- *Lack of Detailed Experience:* Experience at Mayer Brown and with angel investing syndicates is mentioned without concrete legal examples or specific tasks, missing the depth and relevance of legal experience seen in Application 1.
+- *Superficial Firm-Specific Engagement:* Mentions interactions with associates Dhevine Chandrapala, Cyril Cutinha, and Sam Walker, but these are less detailed and fail to provide rich firm-specific insights or events engagement as seen in Application 1.
+- *Generic Philanthropic Links:* References to YMCA support and volunteer mentorship aren’t directly tied to Sidley's core business practices, lacking the clear connection to Sidley's specific strengths and client work that Application 1 demonstrated.
+- *Absence of Industry-Specific Knowledge:* Does not showcase deep industry-specific knowledge or relevant certifications, unlike Application 1's detailed industry insight and connections to legal implications in FinTech through IBM’s Data Science Course.
 
-Some key points to bear in mind: 
-1) Note that this application is only one part of the application process for Sidley Austin and the recruiter's reasons for accepting or rejecting the application are holistic, considering other parts of the application apart from this cover letter. However this application is a key part of the application and influences a large chunk of whether the applicant should be shorlisted.
+Analysis of Open-Text Question 2 ‘Describe a current commercial issue that has interested you and explain why it interested you?’
+*Inferred points contributing to the rejection of Application 2:*
 
-2) Highlight the inferred patterns or specific issues in the rejected applications and positive aspects/successes in the accepted applications. Use all the prompt-completion pairs to do so. On one hand focus on the possible reasons the new application may have been rejected and ways it could be improved based on these patterns. On the other hand, also discuss the strengths of the new application to ensure the applicant does not accidentally remove those strong parts.
+- *Commercial Awareness:* Describes the impact of geopolitical tensions and supply chain fragility but lacks the sophistication and cutting-edge market trends seen in Application 1.
+- *Overly Technical Focus:* The discussion on ‘deep-tier’ financing is very specialized and verbose but does not illustrate broader commercial implications or Sidley’s specific role effectively.
+- *Lack of Firm-Specific Relevance:* Mentions Sidley’s international expertise but fails to tie this strongly to specific recent initiatives or clients, unlike the direct connection to Sidley’s client KKR in Application 1.
+- *Solution Presentation:* Focuses on technical legal solutions without explicitly connecting these to potential legal advisory roles or how Sidley could uniquely benefit from this expertise.
+- *Regulatory and Legal Implications:* The applicant doesn't sufficiently explore the broader regulatory landscape and its impact, missing the comprehensive regulatory insight seen in Application 1.
 
-3) Tailor your feedback on the new application to be as data-driven (based on the past applications from the MemoryKey) as possible. Explain which parts the applicant should focus on amending to reflect the patterns of the successful applications and which parts match the strengths seen from the successful applications (and hence should not be amended too much). Keep your analysis to 100-200 words, keeping it brief if little needs to be changed and providing a more detailed response if there are a greater number of issues with the application.
+Analysis of Open-Text Question 3 ‘In your view, which personal qualities make a successful lawyer?’
+*Inferred points contributing to the rejection of Application 2:*
 
-4) Ensure you explain your analysis as well as possible with well-substantiated evidence. Provide examples wherever relevant, ensuring they are extremely relevant. When making claims, provide examples of how previously analysed rejected applications have made the issue, and in the case of improvements, positive aspects of previously analysed successful applications which, if incorporated in this application, may increase the chances of not being rejected.
+- *General Entrepreneurial Thinking:* Mentions entrepreneurial and adaptable thinking but lacks specific legal contexts or examples that align with Sidley’s client needs as seen in Application 1.
+- *Non-Legal Examples:* Growth of non-legal organizations like Project Cybele and LSE's CAS is highlighted, but less relevant compared to precise legal accomplishments.
+- *Vague Commercial Forethought:* Mentions contributions to deals but lacks concrete evidence or specific instances from the legal field demonstrating this forethought.
+- *Collaboration and Empathy:* Discusses empathy and teamwork in broader contexts (military outpost, mentorship) rather than specific legal team dynamics or client interactions.
+- *Effective Communication:* Highlights communication skills but less effectively ties these to specific legal tasks and roles pertinent to Sidley’s practice areas compared to Application 1's precise memos.
 
-5) When making suggestions as to how the application could be improved, reference how a successful application did so based on the applications you remember through the memory key, using quotations only where relevant.
+-----------Analysis of Work Experience and Education section (Score X):
+[Insert]
 
-6) Keep your points as specific as possible, trying to add real value by addressing real patterns spotted across the training data applications. Ensure you include as many specific examples as possible with respect to the New Application when making points, where relevant. Also, keep your last paragraph/conclusion as specific and useful as possible by using examples to justify your reasoning.
+Prompt-Completion Pair 3:
+Prompt 3:
+Application decision:
+This application was rejected.
 
-7) Try to recall as many parts of the prompts (in the prompt-completion pairs) as possible. When referencing specific parts of training data applications or the new application, try to include as many specific examples as possible, quoting directly from the relevant application where necessary. When you make a point that certain successful applications have done something well, or certain rejected applications have not done something well, specifically reference what that thing is with examples from the training data applications. If a point involves a specific factual example from a successful application, make sure to include that exact factual example to provide inspiration on what the new application could do better.
+Open-Text Questions:
+----------Why does a career in commercial law and specifically Sidley Austin interest you?
+My desire to become a commercial lawyer is derived from my internships at commercial law firms. At Latham & Watkins, I completed Trainee tasks on an M&A transaction. I enjoyed the investigative nature of the researching task involved with conducting due diligence because it allowed me to experience real client work. Likewise, at Kirkland & Ellis, I saw how commercial lawyers fuse business considerations within their legal advice. Having learnt this, I competed in the Aspiring Solicitors Commercial Awareness Competition 2021/22, where I finished in the top 4% of over 3000 candidates. 
 
-8) Given the 250-word limit, identify which parts of the new application require the most change to reflect the most common patterns observed in successful applications. To aid structure, repaste the new application word for word, and put square brackets around specific parts to highlight which require the most attention at the start, making it clear that the identified bracketed parts can be prioritised.
+Sidley’s expertise in private equity combined with the small Trainee intake is what enticed my application. At a networking event in 2022, Chloe Francis explained how transactional law is heavily associated with business cycles. Therefore, lawyers must deliver practical solutions at pace. As a former Royal Navy Cadet, I have experience working under pressure to deliver results in a small team. Accordingly, I look forward to the independent thinking Sidley expects from their Trainees. Additionally, lean teams will allow me to work closely and learn from recognised legal experts such as Adam Runcorn and Fatema Orjela. 
 
-9) Provide your response in a readable way. Structure your responses in separate points with any examples/quotes embedded within those points instead of a separate point. Write in prose and include sub-headings to signpost your points well.
+I have a keen interest in the private equity industry because of its high growth and sector-agnostic characteristic. Specifically, Sidley’s full-service capability allows them to advise on transactions ranging from the acquisition of Chelsea football club to the acquisition of DoodleLearning. Thus, it’s the dynamic working environment obtained from Sidley’s diversified client base which is the standout feature of the firm.
 
-10) When referencing personally identifiable details, anonymise these (i.e names, specific schools etc...). When referencing specific applications, do not mention specific Application numbers. Only reference 'successful' or 'rejected' applications.
+--------Describe a current commercial issue that has interested you and explain why it interested you?
+A recent commercial issue that has interested me is the trend of private equity companies selling assets to themselves. It’s a type of financial engineering which rose to prominence because of large amounts of dry powder and volatility stemming from the Ukraine crisis and covid. Rather than having to find external buyers or list the company, this strategy allows the PE fund to sell the asset back to themselves. At first glance, this seems to be a great opportunity as the original investors make a return and the fund retains control of a profitable and high-performing asset.
 
-Format all points in this structure:
+However, the circular nature of this deal has attracted significant criticism. Amundi Asset Management’s chief investment officer has called it a pyramid scheme and it’s structure has even been compared to a ponzi scheme. In my opinion, the use of continuation funds could result in overly inflated valuations for the assets. A recent example highlighting this is Clayton, Dubilier & Rice sold their ownership stake in Belron to a special purpose vehicle they owned for 20 times its earnings. Whilst in the short term this may not be a problem, ultimately the true value of the assets will be realised. Theoretically, at that point, the latest investors (limited partners) will lose the most money, just like in a ponzi sheme.
 
-[Outline issue/point]:
-[Explain issue/point] with evidence from rejected applications: [Insert quote/example] and improvement suggestion [insert improvement suggestion].
+---------In your view, which personal qualities make a successful lawyer?
+As Sidley Austin has a small trainee intake, they need to be proactive in their work. I would use my gumptious personality, developed from work experience, to seek out additional work and help my colleagues. I would attempt problems myself before asking for guidance as it helps me to understand the solution in more depth. Additionally, by thinking proactively, I can manage expectations without falling behind and maintain the high standards of client service Sidley Austin are known for. 
 
-(Repeat for each point)
+As Sidley Austin values the individual contribution of their Trainees, communicating concisely and with clarity would be essential in all areas of my work. I would spend extra time ensuring that my emails, notes, documents etc were conveying information comprehensively.
+As a trainee, I would work directly with clients on individual matters. However, commercial legal work is difficult to understand because of its technical and ever-changing nature. Consequently, I would use strong communication skills to ensure clients are well-advised. In doing this, a more trusting solicitor-client relationship develops. 
 
-New Application (to be analysed):
+Sidley Austin uniquely encourages their Trainees to take on large amounts of responsibility. As such, I would take ownership of my work from an early stage and prioritise my time to ensure deadlines are met. From previous leadership experience, I have developed the confidence to think and work independently. I am determined to be an active lawyer that contributes to all areas of the firm. Therefore, my leadership experience would allow me to be a committed and valuable member of the London team.
+
+------------Work Experience:
+•	[insert]
+--------------Education:
+This applicant studied [insert] at [insert] at undergraduate level.
+
+
+Completion 3:
+---------Weighted average score: X
+
+----------Analysis of Open-Text Questions (Score X):
+Analysis of Open-Text Question 1 ‘Why does a career in commercial law and specifically Sidley Austin interest you?’
+*Inferred points contributing to the rejection of Application 3:*
+
+- *General Commercial Awareness:* The applicant describes interest in M&A transactions and general experiences but lacks specific insights into Sidley's unique strengths and high-profile cases, unlike the detailed deal mention in Application 1.
+- *Lack of Detailed Experience:* Tasks at Latham & Watkins and Kirkland & Ellis are noted but without concrete examples or detailed tasks, missing the depth and specific legal tasks highlighted in Application 1.
+- *Superficial Firm-Specific Engagement:* Mentions networking event with Chloe Francis but lacks depth and specificity in engagement details and firm-specific insight seen in Application 1.
+- *Generic Interest and Capabilities:* An interest in the diversified client base and small team dynamics is mentioned but does not strongly link these aspects to Sidley's unique strengths or detail how this specifically benefits the applicant’s career, as effectively done in Application 1.
+- *Absence of Industry-Specific Knowledge:* Although the applicant mentions interest in private equity, they do not demonstrate specific industry knowledge or certifications, unlike the detailed knowledge and industry connections in Application 1.
+
+Analysis of Open-Text Question 2 ‘Describe a current commercial issue that has interested you and explain why it interested you?’
+*Inferred points contributing to the rejection of Application 3:*
+
+- *General Commercial Awareness:* Discusses the trend of PE companies selling assets to themselves, but it lacks the advanced market insight and latest trend analysis demonstrated in Application 1.
+- *Critique Over Insight:* The application largely focuses on criticisms (calling it a pyramid scheme), rather than providing constructive insights into the commercial and legal implications or potential benefits of the trend.
+- *Lack of Firm-Specific Connection:* Does not link the trend or critique to Sidley's work, clients, or strategic areas, unlike the direct relevance shown in Application 1 regarding Sidley clients and specific practice areas.
+- *Technical and Regulatory Analysis:* Fails to deeply explore regulatory or legal frameworks involved, missing the nuanced regulatory understanding seen in successful applications like Application 1. 
+- *Solution and Legal Implications:* Does not present possible legal advisory roles or how Sidley could navigate or benefit from this trend, differing from the legal opportunities and compliance aspects referenced in Application 1.
+
+Analysis of Open-Text Question 3 ‘In your view, which personal qualities make a successful lawyer?’
+*Inferred points contributing to the rejection of Application 3:*
+
+- *General Proactivity:* Mentions being proactive but lacks specific, legal-based examples or evidence showing how this aligns with Sidley’s clients or practice areas.
+- *Overly Generic Communication Skill Description:* Talks about ensuring emails and documents convey information comprehensively, but does not provide concrete instances of doing so in a legal context, unlike the specific memo writing in Application 1.
+- *Leadership Experience:* Mentioned leadership experience in general terms but does not tie it directly to legal responsibilities or specific accomplishments, unlike detailed examples in successful applications.
+- *Vague Responsibility and Management:* States a belief in taking ownership and prioritising time but fails to illustrate this with specific past experiences or relevant scenarios in a legal setting.
+- *Lack of Commercial Insight:* Mentions that commercial legal work is technical and ever-changing but does not demonstrate an in-depth understanding or specific examples of commercial issues or solutions tied to Sidley’s practice.
+
+-----------Analysis of Work Experience and Education section (Score X):
+[Insert]
+
+
+Prompt-Completion Pair 4:
+Prompt 4:
+Application decision:
+This application was successful.
+
+Open-Text Questions:
+----------Why does a career in commercial law and specifically Sidley Austin interest you?
+I am attracted to commercial law because of the blend between technical expertise and big-picture thinking. In my degree, I most enjoy applying the law to novel scenarios. At Duncan Lewis, I shadowed an unfair dismissals case and was intrigued by how the legal decision unsettled the working culture and led to poor business performance. Commercial lawyers combine these activities as they need to anticipate market changes while using the law to help manage a client company’s risk. 
+I am attracted to Sidley both because of its values and attitude towards growth. After attending Sidley’s BME Open Day, it was clear that your firm’s inclusive culture aligns with my personality. I saw how initiatives, like the Committee on Retention and Promotion of Women, provide support for underrepresented groups. In Year 13, I headed a free GCSE tuition scheme for disadvantaged students whilst at University I organised the Sikh Society ACCESS conference. Therefore, I believe this is a working culture where I would thrive but also be able to contribute toward. At the Cambridge University Sidley dinner, Neils Gravenhorst explained that Sidley has recently used its expertise in life sciences and insurance to build out its private equity team through strategic lateral hires. On the open day, partner Fatema Orjela emphasised that these growing teams in the London office aren’t clouded by the historical weight carried by other firms. This excited me as it means that lawyers are encouraged to contribute to the team’s business direction at an early stage.
+--------Describe a current commercial issue that has interested you and explain why it interested you?
+As a dementia carer, I have seen first-hand how the pandemic exposed weaknesses in the healthcare system. Thus, Amazon’s venture into healthcare intrigued me because although the sector requires refreshing, they are facing huge challenges.
+
+Recently, Amazon launched Amazon Care and Pharmacy, attempting to create a new healthcare platform – with services like on-demand virtual doctors’ appointments that circumvent long waiting times. The company has over one million US employees on whom it can trial services. Arguably, this has come at the perfect time with the US loosening regulations relating to the kinds of care that can be administered over the internet.
+
+However, Amazon’s strategy may face difficulties. If growth through acquiring larger companies is preferred, which previous purchases like Ring and Whole Foods indicate, competition concerns may crystalise into antitrust regulation that stymies growth. Sidley’s life sciences team has expertise in competition law, hence would be strongly positioned to advise Amazon on achieving compliance.
+
+Alternatively, Amazon could choose to develop its interest in early-stage companies. Currently, a 4-week incubator programme for AWS exists. If this investment is scaled up, it could become very attractive to growing biotech companies. This would better the private equity equivalent because Amazon has access to existing infrastructure allowing it to offer supply chain and distribution guarantees that others cannot. Sidley clients, like KKR whose healthcare fund aims to scale up growing companies, would be challenged. Therefore, clients may pivot to seek opportunities in other sectors, away from life sciences wherein Sidley has expertise.
+
+---------In your view, which personal qualities make a successful lawyer?
+Successful lawyers are team players as complex work requires collaboration across practice areas. For example, Gallagher’s acquisition of Willis Towers Watson assets utilised M&A, insurance, tax and IP lawyers from 8 different Sidley offices. Being part of the 4-person CULS careers team strengthened my teamwork skills. We organised all the law career events at the university which required us to delegate events between us and ensure they all ran smoothly.
+
+Lawyers must be highly entrepreneurial. George Herring explained that trainees should be proactive in finding solutions to issues and questioning their supervisors to understand how their work fits into the wider deal. Senior lawyers become successful by translating this into driving business by pitching to clients and winning mandates. As Vice-President of Sikh Society, I developed this entrepreneurial spirit. I sought to ensure the society’s permanence rather than it coming into and out of existence. I focused on financial sustainability by prioritising sponsorship agreements rather than one-off donations, increasing the funding from £1000 to £4000 over the summer alone.
+
+Trainee lawyers must be especially determined. Their fee-earning tasks in corporate teams are often process heavy. Associate Arjun Seghal told me that typical trainee tasks, including project management and conducting due diligence, are very time-consuming. I realised my self-motivated and determined attitude as a consequence of the 4-hour round commute I took to sixth form. Despite the commute, I balanced my academics alongside playing for the football team, being part of the debate team and initiating a GCSE tuition scheme.
+
+------------Work Experience:
+•	[insert]
+--------------Education:
+This applicant studied [insert] at [insert] at undergraduate level.
+
+
+Completion 4:
+---------Weighted average score: X
+
+----------Analysis of Open-Text Questions (Score X):
+Analysis of Open-Text Question 1 ‘Why does a career in commercial law and specifically Sidley Austin interest you?’
+*Inferred points contributing to the success of Application 4:*
+
+- *Commercial Awareness:* The applicant showcases an understanding of the intersection between legal decisions and business performance, exemplified by the experience at Duncan Lewis, mirroring the depth of commercial insights seen in Application 1.
+- *Firm-Specific Interest:* Clearly articulates interest in Sidley's growth in life sciences and insurance sectors and mentions strategic lateral hires—demonstrating a nuanced understanding of Sidley’s strengths similar to Application 1's FinReg expertise.
+- *Active Engagement with the Firm:* Attended Sidley’s BME Open Day and Cambridge University dinner, providing specific details from these events and insights from personnel like Neils Gravenhorst and Fatema Orjela, similar to Application 1’s proactive engagement.
+- *Cultural Alignment and Values:* Highlights Sidley’s inclusive culture and initiatives, aligning personal experiences of heading diversity efforts with the firm’s values.
+- *Industry Connection:* Links commercial law interest to broader market dynamics and regulatory change, aligning with Sidley’s strategic growth areas, akin to Application 1's connection to FinTech and regulatory research opportunities.
+
+Analysis of Open-Text Question 2 ‘Describe a current commercial issue that has interested you and explain why it interested you?’
+*Inferred points contributing to the success of Application 4:*
+
+- *Personal Connection and Commercial Insight:* Starts with a personal experience as a dementia carer, tying it to Amazon's healthcare ventures, showcasing deep commercial awareness and personal engagement.
+- *Understanding of Market Impact:* Explains how Amazon's healthcare initiatives can address current weaknesses in the system, demonstrating sophisticated market knowledge.
+- *Regulatory Insight:* Highlights potential antitrust regulation challenges and connects these to Sidley's expertise in competition law, illustrating a clear grasp of legal implications.
+- *Firm-Specific Relevance:* Links Amazon's strategies to Sidley’s life sciences team and KKR, tying client interests and Sidley’s advisory capabilities directly to the topic.
+- *Strategic Alternative:* Discusses the potential for Amazon to scale its investment in early-stage companies, showing an understanding of strategic alternatives and their implications for Sidley's clients.
+
+Analysis of Open-Text Question 3 ‘In your view, which personal qualities make a successful lawyer?’
+*Inferred points contributing to the success of Application 4:*
+
+- *Teamwork and Collaboration:* Highlights experience in organizing law career events at university, showing practical teamwork skills relevant to the legal field, similar to how Application 1 showcased specific relevant skills.
+- *Entrepreneurial Spirit:* Links entrepreneurial drive to concrete achievements as Vice-President of Sikh Society, achieving substantial funding growth—demonstrates initiative and proactivity, which was lacking in rejected applications.
+- *Determination and Work Ethic:* Specific example of managing a demanding commute while balancing various commitments demonstrates resilience and time management, aligning well with Sidley's expectation of handling complex and time-consuming tasks.
+- *Contextual Understanding:* Provides examples of discussions with Sidley associates, indicating a specific understanding of the firm's demands and environment.
+
+-----------Analysis of Work Experience and Education section (Score X):
+[Insert]
+
+--------------Some key points to bear in mind:
+1) Use all your experience on inferring the reasons the rejected applications have been rejected and the reasons the successful ones would have been successful. Discuss both the possible reasons the application could have been rejected based on all the patterns you have identified from your experience. Also discuss some key strengths (if any) of the New Application that the applicant should retain that match the patterns you've noticed across the successful applications you have reviewed.
+
+2) Tailor your feedback on the new application to be as data-driven (based on the applications and the reviews given above) as possible. Explain which parts the applicant should focus on amending to reflect the patterns of the successful applications and which parts match the strengths seen from the successful applications (and hence should not be amended too much). Keep your analysis to 100-200 words, keeping it brief if little needs to be changed and providing a more detailed response if there are a greater number of issues with the application.
+
+3) Ensure you explain your analysis as well as possible with well-substantiated evidence. Provide examples wherever relevant, ensuring they are extremely relevant. When providing examples, discuss how the rejected applications have made the issues identified and how successful applications have matched the strengths identified.
+
+4) When making suggestions as to how the application could be improved, reference how a successful application did so based on the applications you remember through the above applications and the reviews, using quotations only where relevant.
+
+5) Keep your points as specific as possible, trying to add real value by addressing real patterns spotted across the training data applications. Ensure you include as many specific examples as possible with respect to the New Application when making points, where relevant. Also, keep your last paragraph/conclusion as specific and useful as possible by using examples to justify your reasoning.
+
+6) Try to recall as many parts of the prompts (in the above applications and their reviews) as possible. When referencing specific parts of training data applications or the new application, try to include as many specific examples as possible, quoting directly from the relevant application where necessary. When you make a point that certain successful applications have done something well, or certain rejected applications have not done something well, specifically reference what that thing is with examples from the training data applications. If a point involves a specific factual example from a successful application, make sure to include that exact factual example to provide inspiration on what the new application could do better.
+
+7) Given the word-limits, identify which parts of the new application require the most change to reflect the most common patterns observed in successful applications. Each Open-Text Question has a word-limit of 250 words.
+
+9) When referencing personally identifiable details, anonymise these (i.e names, specific schools etc...). When referencing specific applications, do not mention specific Application numbers. Only reference 'successful' or 'rejected' applications.

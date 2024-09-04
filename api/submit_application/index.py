@@ -16,11 +16,6 @@ jones_day_prompt = read_prompt('jones_day_prompt.txt')
 sidley_austin_prompt = read_prompt('sidley_austin_prompt.txt')  
 dechert_prompt = read_prompt('dechert_prompt.txt')
 
-# Additional Sidley Austin specific prompts
-why_career_sidley_austin_prompt = read_prompt('why_career_sidley_austin_prompt.txt')
-commercial_issue_prompt = read_prompt('commercial_issue_prompt.txt')
-personal_qualities_prompt = read_prompt('personal_qualities_prompt.txt')
-
 class handler(BaseHTTPRequestHandler):
     def set_CORS_headers(self):
         self.send_header('Access-Control-Allow-Credentials', 'true')
@@ -38,14 +33,13 @@ class handler(BaseHTTPRequestHandler):
         post_data = self.rfile.read(content_length)
         data = json.loads(post_data.decode('utf-8'))
         
-        application_text = data.get('applicationText')
+        questions_and_answers = data.get('questions_and_answers')
         firm = data.get('firm')
-        question = data.get('question')
         work_experience = data.get('work_experience', '')
         education = data.get('education', '')
         sub_category = data.get('sub_category', '')
         
-        if not application_text or not firm or not question:
+        if not questions_and_answers or not firm:
             self.send_error(400, "Missing required data")
             return
 
@@ -72,27 +66,18 @@ class handler(BaseHTTPRequestHandler):
                 system_prompt = jones_day_prompt
                 model = "gpt-4o"
             elif firm == "Sidley Austin":
-                # Use specific prompts based on the question
-                if question == "Why does a career in commercial law and specifically Sidley Austin interest you? (250 words max)":
-                    system_prompt = why_career_sidley_austin_prompt
-                elif question == "Describe a current commercial issue that has interested you and explain why it interested you? (250 words max)":
-                    system_prompt = commercial_issue_prompt
-                elif question == "In your view which personal qualities make a successful lawyer? (250 words max)":
-                    system_prompt = personal_qualities_prompt
-                else:
-                    system_prompt = sidley_austin_prompt
+                system_prompt = sidley_austin_prompt
                 model = "gpt-4o"
             elif firm == "Dechert":
                 system_prompt = dechert_prompt
                 model = "gpt-4o"
 
             user_prompt = f"""Firm: {firm}
-            Question: {question}
             Application decision:
             This application was rejected.
 
-            Open-Text Question:
-            {application_text}
+            Application Content:
+            {questions_and_answers}
 
             Work Experience:
             {work_experience}

@@ -91,7 +91,7 @@ export const createApplicationDraft = async (draftData) => {
   return await response.json();
 };
 
-export const handleApplicationSubmit = async (user, applicationText, selectedFirm, selectedQuestion, setFeedback, setTotalTokens, setResponseTime) => {
+export const handleApplicationSubmit = async (user, applicationText, selectedFirm, setFeedback, setTotalTokens, setResponseTime) => {
   if (!user) {
     throw new Error('Please log in to submit your application.');
   }
@@ -103,11 +103,15 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
     const userAgent = navigator.userAgent;
     const screenSize = `${window.screen.width}x${window.screen.height}`;
 
+    // Combine all questions and answers into a single string
+    const questions_and_answers = Object.entries(applicationText)
+      .map(([question, answer]) => `${question}\n${answer}`)
+      .join('\n\n');
+
     const data = await submitApplication({
       userId: user.id,
-      applicationText,
       firm: selectedFirm.value,
-      question: selectedQuestion.value,
+      questions_and_answers,
       email: user.email
     });
 
@@ -118,8 +122,7 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
 
     await insertApplication({
       firm: selectedFirm.value,
-      question: selectedQuestion.value,
-      application_text: applicationText,
+      questions_and_answers,
       feedback: data.feedback,
       email: user.email,
       device: userAgent,
