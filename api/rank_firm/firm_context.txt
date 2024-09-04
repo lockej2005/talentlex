@@ -1,0 +1,838 @@
+You will be given a student user profile who wants to consider applying to one of the given firms. Based off of their profile given in the user input and the large text context you're given for each firm, return a ranked order of firms relevant to the user, with an accuracy score between 0 -1 and to 2 decimal places. 
+
+Follow this JSON structure (the data here is an example:
+{
+  "law_firms": [
+    {
+      "name": "Goodwin",
+      "relevancy_rank": 0.8
+    },
+    {
+      "name": "Sidley Austin",
+      "relevancy_rank": 0.77
+    },
+    {
+      "name": "White and Case",
+      "relevancy_rank": 0.45
+    },
+    {
+      "name": "Dechert",
+      "relevancy_rank": 0.23
+    }
+  ],
+  "justification": "Goodwin is well suited to this candidate because..."	
+}
+
+
+FIRM CONTEXT
+BEGIN
+
+----------------------------Start of Goodwin---------------------------- 
+With winning ambitions, Goodwin is a firm favoured by start-ups and private equity powerhouses alike.
+
+Goodwin training contract review 2024
+
+The Firm
+It’s not always the case, but sometimes, to get a sense of a law firm’s capabilities, you need only look at where it’s decided to put its offices. Take Goodwin, for example. Founded by two classmates on a Boston sidewalk just over a century ago, the firm today has 16 bases around the world. Notably, many of these can be found the world’s major tech and life sciences hubs. Along with Boston, there are bases in Silicon Valley, San Francisco, and New York in the States, and beyond the US, the firm has also set up shop in South-East Asia in Hong Kong and Singapore. In 2019, Goodwin established a life sciences and technology hub in Cambridge – a well-known hotspot for tech in the UK. It’s these sorts of moves that prompted one Goodwin trainee to describe it as “a firm that’s agile and nimble.”
+
+“It’s a huge firm trying to get huger.”
+
+The London office is only 15 years old (that’s fairly young by law firm standards!), and in that time it’s grown to a headcount of more than 200 lawyers. To put it simply, “it’s a huge firm trying to gethuger.” It’s actually grown so much that the digs are starting to feel a little crowded. “We’re spread across three offices in London because we’ve grown too big!” Fortunately, the firm is gearing up for a move to Sancroft at Paternoster Square in early 2024. “We’re all excited to be under one roof,” trainees told us.
+
+There are more signs of growth at the junior end in particular. Goodwin launched its training contract six years ago with an intake of just four trainees a year – today it’s more than tripled to 14. But even though the class sizes are growing, the numbers were just right for our interviewees. “After getting experience with UK firms, I wasn’t too keen on large intakes,” one shared. “With US firms, trainees get a say in their workstreams, and it’s not top down.” Trainees felt able “to gain responsibility, contribute to much larger deal documents, and get real breadth” in their experience.
+
+Science and engineering degrees can be a plus (though it’s definitely not a prerequisite!) as this boffin attested: “I was looking to leverage my degree in applications with firms that were in that field, and Goodwin was the best fit.” Living up to its start-up smarts, Goodwin is rated as one of the best firms in the UK for venture capital according to Chambers UK, along with real estate funds. Its real estate team is also among the best in London for mid-market deals. On an international scale, Goodwin’s strong private equity expertise is recognised in Chambers Global, and that forms a major chunk of the London practice too.
+
+The Seats
+Once trainees have succeeded in the application process and are ready to begin, they email the early careers team with their top three seat choices. “They try to accommodate you, but it depends on the number of applications and business need,” a trainee explained. With trainees expected to take four seats for six months each, “most people will do a private equity and a funds seat.” There are also options in real estate, technology and life sciences, tax, litigation, antitrust, general commercial IP, and finance.
+
+Without a doubt, a stint in private equityprovides a front-row seat to the core of Goodwin’s work. As a trainee explained, the scope of the work here covers “corporate governance, M&A matters, and the acquisition of businesses by private equity funds.” Goodwin mostly acts on the buy-side of transactions, often in tech and life sciences, like acting for CSafe Global, a shipping company, on its acquisition of Softbox, a packaging provider for the biotech and pharmaceutical industries. In the tech sphere, it advised Mayfair Equity Partners on its $120 million investment in LoopMe, a mobile ad platform. Other strengths include the capability to advise across the investment lifecycle, from fund formations to restructurings and exits. Trainees can expect to “review documents from the data room, coordinate deadlines, and act as a conduit between teams and opposing counsel.” Under the corporate governance umbrella, “it’s a good mix of due diligence and drafting. If clients want to change their board of directors, you do the consents involved,” for example. “You can work on disclosure letters if you ask.” Other additional tasks include “pulling together reports and proofreading them.”
+
+“You must make sure everything is perfect, in the right order, and at the right time.”
+
+The funds seat focuses on private fund formation, structuring and fundraising, often acting for fund sponsors. “You are dealing with a lot of different investors coming in, so it’s pretty admin-heavy,” one said. “The core skill is process management. Funds are structured in intricate ways. You must make sure everything is perfect, in the right order, and at the right time.” Sounds like a good place for perfectionists! Between them, interviewees had also got drafting experience with board minutes and side letters. It recently advised on the launch of investment platform Plural, including a €250 million early-stage venture fund. The firm also acted for Intermediate Capital Group on the structuring and fundraising of an €8 billion fund.
+
+For trainees with a keen interest in start-ups, the technology and life sciences department takes on “early-stage companies that have big prospects,” as one insider put it. “We work with them from the seed round all the way to IPO!” The bulk of the matters involve venture capital investment, M&A work, and some restructuring. The team here recently advised MiroBio (based in the Oxford Science Park) on a share purchase agreement for its $405 million sale to biopharmaceutical giant Gilead. It also advised biotech company ReViral on its $525 million acquisition by Pfizer. “You get a bit more responsibility in venture capital because the clients have a smaller budget, and it’s exciting because you’re acting at an early stage,” an interviewee noted. They found more responsibility, but still, “the core of trainee work is support. The partner brings in the deal, the associates run it and we help move it along.” Our sources mentioned monitoring deadlines, drafting resolutions and ancillary docs. They also attended board meetings, conducted research, and dealt with all the signatures and shareholder communications.
+
+Under the bigger finance umbrella, there is real estate finance, debt finance, and restructuring. “In restructuring, we work with companies that are in distress financially,” one explained, “while in real estate and leveraged finance, we help companies find a way to fund real estate transactions and the acquisition of companies.” Our sources who’d sat here had managed conditions precedent checklists, and drafted board minutes, debentures and share charge agreements. Trainees are also involved in preparing shareholder resolutions and completing background checks.
+
+The commercial litigation team offered a different experience as “a small team with two partners and five or six associates.” The practice handles complex disputes with individuals, businesses, and government bodies. A trainee mentioned doing a lot of “investigations work and sanctions research right after the Ukraine invasion.” The trainee work varies and it includes drafting legal correspondence, taking part in strategy discussions, prepping for hearings, court filings and monitoring court deadlines. In a recent case, Goodwin defended Cycle Pharmaceuticals against a $2.2 million claim relating to a drug that Cycle developed and commercialised. Goodwin also acts for claimants, and at the time of writing was representing online food delivery company Delivery Hero in a multimillion-dollar claim against Mastercard, concerning a business agreement between the two that had indicated Delivery Hero would get a $40 million ‘sign on’ bonus.
+
+Trainee Life
+Given that “Goodwin has grown in leaps and bounds with lots of laterals” in the last few years, it was no surprise to hear several interviewees describe the feel of the firm as “growth-oriented” and “a melange of cultures.” For example, “teams with people from legacy firmsare different from other teams, because they inherited their culture.” But trainees clarified that “we all aim for the same thing and that brings us together – the firm wants to grow and everyone wants that.”
+
+Moreover, we heard the firm “wants you to use ‘anchor’ days to socialise” in the office – trainees are expected to be in at least three days a week. One highlight that “brings everyone together” is a weekly food truck pop-up at lunchtime. “It’s nice because you can see people from other teams.” While there are “occasional” team get-togethers, “trainee socials stand out the most.” They get a budget to spend together on “nice dinners at good restaurants.”
+
+Given that most teams are transactional, the environment is fast-paced and the hours can be full on: “Sometimes we finish at 7pm and other times at midnight.” This is a familiar story among trainees at US firms in London, and isn’t particular to Goodwin. One trainee noted that “everyone is appreciative of your work, especially if you work on the weekends.” Another one recalled that after a particularly busy stint “the people I worked with gave my supervisor great feedback, which was nice.”
+
+Speaking of supervisors, trainees normally sit in the same room as their supervisors, which they liked. “With lots of contact, you stop worrying about being disruptive,” a source commented. For more formal feedback, trainees have a mid-seat and end-of-seat appraisal. Outside of that, training varies by department. “The funds teams have two dedicated knowledge management lawyers and put on weekly training, while other teams have sporadic training,” an interviewee pointed out, and it is a format other teams are increasingly trying to replicate. Most training is in-house but external providers can be brought in to talk about topics ranging from diversity, equity and inclusion in the workplace, to reading financial documents. “They train us on core issues in transactions. It’s minimal, but you get enough to bridge the gap between law school and work.” In addition, they reasoned, “you can only learn so much from a PowerPoint presentation. You learn more by doing and trying your hand.”
+
+“A hugely insightful play built on the experience of people at the firm…”
+
+This mentality is also reflected in pro bono: “Goodwin cares about pro bono.” As an encouragement for everyone to get involved, an unlimited number of pro bono hours can count towards the annual billing target. Everyone receives weekly emails highlighting the pro bono opportunities that are available. For example, the firm has a partnership with TrustLaw, an organisation that sources and aggregates transactional pro bono opportunities. “You get experience you might not get from billables,” a trainee appreciated. Our interviewees also occasionally worked at the South Westminster legal advice centre, “usually with a partner and an associated.” One shared their experience with us: “I worked with someone who needed emergency housing and was being stonewalled by the council.”
+
+And what do efforts in diversity look like at Goodwin? The firm has a committee for racial and economic diversity (CRED) which organises retreats in the US every year. Last year, it was split between Boston and New York. Earlier in 2023, Goodwin put on a series of face-to-face Inclusive Leadership training sessions, specifically tailored to the firm’s UK, Germany, and Luxembourg offices. The sessions were co-designed with, and delivered by, an external organisation called Steps who use interactive drama to inspire behavioural change.
+
+In typical US fashion, Goodwin compensates its trainees and NQs with salaries in line with competitors at £52,000 for first-years, rising to £160,000 upon qualification. Each department handles the qualification recruitment themselves. “In funds you have to go for a technical interview with a partner, while in commercial, you take part in a negotiation exercise.” In 2023, the firm retained 9 of 12 qualifiers.
+
+A winning bet? While there’ve been a lot of lateral hires in recent times, trainees observed that “people aren’t leaving. It’s a long-time bet.”
+
+How to get into Goodwin
+The application and assessment
+
+Candidates can apply to the firm via the online application form. Within the application, Goodwin is looking for the classics: “We would like to understand why they have chosen a career in law and why they are interested in Goodwin specifically.” Goodwin's early careers recruitment manager adds: “We expect candidates to have explored what it would be like to work in a City commercial law firm, and be able to demonstrate their commercial awareness.”
+
+Those that pass the initial review are invited to a first-stage interview with two members of the early careers recruitment panel.
+
+Goodwin's early careers recruitment manager warns that candidates should “be prepared to  answer questions around their motivation for law and Goodwin, and to be asked some relatively tough questions to test their commercial awareness.”
+
+Assessments come in the form of a written exercise and group exercise, both based on a case study. With the written exercise, the “emphasis is on assessing the candidate's written communication, time management and attention to detail,” whereas the group exercise “looks at interpersonal skills, how they present and how they work in a group.”
+
+Vacation scheme
+
+There are up to 20 spaces on offer for each of Goodwin's spring and summer vacation schemes. The application is the same as the direct trainee solicitor programme application, and vac schemers are automatically considered for the trainee solicitor role as well.
+
+Students gain exposure in at least one practice area: “We try to meet everyone’s preferences on practice area, although this is not always possible.” Students can expect to shadow associates, attend client meetings, and attend information sessions on the work of practice areas in the London office. The emphasis is very much ensuring that candidates “experience the Goodwin culture.” Highlights include a session with the firm’s global chair. On top of that, there are a number of social perks. “Our headline socials for the vac schemers were the painting social and an evening at Puttshack,” Goodwin's early careers recruitment manager tells us. “It was good to see them mix with the current trainees.”
+
+“We recruited 14 trainees across several intakes from our 2023 vacation schemes,” Goodwin's early careers recruitment manager confirms.
+
+Trainee profile
+
+There are up to 14 spots up for grabs, but with around 600 applicants each year, how can a candidate really stand out? “Those that stood out had really researched the firm and tailored their application to us. They had highlighted traits in themselves that matched our values,” Goodwin's early careers recruitment manager reflects.
+
+Profile
+Goodwin
+
+100 Cheapside,
+London,
+EC2N 1HQ
+Website www.goodwinlaw.com
+
+Firm profile
+We are in the business of building authentic, long-term relationships with our clients, who are some of the world’s most successful and innovative investors, entrepreneurs and disruptors in the life sciences, private equity, real estate, technology and financial industries, and where they converge. Our immersive understanding of these industries – combined with our expertise across high-stakes litigation and dispute resolution, world-class regulatory compliance and advisory services, and complex transactions – sets us apart.
+Main areas of work
+Financial Industry: Our Financial Industry practice provides clients with a full-service platform across transactional, compliance, regulatory, enforcement and litigation matters. Our lawyers offer extensive experience in the investment management, banking, insurance, fintech, consumer finance, commodities, broker-dealer and investment bank sectors.
+
+Life Sciences: Our Life Sciences practice serves clients who work collaboratively to improve patients’ lives with market-leading innovations and technology. We advise companies throughout the corporate lifecycle, from pure startups to commercial-stage biopharmaceuticals, as well as the investors, banks and other entities that support those companies.
+
+Private Equity: Our Private Equity practice focuses on middle-market private equity. We advise founders, buyers, sellers, investors, boards and special committees in matters across the corporate lifecycle. Our private equity work includes buyouts, growth equity deals and growth company representations in the technology, healthcare, financial and business services, and consumer and manufacturing sectors.
+
+Real Estate: Our Real Estate practice places a distinct emphasis on the capital markets, working on transactions that involve equity and debt financings, joint ventures, portfolio and REIT M&A, cross-border transactions, hospitality and leisure, and large-scale development work.
+
+Technology: Our Technology practice supports companies seeking to secure funding, protect their intellectual property and navigate a challenging regulatory environment. We also help our technology clients differentiate their products in the marketplace and scale their businesses accordingly.
+Training opportunities
+Goodwin’s London office recruits 14 trainees each year and offers a variety of training in our core practice areas including tech and life sciences, private equity, private investment funds, litigation, antitrust and real estate. Our size and continued growth allow us to offer our trainees and associates increased responsibility and meaningful client contact from the outset. We work in small teams, which gives our lawyers the opportunity to work directly with, and be mentored by, senior colleagues, and to develop a network that will be an invaluable part of their future career development. Goodwin trainees will complete four 6-month seats. 
+Vacation scheme
+
+We run both a Spring and a Summer Vacation Scheme, which provide real insight into what it is like to train and work at Goodwin while giving you the opportunity to get to know us and your colleagues better. You will witness first-hand the work we do for our clients by shadowing partners and associates, attending client meetings, and participating in negotiations and departmental meetings.
+Students will witness first-hand the work we do for our clients by shadowing associates, attending client and business unit meetings, and attending information sessions focussed on the work of each practice area in the London office.
+
+You will leave our programme with valuable mentors and a large professional and social network. All vacation scheme participants are automatically considered for a place on our trainee solicitor programme.
+
+Spring Scheme: 15 - 19 April 2024
+Summer Scheme: 17 - 21 June 2024
+
+To apply please visit https://www.goodwinlaw.com/en/careers-pages/early-careers-in-the-united-kingdom
+Other benefits
+
+First year salary: £52,000
+Second year salary: £57,000
+
+• Law school sponsorship for PGDL and LLM SQE 1 & 2 course, with a maintenance grant of £15,000 per year of full time study
+• Private medical insurance for you and your eligible dependents
+• Personal travel insurance
+• Dental insurance for you and your eligible dependents
+• Group term life insurance – income protection up to 75% of base salary
+• Season ticket loan
+• Pension contribution of 6% of your basic salary
+• Tuition/certificate/license reimbursement
+• Employee Assistance Programme
+• Digital health and wellbeing service
+• Mental health counselor
+• Family planning services and reimbursement policies
+• Family care support programme
+• Eye test and glasses reimbursement
+• Cycle to Work (with onsite lockers and shower facilities)
+• Virtual GP
+• Gym and wellness subsidies, including free Headspace membership
+• Discounts and special offers with select retailers
+Firm Facts
+Famous for: private equity and funds work; innovation hub in Cambridge
+
+Locations: London, Cambridge
+
+Overseas offices: 14
+
+UK partners/solicitors/trainees: 66/127/27
+
+Seats: 4x6 months
+
+Overseas seats: Yes
+
+First-year trainee salary: £52,000
+
+Second-year trainee salary: £57,000
+
+NQ salary: £160,000
+
+Seat options: technology and life sciences, private equity, private investment funds, real estate, tax, financial services, antitrust, and complex litigation and dispute resolution
+
+Training contract deadline: 15 December 2023
+
+Vac scheme deadline: 15 December 2023
+
+Course fees sponsored: SQE; PGDL
+
+Quick Contacts
+Goodwin
+100 Cheapside
+
+London
+EC2N 1HQ
+
+Email:
+Website: www.goodwinlaw.com
+
+This Firm's Rankings in
+UK Guide, 2023
+Ranked Departments
+London (Firms)
+Banking & Finance: Sponsors (Band 4)
+Real Estate: £50-150 million (Band 2)
+Restructuring/Insolvency (Band 5)
+Tax (Band 5)
+UK-wide
+Hotels & Leisure (Band 3)
+Investment Funds: Real Estate (Band 1)
+Life Sciences: Transactional (Band 1)
+Private Equity: Buyouts: Up to £500 million (Band 2)
+Private Equity: Venture Capital Investment (Band 1)
+
+----------------------------End of Goodwin----------------------------
+
+----------------------------Start of Sidley Austin----------------------------
+Saddle up for Sidley Austin: this US firm has a world-class funds practice, but it’s no one-trick pony.
+
+Sidley Austin training contract review 2024
+
+The Firm
+Among Sidley’s greatest achievements, we’d highlight its world-class reputation in hedge funds, its status as one of the top ten highest-grossing law firms in the world, and its role in producing one of the world’s best power couples (the Obamas). Beyond the firm’s numerous notable alumni, Sidley Austin’s gargantuan reach of 22 global offices makes a startling impression. With 2,400 lawyers around the world, “it sometimes feels unimaginably enormous,” says training principal Patrick Harrison.
+
+“We are most known for private equity work.”
+
+It’s fair to say that Sidley Austin is more of a household name in its native US, where you’ll find half of its offices (opening most recently in Miami) and dozens of Chambers USA  rankings. The London office is the largest of Sidley’s four European bases, housing 350 lawyers and for the last three years in a row, it’s recorded double-digit revenue growth.Harrison gives us a sense of its coverage, highlighting litigation and arbitration, employment, regulatory, life sciences, tax, and “all aspects of finance” as some of the areas of work on offer. “Within that breadth, we are most known for private equity work, and that’s really picked up in the last six years,” he tells us.Sidley earns recognition from Chambers UK for investor representation and hedge funds, as well as payments law, data protection, insurance, and capital markets in London.
+
+Of course, Sidley’s “reputation for having some of the highest calibre of work” was a juicy draw for incomers, but it was also the size of the intake: “Having 12 to 15 trainees suits how you’re going to learn.” That is to say, “a lot of learning by doing.” As one elaborated, “within two weeks of being in a seat, I was involved in a big deal!”
+
+The Seats
+When it comes to picking seats, while Sidley is best known for its private equity work, training principal Patrick Harrison underscores that the London office has "a broad portfolio of specialisms trainees can go into from the outset.” The training contract does have a strong finance flavour, and most trainees are likely to do a stint in the corporate department, but there are also seat options in groups like healthcare and regulatory.To start with, the firm sends out a list of options for trainees to consider before submitting their preferred destinations. We heard the firm looks to recruit an array of newbies with different interests to ensure that trainee intakes aren’t too skewed towards any one group. Most of the cohort got one of their top three choices for placement (and those who didn’t said they’re guaranteed a top three choice for their next seat).
+
+With around 45 people in corporate, “it’s a big team,” trainees told us. “Corporate has a lot of different workstreams” in industries ranging from financial services, insurance and real estate to technology, life sciences and hospitality. The team mostly handles cross-border M&A and mid-market private equity of deals in the tens of millions, although there are some bigger transactions reaching into the hundreds of millions. These are “arguably more popular,” one trainee grinned, “because it’s the deals you read about in the press!” Football fans will be interested to learn that Sidley represented the private equity company Clearlake in its acquisition of Chelsea Football Club.In another biggie, Sidley Austin advised insurance company Arthur J. Gallagher & Co on a $3.35 billion acquisition. “Within my first week I was working on multiple deals,” one trainee told us, “with lots of drafting opportunities and helping with aspects of purchase agreements.” Trainees are also expected to carry out the less exciting due diligence on a deal, and while “that can get a bit repetitive,” combined with research tasks it was good experience for those just starting out. Sidley places some emphasis on proactivity in this department, expecting trainees to reach out for work, and “rewarding” those that do.
+
+“We were working on restructurings for Chinese companies, so those hours start relatively early!”
+
+Restructuring  can be a busy seat for trainees, particularly given the firm’s international client base. “We were working on restructurings for Chinese companies, so those hours start relatively early!” In 2023, Sidley represented China Fortune Land Development in the restructuring of its $4.96 billion offshore debt. In another cross-border matter in Europe, the firm advised Schur Flexibles (a plastic packaging manufacturer) on its €600 million restructuring. One interviewee detailed their experience: “As you become more acquainted and engaged in the team, your responsibilities grow to include involvement in strategy meetings, and taking responsibility when it comes to drafting. So towards the end you get pretty comfortable!”
+
+The firm’s banking and financial servicesteam is “pretty much exclusively advisory,” and encompasses three main types of work. First up, there’sinvestment funds, advising US hedge funds on UK regulations. Then you have the regulation of payment services, and helping banks and asset managers navigate the UK aspects of securitisation transactions in the US. “I focused on payment services,” one told us. “They’re happy for you to pick one out.” This team also played a role in Clearlake’s acquisition of Chelsea FC, advising on an £800 million loan agreement.
+
+The data privacy team is part of the firm’s global privacy and cybersecurity group, and is currently advising pharmaceutical company Bristol Myers Squibb on GDPR and privacy issues in both the UK and the EU, related to collecting sensitive data during clinical trials. Trainees can expect to do research around topics like these, and there were also plenty of interesting writing tasks: “I wrote a report for a video surveillance company on facial recognition technology,” said one. Trainees also “wrote blogs on new laws and different proposals.”
+
+On the contentious side, trainees can sit in the arbitration and international disputes practice. There are also white-collar investigations on the go. “Sidley has all of that in one,” one trainee explained, and “you’re required to be on all of those to see the broad range of work in London!” While there is “a bit of grunt work, like proofreading and taking attendance notes and all that jazz,” trainees can get a bit of client contact in this “intense” seat. “I worked on a judicial review application,” one shared. “I got to take the lead on witness interviews and putting together witness statements.” Sidley recently defended Brightline (formerly Virgin Trains USA) against a $250 million breach of contract claim by Virgin Enterprises (a subsidiary within Virgin), after Brightline terminated their trade mark licence agreement. Under the white-collar banner, Sidley represented Lars Mørch, a former executive board member of Danske Bank, during an investigation into money laundering for sums of $230 billion.
+
+Trainees also get the chance to go on secondment either with firm clients (“you can go to a Premier League team, which is pretty cool!”),or to Brussels for a competition seat. And trainees told us pro bono is “huge” at the firm: “There’s a real drive – in the first week they had a session about the different types of pro bono available, so every trainee is involved in at least one matter.”
+
+Trainee Life
+You’ll find Sidley’s London office in the Can of Ham building opposite the Gherkin on Liverpool Street. “It’s lovely,” one trainee praised. There’s a rooftop terrace and the odd extracurricular activity – "sometimes they’ll have something like wreathmaking at Christmas.” The firm takes up the 21st down to the 14th floor, where people usually have lunch: “It’s not a cafeteria, but there’s a lovely kitchen area where you have fresh fruit and barista-style coffee machines. And we can get Deliveroo after a certain time!”
+
+While the trainees we spoke with tended to travel into the City for most of the week, Sidley has no formal firm-wide policy on working from home, instead allowing practices to decide on what works best for them. From what we heard, restructuring, employment, privacy, and regulatory tended to be the most flexible, while litigation and leveraged finance expected trainees to be in every day. Those we spoke with did stress that while some groups are slightly stricter, “there’s no expectation to be in into the late hours of the night!” Trainees were pretty accepting of the “long hours” that were sometimes required of them, warning incomers: “Don’t make weekday plans if you know your team is busy!” They reasoned that “everyone’s going through the same thing,” and they’re also compensated with a hefty salary befitting of a US firm in London. “No problems there,” one commented.
+
+Trainees also stressed that “everyone was always in, which made working as a team a lot better.” They typically share an office with a supervisor or another trainee, which insiders told us was vital for getting quick feedback on tasks. “Partners won’t acknowledge your existence at some firms,” one trainee mused, but thankfully, “that doesn’t happen here! They’re the most down-to-earth people you’ll have met in your life.” And they said if they ever had “any concerns, you can go to your senior associate comfortably.”
+
+Going into the office was also helpful for building their social networks. Trainees said they often meet up to have lunch together, and go for drinks each quarter (paid for by the firm). “They’ve cut a bit of the social spending budget with the state of the market,” but despite this, Sidley plans a good number of formal events through the year, including the annual Christmas do, summer party, and events through the firm’s affinity groups.
+
+“If you want to do retreats to the US, Sidley is the place to be!”
+
+The firm’s women’s group is particularly active, meeting regularly and hosting events such as the International Women’s Day coffee morning. Trainees were also positive about the firm’s efforts for other minority groups and felt that the firm’s ethnic minority network“really makes a difference.” For example, the firm holds a black lawyers retreat in LA, which trainees in the London office are invited to, as well as an Asian lawyers retreat, which was most recently held in New York. There’s also an LGBTQ+ retreat in Chicago. So “if you want to do retreats to the US,” one trainee quipped, “Sidley is the place to be!”
+
+In true US firm fashion, trainees picked up most of their skills during on-the-job training, but this doesn’t mean the firm leaves its newbies high and dry. There are formal trainings across the practice spectrum, including weekly M&A and private equity sessions. “We’re given training on non-disclosure agreements and competition,” for instance. “Then you have investment and regulatory team-specific trainings talking about market structure and the different players in the financial industry… it’s good to hear the theory behind it.”
+
+When the time for qualification rolls around, HR publishes the seats that have roles available and qualifying trainees make their applications. “There is an informal track though,” one insider told us, so it’s common for trainees to have had chats with the teams they’re interested in by the time the formal process kicks off. By then, our sources felt “it’s kind of just a hoop-jumping exercise.” In 2023, 8 out of 14 qualifiers joined Sidley as NQ associates.
+
+21 Days Later
+
+Sidley Austin held ‘21 days of diversity’ encouraging attorneys to engage with a piece of media, sparking conversations around diversity and inclusion at the firm.
+
+How to get a Sidley Austin training contract 
+
+Applications and assessments  
+
+The firm launched a vacation scheme in summer 2013 and now receives around 1,000 applications each year. Sidley recruits all trainees through the vacation scheme. 
+
+The initial online form sets out to assess candidates' commercial awareness, academic record and work experience. The form includes a question asking applicants to describe a recent commercial issue. A graduate recruitment source tells us this is “the first question I look at when shortlisting candidates – it's a very telling question, as it reveals what interests applicants have and speaks to elements of their personality.”  
+
+Aspiring recruits need a high 2:1 degree with consistently good grades throughout. The firm pays attention to A level results, but also uses Rare’s contextual recruitment system and considers mitigating circumstances. 
+
+The firm keeps an open mind on the work experience front. “This doesn't have to be legal experience,” confirms our recruiter source, telling us, “It’s actually refreshing to see non-legal work experience on the form. It's particularly impressive to see someone who has thrived academically while also holding down a part-time job.” Tying these experiences and the skills acquired from them to the realities of a job in a City firm is a must.  
+
+Those who impress on paper are invited to attend an hour-long interview with one partner/counsel. 
+
+The interview  
+
+“We can see from their application form that shortlisted candidates have excelled academically,” our source tells us, “so the next part of the selection process provides us with an opportunity to test their intellect and find out more about the individual and their personality.” Candidates are given each interviewer's biography beforehand. We suggest using this as a tool to stimulate conversation and make the interview a two-way exchange.   
+
+Ultimately, it's “the subtle things” that are scrutinised during the interview, we're told – for example, whether someone is confident or over-confident, and whether they could hold their own with clients. “They asked me some professional conduct-type questions to see how I'd deal with certain situations,” recalled a current trainee. “It's about seeing how you react under pressure.”  
+
+Interviewers are also likely to raise questions involving the economy and the latest financial news. “They want to see that a candidate has their own thoughts and isn't swayed automatically by the interviewer’s views,” our source reveals. “We're not looking for 'yes' people in that sense; it's always good to have a debate.”  
+
+Interviewees aren't expected to be an expert on the inner workings of Sidley's practice areas, but they do need to demonstrate a sound understanding of the firm's work, clients, and recent matters to impress.  
+
+Vacation scheme  
+
+Since 2015/16, the firm has run a one-week winter and two-week spring scheme on top of its usual two-week summer schemes. Each scheme has space for up to 15 candidates and participants spend each week in a different department.  
+
+“We try to make it into a mini training contract and cram as much in as we can,” the firm tells us. In between live work, vac schemers attend briefings from various practice groups and a few social events.
+
+Sidley Austin LLP
+
+70 ST MARY AXE,
+London,
+EC3A 8BE
+Website www.sidley.com
+
+Firm profile
+
+Sidley is an elite global law firm powered by lawyers who practice at the highest level of the profession. Backed by 157 years of trailblazing heritage, we deliver superior service to a high-caliber group of market leaders worldwide, while placing a premium on collaboration and diversity. Our firm boasts a roster of more than 2,300 lawyers who wield deep experience in litigation, transactional, and regulatory matters spanning over 50 legal disciplines and industries. With 21 offices situated in major commercial and financial capitals around the world, our lawyers possess the cultural awareness and legal acumen needed to advise clients in today’s global economy.
+Main areas of work
+
+We handle a vast array of litigation, transactional, and regulatory client matters with practices in: antitrust/competition; capital markets; corporate governance; derivatives; employment; food, drug and medical device; global finance (including structured finance); healthcare; hedge funds, insurance; investment funds; private equity; real estate; real estate finance; restructuring; and tax. 
+Trainee opportunities
+
+The firm is not a typical City firm, nor is it a ‘legal factory.’ Everyone is encouraged to be proactive and to create their own niche from the first day onwards, so there is no risk of being just a number. Trainees spend time in the firm’s main groups. In each group, trainees will work with a partner or associate to ensure individual training with practical hands on experience. You will be encouraged to take on great responsibility where appropriate. Regular meetings with your supervisor ensure both the quality and quantity of your time at Sidley. In addition, there is a structured timetable of training on a cross-section of subjects.
+Vacation scheme
+
+We run a one-week winter vacation scheme and two-week vacation schemes in both the spring and summer each year. You will get to experience the day-to-day life of a lawyer at the firm and will have the opportunity to undertake real casework, rather than just observing or shadowing. This practical experience will be supplemented by a programme of presentations and workshops that will ensure you get to know the full firm culture. We aim to recruit all of our trainees from the vacation schemes.
+Other benefits
+
+Benefits include: private health insurance, life assurance, contribution to gym membership, interest-free season ticket loan, income protection scheme, and pension.
+Open days and first-year opportunities
+
+Sidley is offering first year students the opportunity to attend an Open Day held in March. For more information, please visit our website. 
+Sidley and Sidley Austin refer to Sidley Austin LLP and affiliated partnerships as explained at www.sidley.com/disclaimer
+
+Firm Facts
+Famous for: Obama link, global finance prowess, Chicago roots
+
+Locations: London
+
+Overseas offices: 21
+
+UK partners/solicitors/trainees: 48/185/33
+
+Seats: 4x6 months
+
+Overseas seats: Brussels
+
+First-year trainee salary: £55,000
+
+Second-year trainee salary: £60,000
+
+NQ salary: £166,500
+
+Seat options: global finance; real estate; litigation; restructuring; M&A and private equity; employment; competition; capital markets; banking and financial services; data privacy; insurance; investment funds; tax; life sciences
+
+Vac scheme deadline: 15 October 2023
+
+Course fees sponsored: SQE; PGDL
+
+Quick Contacts
+Sidley Austin LLP
+70 ST MARY AXE
+
+London
+EC3A 8BE
+
+Email: ukinfo@sidley.com
+Website: www.sidley.com
+
+This Firm's Rankings in
+UK Guide, 2023
+Ranked Departments
+London (Firms)
+Competition Law (Band 6)
+Restructuring/Insolvency (Band 3)
+UK-wide
+Banking Litigation (Band 4)
+Capital Markets: Debt (Band 3)
+Data Protection & Information Law (Band 3)
+Financial Services: Non-contentious Regulatory (Band 4)
+Financial Services: Payments Law (Band 2)
+Insurance: Non-contentious (Band 3)
+Investment Funds: Hedge Funds (Band 3)
+Investment Funds: Investor Representation (Band 2)
+Life Sciences: Regulatory (Band 2)
+
+----------------------------End of Sidley Austin----------------------------
+
+----------------------------Start of Dechert----------------------------
+Renowned for its funds and cross-border work, this global firm “nurtures your confidence and pushes you to go for it,” say trainees.  
+
+Dechert training contract review 2024
+
+The Firm  
+There are good law firm names, then there are great ones. And for us, Dechert falls firmly in the latter. Firstly, in case you're saying it wrong, it’s not ‘de-shurt’ or ‘de-cher’ of the French variety – it’s pronounced ‘deck-urt.’ Secondly, Dechert is a Philly native, with most of its offices spread across the US, as well as another nine offices across Europe, Asia and the Middle East to add to the tally. While the firm’s New York HQ is its crown jewel, the London office wears its own crown. Recently moving to a refurbished office overlooking St Paul’s, one trainee shared that “compared to other American firms, the London branch is not simply a satellite office. We are not just supporting the US office. We have our own clients.”  
+
+“Whenever someone wants to set up a fund, our number is probably in the top five.”  
+
+The cross-border work of this “slightly less cut-throat American law firm” seemed to be a hit with our sources. One trainee told us that “the work we do is complex. We don’t do standard transactions; we do more stimulating and interesting work.” The work in question? Trainees commended the “funds seat which is excellent and class-leading” as well as the opportunities for international secondments to Dublin and Dubai. Chambers UK dishes out praise for the firm’s mid-market banking and finance work on the lender side and corporate financial crime in London. Nationally, Dechert scores top marks for its investment funds work. In Chambers Global, the firm is highly regarded for its UK investigations & enforcement on white-collar matters (international & cross border).
+
+The Seats  
+At Dechert, trainees sit in six seats of four months over the course of the training contract. One trainee preferred this set-up as “you have flexibility and customisation with a six-seat contract. You get to repeat seats and if you don’t like them, you don’t need to be there for long.” The firm offers a range of seat options, which include corporate and securities, financial services (funds), finance and real estate, employment, intellectual property, antitrust, white-collar, litigation, tax, and financial restructuring. Under the corporate and securities umbrella, trainees can sit in private equity, M&A, capital and debt markets, as well as leveraged finance. Talk about being spoilt for choice! 
+
+Around a month or two before each seat, trainees list their choices and ”grad recruitment curates everyone’s preferences and marries them with business needs.” Our sources said they find out which seat they’re headed to about a week in advance. Whilst there are no compulsory seats at Dechert, one insider mentioned that "most people have a seat in funds because it’s the biggest one.”   
+
+Starting with the biggest team in the firm, the funds team was described as “one of the strongest and most institutionalised in the firm.” The source added that “whenever someone wants to set up a fund, our number is probably in the top five.” The department takes care of the life cycle of hedge and credit funds. This means advising on restructuring, setting up underlying funds or their liquidation. With expanding regulatory and ESG practices, there is plenty of work to be found in this team. “You have to prioritise deadlines and deal with intense hours, but it’s worth it,” one source reflected. Some typical trainee tasks included project management, keeping the local council up to speed, negotiating with service providers, and ensuring that ancillary documents and board materials are tied up. To get an idea of who the team works for, Dechert was the sole legal adviser to former Court of Appeal judge Dame Elizabeth Gloster on her independent investigation into the Financial Conduct Authority’s (FCA) regulation and supervision of London Capital & Finance. The seat is also “drafting and research-heavy” and trainees work on preparing term sheets for fund launches, write board minutes, work on memorandums and subscription documents as well as mark-ups for third-party agreements. Reflecting on their time in this seat, one interviewee praised the fact that “you get so much drafting experience and get to do first drafts of key, large and ancillary documents.” Another added: “This team is renowned for giving trainees high levels of responsibility. It comes with its upside. The more work you do here, the more you get involved.”  
+
+“We advise on cryptocurrency deals and work on the edge of the market.”  
+
+The finance and real estate practice represents major lenders on real estate deals. The team is involved in the conveyancing process and sales and leases of commercial properties. But also, “we advise on cryptocurrency deals and work on the edge of the market. The deals are new and the way we draft their documents is interesting,” one interviewee highlighted. They added that while the work can be complicated, “no one hesitated to explain to me the complex instruments. They broke them down for me and this shaped the way I see complexity in transactions.” Trainees in this team are responsible for running checklists, keeping data rooms up to date, and drafting ancillary documents. On the derivative side, a source described being involved in settlements for clients and Wall Street banks. “I was involved in marking out agreements and discussing the strategy with partners and clients.” A case in point, clients of this team include Citibank, Wells Fargo & Goldman Sachs.  
+
+The wider corporate and securities department at Dechert hosts seats in private equity, M&A, capital and debt markets, as well as leveraged finance. In private equity, one interviewee told us they do “sales, portfolio work and management incentive plans.” In M&A, the team similarly deals with private equity firms, as well as life sciences and public listed company work. Trainees in both seats managed the due diligence process on deals and were the points of contact for the internal and external parties involved. They also drafted board minutes and worked on ancillary documents. The M&A team advised Kinross Gold Corporation, a Canadian-based gold and silver mining business, on the sale of assets to Highland, a gold mining company. 
+
+Switching to the firm’s contentious offering, the commercial disputes department handles regular litigation, as well as mediation and international arbitration work. “We work with large banks,” said one trainee. And there’s no shortage of things to be tasked with: “I worked on a few big cases where you would review documents, attend court, do pro bono and conduct lots of research.” Key skills here were “attention to detail, meeting deadlines, taking calls and attendance notes.” As is the case for most litigation trainees, there was also “lots of research on case law, precedents and court procedure” – fire up WestLaw! – The team recently acted for a number of Lebanese banks, defending claims by depositors in a series of cases pursued by customers of Lebanese banks in London, New York and Paris as a result of the ongoing Lebanese banking crisis. 
+
+Trainee Life  
+Given the London office came into its own following a merger with a British firm, it’s no surprise our sources felt that Dechert “has a British feel, even though it's American.” One trainee explained that “as far as US law firms go, it’s uncommon to be working in a non-competitive environment.” They added that “we strive to achieve excellence, but it’s easier to be excellent when you’re working in a positive environment with people you like!” In fact, all of our interviewees commented on the open and welcoming culture at the firm: “People want to get to know you personally and they take a real interest in you.” Others noted a “real focus on teaching and development,” and one trainee explained that “the firm is good at springboarding you. They don’t silo you as a trainee. So, in terms of longevity in the industry, it will set you up with the skills you need.”   
+
+“Supervisors are excellent, excellent, excellent!”  
+
+Speaking of skill development, one source beamed that “supervisors are excellent, excellent, excellent!” Trainees sit with their supervisors, who offer feedback freely. They also have mid-seat and end-of-seat appraisals which are extensive, with feedback given from the whole team. The supervision is supported by the seat rotation training offered by the associates, as well as weekly departmental ones offered in some practice areas. “In litigation, it might be legal updates or cases of interest. In corporate, they might take you through the life cycle of a private equity transaction,” explained one source. Another interviewee mentioned that “departmental in-house training usually happens at lunchtime and is led by professional support lawyers or partners.”  
+
+A number of interviewees mentioned working from 9am to 7pm, though the hours can vary quite a bit depending on the practice area and the work going on. Many reported working to 9.30pm or later, especially those in funds, which is said to be the busiest department. Though, trainees get the chance to let their hair down as there is plenty happening on the social side of things. Dechert holds the typical pub quizzes, summer and Christmas parties. But there is also a choir, a netball and football team, and the firm also takes part in the annual legal sailing league. One source told us that “Dechert also funds networking events for trainees,” such as Dechert uncorked, which is run by trainees.Another interviewee told us that “we bring our friends who are in the field,” and it’s a chance for trainees to get involved with business development.This event is particularly important because, as one source put it, “it can be hard networking when everyone seems very important, so these events where everyone is junior are great!”   
+
+“Pro bono is also a cornerstone at Dechert. It is mandatory and non-negotiable.” 
+
+“Pro bono is also a cornerstone at Dechert. It is mandatory and non-negotiable,” one insider informed us. Lawyers at the firm have to do 25 hours of pro bono and, uniquely, so do trainees. All of our interviewees got stuck into this, one reflected that “it provides us with a sense of perspective on what we do. In our work, you can lose sight of reality in the wider context of the world.” There’s a wealth of projects that the firm works on. Some mentioned working at the Islington law clinic, advising people with housing issues and assisting on disability appeals. Whilst others helped individuals who were denied pension payments.  
+
+Finally, when qualification comes around, Dechert publishes a jobs list for all departments. Trainees can pick up to two choices and then they interview with those teams; for some groups this can involve both a technical and a motivational interview. One source told us that “it’s not game playing. They are quite transparent and encourage you to share what you are thinking. Grad recruitment offer a lot of support.”
+
+Decked out and ready to win.  
+
+Dechert funds the aspiring solicitor's commercial awareness competition. Students that win are offered a vacation scheme at the firm. 
+
+Firm Facts
+Famous for: BigLaw prestige, funds work and culture
+
+Locations: London
+
+Overseas offices: 20
+
+UK partners/solicitors/trainees: Undisclosed
+
+Seats: 6x4 months
+
+Overseas seats: Dubai, Dublin
+
+First-year trainee salary: £50,000
+
+Second-year trainee salary: £55,000
+
+NQ salary: £145,000
+
+Seat options: corporate and securities; finance and real estate; financial services; employment; financial restructuring; global tax; intellectual property; antitrust and competition; white-collar crime; commercial litigation
+
+Training contract deadline: See vac scheme
+
+Vac scheme deadline: 27 October 2023 (Winter); 31 December 2023 (Spring); 31 January 2024 (Summer)
+
+Course fees sponsored: SQE; PGDL; LPC
+
+Quick Contacts
+Dechert LLP
+25 Cannon Street
+
+London
+EC4M 5UB
+
+Email:
+Website: www.dechert.com
+
+How to get a Dechert training contract   
+
+Applications and assessments   
+
+Dechert recruits all of its trainees exclusively through its vacation schemes. The firm generally receives around 1,500 applications for its winter, spring and summer vacation schemes, which takes up to ten candidates each. A source tells us that the vacation scheme “acts as a two-week training contract interview.” There are usually ten training contracts on offer in total.   
+
+Following an initial application shortlisting stage, successful candidates are invited to undertake a video interview and written exercise. Once through that stage, candidates are invited to attend an assessment day at the firm’s office. This includes two face-to-face interviews with partners, associates and a member of the graduate recruitment team and an opportunity to have a coffee with one of the firm’s current trainees.   
+
+At this stage, the firm now operates a blind interviewing system, which means that interviewers have no information on the candidate before they see them, ensuring that everyone is in the same position. Rather than focusing on candidates’ CVs, there is more of a focus on commercial scenarios and the strategy the candidate employed when applying for the role. Candidates are evaluated on style, presentation and the judgement they demonstrate. “Here we're looking for candidates to present their answers in a logical, structured way,” says grad recruitment. “They don't necessarily have to get the answer right, in fact there isn't a right answer; it's more about how candidates reason an argument and analyse the scenario. Like a maths exam, usually a lot of the marks you get are for your working out. It's more about how you arrived at your answer than the answer itself.”   
+
+Vacation scheme   
+
+Vacation scheme attendees visit two departments during their placement and can state up to four seat preferences beforehand. Alongside live pieces of work there are skills workshops, insight sessions, training and practice area sessions. Attendees also participate in a group project over the course of their placement. “Take that seriously,” trainees advised. “It’s a crucial part of the decision-making process at the end.” Various networking lunches, sporting events, and evening drinks keep things ticking over on the social front. “There are a lot of socials!” said trainees. “As well as having fun, my tip would be to use them as an opportunity to get an insight into what people are like at the firm rather than just going for drinks and food.”  
+
+Firm Facts
+Famous for: BigLaw prestige, funds work and culture
+
+Locations: London
+
+Overseas offices: 20
+
+UK partners/solicitors/trainees: Undisclosed
+
+Seats: 6x4 months
+
+Overseas seats: Dubai, Dublin
+
+First-year trainee salary: £50,000
+
+Second-year trainee salary: £55,000
+
+NQ salary: £145,000
+
+Seat options: corporate and securities; finance and real estate; financial services; employment; financial restructuring; global tax; intellectual property; antitrust and competition; white-collar crime; commercial litigation
+
+Training contract deadline: See vac scheme
+
+Vac scheme deadline: 27 October 2023 (Winter); 31 December 2023 (Spring); 31 January 2024 (Summer)
+
+Course fees sponsored: SQE; PGDL; LPC
+
+Quick Contacts
+Dechert LLP
+25 Cannon Street
+
+London
+EC4M 5UB
+
+Email:
+Website: www.dechert.com
+
+Dechert LLP
+
+25 Cannon Street,
+London,
+EC4M 5UB
+Website www.dechert.com
+
+Firm profile
+Dechert is a global specialist law firm with approximately 1000 lawyers across 21 offices. We have some of the world’s leading lawyers advising on both domestic and cross-border matters. The firm is frequently retained to work on the most challenging transactions and disputes, and prides itself on its ability to deliver premium legal services and sound business judgment to its clients. Dechert lawyers bring to their assignments a focus on quality, responsiveness and value for money. We are driven by one key principle: exceptional client service.
+
+Main areas of work
+In London, our lawyers are active in Dechert’s core practice areas of corporate and securities, financial services and investment management, finance and real estate, trials, investigations and securities, which incorporates our white collar and commercial litigation teams. Our clients include corporations, financial institutions, sovereign states, quasi-sovereign entities and private and high-net-worth individuals all over the world. Dechert undertakes work for 40 of the ‘Fortune 100’ companies and advises 24 of the top 25 global asset management firms, and 41 of the top 50 global private debt firms.
+
+Training opportunities
+We take your training seriously, both before and after you qualify. We have a full, and lively, training programme which covers the whole range of skills you need, from technical legal issues and substantive skills training in each practice area to the Critical Skills Institute, which is focused on leadership, management, communication and client relations. Our trainees undertake six seats of four months each, with each trainee being seconded to a client or one of our international offices, providing a truly broad legal foundation. Working closely with partners and associates, and with a small trainee intake, no two trainees’ training contracts will be the same. Following qualification, our NQs attend orientation in Philadelphia. We are looking for candidates who have a genuine interest in business and our clients, are ambitious and who have a keen sense of building community, both within the workplace and with our clients.
+
+Vacation schemes
+We recruit all of our future trainees from our vacation schemes, in winter, spring and summer. Our two-week schemes are designed to give you an idea of what it will be like to be a trainee solicitor at Dechert. Each week you will sit in a different practice group, and you are given real work to do by our lawyers. Exactly what you will do will depend on which practice group you sit in, but it will include research, drafting and attending meetings. You will also attend training sessions on a range of topics, such as legal writing and negotiation. Before you start the scheme, we will ask for your practice area preferences and then try to place you in those groups. You will be allocated a supervisor (an associate or partner) and both a partner and a trainee buddy, but will receive work from people at all levels from across the group. Social events, such as evening activities and dinners, are an important part of the vacation schemes as they enable you to build your relationships with Dechert trainees, associates, and partners.
+
+Other benefits
+Life assurance, an employee assistance programme, subsidised gym membership, subsidised on-site café, private medical and dental insurance, annual health assessments, pension scheme with firm contributions, season ticket loan and cycle to work scheme.
+
+Open days and first-year opportunities
+
+Visit our website for a full list of Dechert’s bespoke open days in 2023/24
+
+University law careers fairs 2023/24
+Visit our website for a full list of the careers fairs we will be attending in 2023/24
+
+Diversity & Inclusion
+Dechert’s guiding principles and personal commitments are not simply words written on our website and in our policies — they are something that we all must live by every day. Championing diversity is part of Dechert’s DNA — a culture where respecting and valuing everyone’s voice and creating a shared enjoyment in all we do empowers people from different backgrounds, experiences and points of view to be fully themselves and bring their very best.
+
+The following are just some of the key measures that Dechert has undertaken to improve diversity and inclusion at the firm:
+
+
+Diversity and Inclusion Committee
+Our firm-wide, partner-led Diversity, Equity, and Inclusion (DEI) Committee oversees policies and procedures that support diversity and inclusion. Similarly, the DEI team is responsible for the strategic oversight and implementation of the firm’s diversity, equity, and inclusion initiatives.
+
+The London Diversity and Inclusion Committee promotes an inclusive culture amongst all employees and seeks to foster a greater understanding of diverse groups represented in Dechert’s London community. The committee engages with other affinity groups across the firm to advance Dechert’s diversity, equity, and inclusion mission.
+Affinity groups
+
+Dechert is home to several affinity groups. Not only do these groups support the development and retention of diverse attorneys, business service professionals, and allies, but they also affect change by identifying and addressing DEI-related issues. Affinity groups contribute to Dechert’s diversity programming, especially heritage month events that celebrate the richness of our different backgrounds, voices, and perspectives. Our affinity groups include:
+• Asian Affinity Group
+•  Black Lawyers Alliance
+•  Disability Affinity Group
+•  Family Network
+• Global Women’s Initiative
+• Greater Middle Eastern Alliance
+•  Latino Affinity Group
+•  LGBTQ Affinity Group
+•  Dechert Heroes (Veterans Affinity Group)
+
+
+Diversity, Equity and Inclusion Week
+This year’s theme for the firm’s annual Diversity, Equity, and Inclusions week, was Together We Rise. Colleagues were encouraged to come together as a community and celebrate the diversity that truly makes us stronger. The week’s activities included, food and literacy donation drives, outdoor walks, an interactive game to build connections, and a special edition of our Meditation Monday series.
+
+Diversity Dashboards
+To increase transparency, goal setting and follow-through, Dechert designed and launched a diversity dashboard that helps firm leaders see where things are working effectively, and where more attention is needed. The Chief Diversity, Equity and Inclusion Officer and Global Director of Diversity, Equity and Inclusion meet bi-monthly with practice group diversity liaison partners and practice group administrators to review hours, work quality and assignments.
+
+Partner Diversity Information Card
+Dechert recently launched a Partner Diversity Information Card (Info Card) dashboard to increase transparency and monitor the utilization and staffing processes for all U.S. and UK associates. The goal of the Info Card is to provide Billing, Supervising, and Consulting partners with real time data on how their matters are staffed and to remind partners of the importance of being intentional and equitable when selecting their teams. The Info Card includes an administrative interface which alerts partners if the utilization on their matters deviates significantly from the head count of the firm or their practice group and allows firm leadership to monitor and track the utilization of underrepresented populations.
+
+This Firm's Rankings in
+UK Guide, 2023
+Ranked Departments
+London (Firms)
+Banking & Finance: Lenders: Mid-Market (Band 2)
+Commercial and Corporate Litigation (Band 5)
+Corporate/M&A: £100-800 million (Band 3)
+Employment: Employer (Band 3)
+Financial Crime: Corporates (Band 2)
+Restructuring/Insolvency (Band 5)
+UK-wide
+Fraud: Civil (Band 5)
+Investment Funds: Hedge Funds (Band 2)
+Investment Funds: Private Equity: Credit Funds Spotlight
+Partnership (Band 3)
+
+----------------------------End of Dechert----------------------------
+
+----------------------------Start of White & Case----------------------------
+In Case you hadn’t noticed, this “global brand” has been putting an international spin on the corporate world in London for over 50 years.
+
+White & Case training contract review 2024
+
+The Firm
+There’s a whole host of reasons why people decide that they want to pursue a career in law. It’s no wonder either, given the breadth of opportunities and practice areas that are out there. For some, the law can serve as a ticket to build a cross-border career, and even see the world – if you choose the right firm, of course. With 43 offices spread across the US, South America, Europe, Asia, Australia and the Middle East, White & Case isn’t a bad place to start.
+
+“… cross-border elements to almost every transaction.”
+
+“It’s a firm with a truly international character,” said one trainee, adding, “it’s not just a US outpost in London; it’s a global brand.” In fact, with a whole host of guaranteed secondment opportunities and “cross-border elements to almost every transaction,” White & Case is the place to be if you fancy yourself as a bit of a jetsetter. Its international credentials are nothing new – White & Case was one of the first US law firms to establish an office outside the United States (Place Vendôme in Paris, back in 1926 if you’re interested). It was also among the first firms to migrate over to London in 1971.
+
+Given the sheer scale of the firm, it was bound to end up with a reputation to match its size. Chambers UK awards the firm top-tier rankings in international arbitration, oil & gas, infrastructure and projects nationwide. If that wasn’t enough, the firm also scoops top rankings in London for its capital markets work in both debt and equity (something of a specialty at White & Case). There’s also a host of strong rankings in banking & finance, restructuring and commodities to boot. That’s before we even get into the firm’s global rankings, which you can wade through here. 
+
+The Seats
+“When you are selecting your seats, you choose three choices and rank them in order of preference, alongside a bit of detail about why you want to sit in that particular practice area.” The general consensus among trainees was that while this extra detail wasn’t a requirement, “it will strengthen your application.” A finance seat (which includes debt finance, FRI (restructuring), capital markets, and project finance) is a compulsory part of the training contract at White & Case, “mainly down to the size of those seats.” Trainees that don’t spend time in a litigious seat will sit a two-week course to gain the necessary experience, “and most trainees will end up doing a corporate seat as well.”
+
+“You have a guaranteed international secondment.”
+
+“You have a guaranteed international secondment in your fourth seat, which is one of the main perks,” one trainee explained. “It’s not mandatory but it’s encouraged. It offers great exposure to some foreign jurisdiction documents, but it’ll also just give you a taste of another culture and environment.” With a host of overseas offices taking trainees, “we will be given a list with the practice areas alongside them. So it might be that, for example, the Frankfurt office needs someone to assist in their capital markets team.”
+
+From a trainees’ second seat onwards, there are a range of client secondment opportunities too, either for a full six-month rotation or for two months as part of another seat. “In bank finance, for example, if you are in your second or third seat, there is a two-month secondment to Blackstone, which is more or less compulsory” – Blackstone is an investment management company. “And that’s on a rolling basis, so we’ve always got a trainee and an associate there.”
+
+As one of the firm’s specialist practices, the capital markets group is one option for trainees’ compulsory finance seat. Split between debt and equity, the team at White & Case is made up of a mixture of US and UK-qualified lawyers. For trainees that specify an interest in equity capital markets, there is the option to jump on the likes of IPOs, SPACs, rights issues, and listings on the London Stock Exchange. Typical trainee tasks included the first draft of the documents involved in fundraising, researching, due diligence and running deadlines. “We got to assist with some of the work in the Dubai offices as well,” another recalled. “The team in London works closely with the capital markets team in Dubai, so there’s plenty of crossover with them.” Following a post-pandemic recovery in 2021, 2022 was a quiet year for IPO deals in London and the rest of Europe. On one deal that was made, the firm was brought in to advise Goldman Sachs and Morgan Stanley as joint global coordinators of Ithaca Energy’s £262 million IPO.
+
+The corporate department at White & Case is split into teams in M&A and private equity. “The M&A team covers quite general corporate work in the sense that they revolve around public and private mergers and acquisitions,” one trainee explained. “Depending on which partner you are paired up with, you might be working on either. Some partners specialise in private stuff, others in the big public takeovers.” On these kinds of deals, trainees’ work will typically focus on the signing and completion checklist process: “There’s a lot of document management – preparing things like signature packs for signing processes.” Trainees in the seat were quick to highlight the level of responsibility on offer too: “A lot of these matters aren’t staffed up with a lot of associates, so I got to see a lot of interesting stuff.” In one recent deal, the firm represented FTSE 100 cybersecurity company Avast in its $9.2 billion merger with NortonLifeLock (a multi-jurisdictional deal involving the UK, US and Czech Republic).
+
+On the other side of the corporate coin, the private equity team covers all private equity-related matters across seven sub-teams including pure private equity, infrastructure and emerging markets. As one trainee highlighted, “there are opportunities to indicate where you want to work (which specific pillar of the practice).” While private equity forms a separate team to M&A under the corporate banner, trainees told us that there was plenty of crossover between the two. In one recent example, the team represented the Goldman Sachs Asset Management Division on its acquisition of a $2 billion controlling stake in pharmaceuticals company Norgine BV. As far as typical trainee tasks go, the current cohort reported “a lot of preparing board minutes and making minor amendments to longer-form agreements. But it’s cool to be a part of the due diligence process in terms of organising signings and running closing documents.”
+
+“There can be a lot of running back and forth, which can be interesting – especially if you’re in heels in court!”
+
+For prospective trainees with their eye on a contentious seat, international arbitration is something of a specialism at White & Case, with the practice split between the offices in London, Paris, Geneva, New York, Washington DC, Stockholm and Singapore. A point of pride for the firm is that White & Case’s lawyers tend to conduct their own advocacy, meaning court time is an inevitability. “I was part of the team working to file an interim application on an injunction in the court,” one recalled. “I got to draft witness statements, prepare bundles, and phone counsel. There can be a lot of running back and forth, which can be interesting – especially if you’re in heels in court!” Don’t forget to pack some Compeed. Trainees mentioned that there was plenty of work on the administrative side of things, as “it’s a longer game before you get exposure to drafting pleadings and things like that.”
+
+As another of the finance seats available to trainees at White & Case, the debt finance group works closely with the private equity team. “A lot of private equity deals have a debt finance side to them,” one source told us, “so a lot of the typical tasks you’ll come across in the seat are quite similar to private equity, from drafting legal opinions and company search reports to managing conditions precedent checklists and things like that.” The debt finance group works on both the borrower and lender side, with sub-teams in bank lending, private credit & direct lending, and borrower finance, which work on everything from leveraged buyouts to acquisition financing and refinancings. As one trainee put it, “there’s been a lot of process management and transaction management, but I got to do some first cuts of security documents too.”
+
+Trainee Life
+One thing to emerge from our conversations with the current cohort was that White & Case is a good place to be if you’re a foodie. As part of the firm’s refurbishment of the canteen area (alongside other parts of the building) trainees can look forward to breakfast, lunch and dinner, all free. Yes, free. One trainee summed it up perfectly: “We have food from all over the world, cake, a separate coffee bar… oh man, the food is good!” What’s more, with breakfast, lunch and dinner all paid for, “it makes it really easy to take someone out for coffee or meet with a supervisor.” If that’s not enough to tickle your tastebuds, “we’ve had a cookery class for trainees and their supervisors, which has been a regular evening thing where we go to a local cookery school, prepare food and get to know each other outside of work.”
+
+When it comes to training at the firm, the general consensus was that “you need to take training into your own hands – if you do not understand something, you need to use your resources to get familiar with the matter.” This is true of feedback too: “We have a formal mid-seat and end-of-seat review, but if you want continuous feedback, it’s something you ask for.” To balance this however, trainees reported that supervisors who were busy getting a transaction over the line went back to provide them with a “post-event breakdown, which was really helpful.” Around the time of end-of-seat reviews, “there will be different questions you are asked against different benchmarks, but it’s never critical, it’s more a case of finding out what opportunities you are looking for.”
+
+“… when you factor in the free food, I don’t think I can complain too much.”
+
+Trainees at White & Case are expected to come into the office three days a week, with Wednesday and Thursday allocated as ‘anchor days’ for all departments. “It’s different between contentious and transactional seats,” one trainee said of hours at the firm. “During a busy period I’ll come in at 9am and leave about 9pm, and that will sometimes slip into the weekend.” That being said, survey responses indicated that while late nights do happen, quieter periods mean that average weekly hours even out in line with the market average. Trainees were satisfied with their salaries too: “Maybe it’s a bit below some of the American firms that have a similar expectations in terms of hours, but when you factor in the free food, I don’t think I can complain too much.” Bon appetit!
+
+As fourth-seaters approach qualification: “We are highly encouraged to reach out to certain partners and express an interest in qualifying into a particular area,” one source told us. “Then when the list comes out, you list four possible options of where you’d like to qualify.” Precisely what the process involves depends on which seat you’ve expressed an interest in. “Each practice area has its own process, so seats like debt finance and private equity don’t have an interview process, leaving it to more informal conversations,” one explained, “but the more contentious seats will have interviews and written pieces that you have to submit. So, it’s not a firm-wide consistent process.” In 2023, the firm retained 38 of 47 qualifiers.
+
+Seen and heard: “I think it’s quite a young partnership which has an effect on the culture of the firm. They put trainees in a position to talk to clients and build their profile. You’re never told that networking events are just for partners.”
+
+How to get a White & Case training contract
+Vacation scheme deadlines:  13 October 2024 (Winter), 12 January 2025 (Spring and Summer)
+First-year insight scheme deadline: 30 March 2025
+Open days deadline: 27 October 2024
+Training contract deadline: 13 July 2025
+White & Case has several ways for prospective trainees to get to know the firm, from vacation and insight schemes to open days. Of course, if you’ve already made up your mind, then there is also the option to apply directly for the training contract.
+
+Open days and insight schemes
+
+White & Case holds two open days in November as well as two, two-day insight schemes in May. The former, says Early Careers Legal Recruitment and Development Manager Gemma Barns, are “for penultimate-year students, finalists and graduates from any degree discipline,” while the insight schemes are also for any degree discipline, but are aimed at first-year students only.
+
+In both instances, those interested “are required to submit an online application form.” However, if you’re not lucky enough to attend one of these, Barns says they’re “a stand-alone opportunity” and are not part of the application process for a vacation scheme or training contract at the firm.
+
+The vacation scheme
+
+One route into the firm is via its three vacation schemes, which take 25 people each. Running in winter, spring and summer, each one is two weeks long and “participants sit in one practice area during the vacation scheme,” Barns explains. “This allows them to develop really strong supervisor and buddy relationships over the two weeks, and to take on more advanced work as the scheme progresses.” Barns tells us that during vacation schemes, participants can expect to do “real client work, which can include drafting memos, legal research, attending meetings and court hearings, for example.” The aim, says Barns, is to ensure that “participants get exposure to our different practice areas and members of the firm across all levels, allowing them to build their networks both professionally and personally.” If that’s sounding rather tasty, be aware that the firm gets approximately 3,000 applications, which takes the form of an online application and covering letter. From there, it’s a “video interview assessed by the graduate resourcing team” followed by “a face-to-face interview with a member of the team and one associate, plus a written assessment.”
+
+The training contract
+
+For those looking to score the training contract, W&C want-to-be trainees need a solid 2:1, or be on track to get one, and an AAB at A level, or equivalent. However, it’s not all about the academics and Barns tells us that “we are looking for candidates with a broad range of experiences and transferable skills that allow them to thoroughly demonstrate the competencies that we are looking for.” Rather than a one size fits all approach, Barns explains, “we actively seek out people with a wide range of backgrounds and experiences to join our equally diverse global teams.” To ensure the process is as inclusive as possible, Barns tells us the firm has several measures in place. “We use Rare Recruitment’s Contextual Recruitment System (CRS) which allows us to review every candidate application in context of their background,” Barns explains. Furthermore, the firm operates “blind recruitment whereby interviewers don’t receive a copy of the candidate’s application before, during or after the interview. This puts all candidates on a level footing during the interview process as the interviewers assess candidates against our set competencies.” The firm also has “one on one conversations with candidates who notify us that they have a disability or long-term health condition to understand any adjustments they require.”
+
+White & Case receives around 1,500 applications for the training contract each year, and as with the vacation scheme, this starts off with a cover letter and online application form. For those applying directly, the firm “runs assessment centres, of approximately eight candidates” per assessment. These centres “include a written assessment, group business simulation, interview with one member of the Early Careers Legal Recruitment and Development team and one associate, and a networking lunch with current trainees,” Barns tells us. “Successful candidates are then invited to a training contract interview with two partners, including delivering a pre-prepared commercial presentation.”
+
+Prior to the assessment centre and following the online application, applicants will do a video interview, where Barns tells us, “Candidates will answer three questions. They’ll have 15 seconds to prepare for each question and 90 seconds to answer. Before they answer the questions, they’ll have the opportunity to complete a practice question to help them feel more at ease.”
+
+For direct applicants, there is also a 30-minute telephone interview with a member of the Early Careers Legal Recruitment and Development team, “and the questions focus on the competencies we look for in our trainee solicitors,” says Barns.
+
+As with the vacation scheme, Barns says face-to-face interviews are an opportunity to meet the team, associates and partners. Barns says, “We want to hear about candidates’ experiences so far and why they’re interested in a career in law. We also want to know why they’re interested in joining White & Case.”
+
+Whatever the route in, Barns is at pains to explain that “through our assessment and interview processes, we are looking for candidates who have real integrity, are driven to succeed, share our mindset and client focus, and those who are a demonstrated team player.”
+
+The firm offers 50 training contracts each year, more than any other international firm in London.
+
+White & Case LLP
+
+5 Old Broad Street,
+London,
+EC2N 1DW
+Website http://www.whitecase.com/
+
+5 Old Broad Street,
+London,
+EC2N 1DW
+
+Firm profile
+White & Case is a global law firm of more than 2,500 lawyers worldwide. We’ve built an unrivalled network of 44 offices in 30 countries. That investment is the foundation for our client work in over 200 countries today. Complex client projects, nuanced local market knowledge and global capabilities define who we are. Many White & Case clients are multinational organisations with complex needs that require the involvement of multiple offices. As part of our training contract, we offer every trainee a guaranteed six-month overseas seat.  
+
+The work
+As a White & Case lawyer, you’ll work on fast-paced cutting-edge cross-border projects from the outset of your career. In London, our key areas of work include: debt finance (including regulatory compliance); financial restructuring and insolvency; capital markets (high yield and securitisation); dispute resolution (including antitrust, commercial litigation, intellectual property, international arbitration, trade, white collar and construction and engineering); energy, infrastructure, project and asset finance (EIPAF); corporate (including M&A, private equity, employment, compensation and benefits, investment funds, real estate and tax).
+The training programme
+White & Case is looking to recruit ambitious trainees who have a desire to gain hands-on practical experience from day one and a willingness to take charge of their own career. We value globally-minded citizens of the world who are eager to work across borders and cultures, and who are intrigued by solving problems within multiple legal systems. They should have an understanding of international commercial issues and an interest in working on big-ticket, cross-border work. We recruit both law and non-law students and owing to the nature of our work, language skills are of interest. Applicants will be welcomed for their individuality, their ability to contribute to the cutting-edge work we do and the energy with which they approach the job at hand. They should have achieved, or be on track to achieve, a solid 2:1, have a positive and friendly attitude, be enthusiastic and work well in teams.  
+
+The training contract consists of four six-month seats, one of which is guaranteed to be spent in one of our overseas offices, including Abu Dhabi, Dubai, Frankfurt, Geneva, Hong Kong, Helsinki, Houston, Madrid, Paris, Prague, Singapore, Stockholm and Tokyo. The remaining three seats can be spent in any one of the Firm’s practice groups in London. Receiving a high level of partner and associate contact from day one, our trainees can be confident that they will receive high-quality, stimulating and rewarding work. Trainees work in small, focused teams, so their colleagues trust them to perform tasks accurately and efficiently. White & Case is a “high-stretch, high-support” workplace that celebrates individual excellence and team success. We actively encourage our trainees to take early responsibility, and there is a strong emphasis on practical training, with plenty of support and feedback. Alongside the training contract, our trainees are encouraged to get involved in all aspects of our globally-renowned pro bono programme, often working directly with clients and even managing small matters. White & Case recruits and develops trainee solicitors with the aim of retaining them on qualification.  
+
+Discover White & Case through the eyes of our people. Read more (https://inside.whitecase.com/) about our work, our people and our offer.  
+
+The deadline for applications is 13 July 2025.  
+
+Vacation schemes
+So you want to be a City lawyer? Taking part in one of our three annual vacation schemes is the best possible way to experience what our lawyers do every day. Try out real client work and see if our Firm is the right fit for you.  
+
+We recruit the majority of our London trainees (on average 80 percent) from our vacation schemes, with 25 participants in each intake. There’s no limit on how many training contracts we offer per scheme, so you won’t be in competition with your peers. 
+
+Wherever your career takes you, we guarantee that you’ll build skills and experience that will last:
+
+• Do real client work: draft memorandums; write client alerts; research areas of the law; attend meetings or court hearings, for example
+• Learn about different practice areas and deepen your knowledge of the law
+• ‘Ask Me Anything’ Q&A session with partners and associates
+• Attend social events, including supervisor and buddy lunches, and fun activities such as sushi making
+• Build your networks, both professionally and personally
+• Receive feedback and advice on your work and performance
+• As part of your training contract interview, you’ll have the opportunity to prepare a presentation on a commercial topic
+
+Our vacation schemes run on the following dates:
+
+Winter (for finalists and graduates)
+Our Winter scheme runs from Monday 2 December to Friday 13 December 2024 and the deadline to apply is 13 October 2024.
+
+Spring (for penultimate-year students, finalists and graduates)
+Our Spring scheme runs from Monday 31 March to Friday 11 April 2025 and the deadline to apply is 12 January 2025.
+
+Summer (for penultimate-year students, finalists and graduates)
+Our Summer scheme runs from Monday 23 June to Friday 4 July 2025 and the deadline to apply is 12 January 2025. 
+Open days
+If you’re curious about working as a City lawyer, our London office open days are a great place to find out more. You’ll learn more about White & Case, and meet our current trainees, associates and partners.
+
+• Learn about City law
+• Network with the White & Case team over lunch
+• Get practical tips on how to do well in your applications and interviews
+• Put your decision-making skills to the test in an interactive business game
+• Speak to trainees, associates and partners about their work and our Firm
+
+Our open days run on 14 and 21 November 2024 and the deadline to apply is 27 October 2024. 
+First-year two-day insight scheme
+Attend one of our two-day insight schemes to understand more about what City law firms do and about different areas of the law. Discover what lawyers really do and see if this is a career that matches your interests and ambitions.
+
+• Learn about White & Case
+• Find out how we compare to other law firms
+• Shadow one of our trainees
+• Understand the day-to-day role of a trainee
+• Enhance your future applications
+• Meet White & Case trainees, associates and partners
+• Attend networking events
+
+Our two-day insight schemes run from 7 to 8 May and 14 to 15 May 2025 and the deadline to apply is 30 March 2025.  
+White & Case Virtual Learning Programme
+Our virtual learning programme offers the opportunity to gain first-hand insight into life as a White & Case trainee and experience the realities of cross-border law.
+
+There is no cost to access the programme; it is self-paced to fit around your schedule, and no application form or legal knowledge is required. You'll gain insight into the fast-paced cutting-edge projects our lawyers and trainees work on, and gain valuable skills by undertaking true-to-life legal tasks. Participation in the learning programme will be recognised on our application forms, and it is a great way to demonstrate your interest in law and White & Case.
+
+Wherever you are based, we want to give everyone the opportunity to get to know us.
+
+If you're globally minded and ambitious, join our virtual learning programme here.
+How to apply & deadlines
+Apply online at whitecasetrainee.com
+Social media
+Twitter account: @WhiteCase
+Facebook account: https://www.facebook.com/whitecase?fref=ts
+LinkedIn: https://www.linkedin.com/company/white-&-case/
+YouTube: https://www.youtube.com/user/whitecaseglobal
+Video Content: https://www.youtube.com/user/whitecaseglobal
+Instagram: @WhiteCase
+Firm Facts
+Famous for: global prestige; guaranteed international secondments; cross-border work; capital markets in London
+
+Locations: London
+
+Overseas offices: 43
+
+UK partners/solicitors/trainees: 157/236/88 (London)
+
+Seats: 4x6 months
+
+Overseas seats: Guaranteed overseas seat. Locations include Abu Dhabi, Dubai, Frankfurt, Geneva, Hong Kong, Helsinki, Houston, Madrid, Paris, Prague, Singapore, Stockholm and Tokyo
+
+First-year trainee salary: £62,000
+
+Second-year trainee salary: £67,000
+
+NQ salary: £175,000
+
+Seat options: Debt finance, capital markets, competition, construction, corporate M&A, corporate PE, energy, infrastructure, project & asset finance (EIPAF), employment, compensation & benefits, financial restructuring & insolvency (FRI), intellectual property, litigation & arbitration, real estate, tax, white collar, environmental social governance (ESG).
+
+Training contract deadline: 13 July 2025
+
+Vac scheme deadline: 13 October 2024 [Winter]; 12 January 2025 [Spring and Summer]
+
+Course fees sponsored: SQE; PGDL
+
+Quick Contacts
+White & Case LLP
+5 Old Broad Street
+
+London
+EC2N 1DW
+
+Email:
+Website: http://www.whitecase.com/
+
+This Firm's Rankings in
+UK Guide, 2023
+Ranked Departments
+London (Firms)
+Banking & Finance: Borrowers: Big-Ticket (Band 2)
+Banking & Finance: Lenders: Big-Ticket (Band 2)
+Banking & Finance: Sponsors (Band 3)
+Commercial and Corporate Litigation (Band 3)
+Competition Law (Band 6)
+Construction: Contentious (Band 2)
+Construction: Non-contentious (Band 3)
+Corporate/M&A: £800 million and above (Band 5)
+Financial Crime: Corporates (Band 4)
+Restructuring/Insolvency (Band 2)
+UK-wide
+Asset Finance: Aviation Finance (Band 3)
+Banking Litigation (Band 4)
+Capital Markets: CLOs (Band 2)
+Capital Markets: Debt (Band 1)
+Capital Markets: Equity (Band 1)
+Capital Markets: High-Yield Products (Band 4)
+Capital Markets: Securitisation (Band 4)
+Capital Markets: Structured Products (Band 3)
+Commodities: Trade Finance (Band 2)
+Construction: International Arbitration (Band 1)
+Data Protection & Information Law (Band 4)
+Energy & Natural Resources: Mining: International (Band 2)
+Energy & Natural Resources: Oil & Gas (Band 1)
+Energy & Natural Resources: Power (Band 4)
+Financial Services: Non-contentious Regulatory (Band 4)
+Infrastructure (Band 1)
+International Arbitration: Commercial Arbitration (Band 2)
+International Arbitration: Investor-State Arbitration (Band 2)
+Private Equity: Buyouts: £500 million and above (Band 4)
+Projects (Band 1)
+Projects: PFI/PPP (Band 4)
+Real Estate Finance (Band 5)
+
+----------------------------End of White and Case----------------------------
+
+
+

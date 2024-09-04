@@ -1,0 +1,80 @@
+.firm-ranks {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .firm-ranks h1 {
+    color: #276D8B;
+    margin-bottom: 20px;
+  }
+  
+  .rank-me-btn {
+    background-color: #276D8B;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+  
+  .rank-me-btn:hover {
+    background-color: #1c4d62;
+  }
+  
+  .rank-me-btn:disabled {
+    background-color: #88a9b5;
+    cursor: not-allowed;
+  }
+  
+  .error-message {
+    color: #d32f2f;
+    margin-bottom: 20px;
+  }
+  
+  .rankings-container {
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    padding: 20px;
+  }
+  
+  .leaderboard {
+    margin-bottom: 20px;
+  }
+  
+  .firm-rank {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 4px;
+  }
+  
+  .rank {
+    font-weight: bold;
+    margin-right: 10px;
+    width: 20px;
+  }
+  
+  .firm-name {
+    flex-grow: 1;
+  }
+  
+  .relevancy-score {
+    font-weight: bold;
+    color: #276D8B;
+  }
+  
+  .justification {
+    background-color: white;
+    padding: 20px;
+    border-radius: 4px;
+  }
+  
+  .justification h2 {
+    color: #276D8B;
+    margin-bottom: 10px;
+  }
