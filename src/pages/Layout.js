@@ -333,6 +333,11 @@ const Layout = () => {
             <div className="logo">TalentLex</div>
             <nav>
               <ul>
+                <li className="section-title">Personalization</li>
+                <div className='seperator'></div>
+                <li className={location.pathname === "/" ? "active" : ""}>
+                  <Link to="/">Profile</Link>
+                </li>
                 <li className="section-title">Tools</li>
                 <div className='seperator'></div>
                 <li className={location.pathname.startsWith("/generate-draft") ? "active" : ""}>
@@ -346,13 +351,8 @@ const Layout = () => {
                     </ul>
                   )}
                 </li>
-                <li className={location.pathname === "/" ? "active" : ""}>
-                  <Link to="/">Application Review</Link>
-                </li>
-                <li className="section-title">Personalization</li>
-                <div className='seperator'></div>
-                <li className={location.pathname === "/profile" ? "active" : ""}>
-                  <Link to="/profile">Profile</Link>
+                <li className={location.pathname === "/application-review" ? "active" : ""}>
+                  <Link to="/application-review">Application Review</Link>
                 </li>
                 <li className="section-title">Guide</li>
                 <div className='seperator'></div>

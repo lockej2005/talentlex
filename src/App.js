@@ -58,7 +58,8 @@ function App() {
               </PrivateRoute>
             }
           >
-            <Route index element={<ApplicationReview />} />
+            <Route index element={<Profile />} />
+            <Route path="application-review" element={<ApplicationReview />} />
             <Route path="generate-draft" element={<GenerateDraft />} />
             <Route path="generate-draft/:id" element={<GenerateDraft />} />
             <Route path="privacy-policy" element={<PrivacyPolicy />} />
@@ -67,7 +68,6 @@ function App() {
             <Route path="videos" element={<Videos />} />
             <Route path="speak-to-founders" element={<SpeakToFounders />} />
             <Route path="due-diligence" element={<DueDiligence />} />
-            <Route path="profile" element={<Profile />} />
           </Route>
         </Routes>
       </Router>
