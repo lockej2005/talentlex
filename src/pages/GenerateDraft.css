@@ -295,6 +295,13 @@
     display: flex;
     flex-grow: 1;
   }
+
+  .draft-title {
+    color: #fff;
+    font-weight: 600;
+    padding-left: 50px;
+    font-size: 24px;
+  }
   
   /* Ensure the toolbar doesn't have rounded corners at the top */
   .comparison-container-draft .save-toolbar {

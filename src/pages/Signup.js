@@ -39,6 +39,7 @@ const Signup = () => {
           .from('profiles')
           .update({ 
             name,
+            email,
             society: societyCode
           })
           .eq('id', data.user.id);

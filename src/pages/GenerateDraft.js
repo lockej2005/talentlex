@@ -114,11 +114,12 @@ function GenerateDraft() {
           setIsLoading(false);
         }
       } else {
+        const defaultFirm = firms[0];
+        setSelectedFirm(defaultFirm);
+        setDraftTitle(defaultFirm.label);
         setDraftText('');
         setEditorState(EditorState.createEmpty());
         setWordCount(0);
-        setDraftTitle('');
-        setSelectedFirm(null);
         setSelectedQuestion(null);
         setAdditionalInfo({});
       }
@@ -223,11 +224,6 @@ function GenerateDraft() {
   };
 
   const handleSaveDraft = async () => {
-    if (!draftTitle.trim()) {
-      alert('Please enter a title for your draft.');
-      return;
-    }
-
     try {
       const draftData = {
         user_id: user.id,
@@ -240,26 +236,31 @@ function GenerateDraft() {
         answer_3: selectedFirm?.value === "Jones Day" ? additionalInfo.whyYou : additionalInfo.relevantInteraction || '',
         answer_4: selectedFirm?.value === "Jones Day" ? additionalInfo.relevantExperiences : additionalInfo.personalInfo || ''
       };
-
+  
       if (draftId) {
         const { error } = await supabase
           .from('saved_drafts')
           .update(draftData)
           .eq('id', draftId);
-
+  
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('saved_drafts')
-          .insert(draftData);
-
+          .insert(draftData)
+          .select();
+  
         if (error) throw error;
+        if (data && data[0]) {
+          // If this was a new draft, update the URL with the new draft ID
+          navigate(`/generate-draft/${data[0].id}`, { replace: true });
+        }
       }
-
+  
       alert('Draft saved successfully!');
       setShowSaveToolbar(false);
       setIsEdited(false);
-      navigate('/generate-draft');
+      // We're not navigating away after saving
     } catch (error) {
       console.error('Error saving draft:', error);
       alert('Failed to save draft. Please try again.');
@@ -321,12 +322,7 @@ function GenerateDraft() {
   return (
     <div className="comparison-container-draft">
       <div className="save-toolbar">
-        <input
-          type="text"
-          placeholder="Enter a title for your draft"
-          value={draftTitle}
-          onChange={(e) => setDraftTitle(e.target.value)}
-        />
+        <div className="draft-title">{draftTitle}</div>
         <button onClick={handleSaveDraft}>Save Draft</button>
       </div>
       <div className="content-draft" ref={containerRef}>

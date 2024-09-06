@@ -1,0 +1,58 @@
+.firm-selector-container {
+    padding: 20px;
+    background-color: #E4E4E4;
+    min-height: 100vh;
+  }
+  
+  .firm-selector-container h2 {
+    color: #276D8B;
+    margin-bottom: 20px;
+  }
+  
+  .firm-search-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #276D8B;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  
+  .firms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .firm-card {
+    background-color: #f0f0f0;
+    border: 1px solid #276D8B;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .firm-card:hover {
+    background-color: #276D8B;
+    color: white;
+  }
+  
+  .firm-card.disabled {
+    background-color: #cccccc;
+    border-color: #999999;
+    color: #666666;
+    cursor: not-allowed;
+  }
+  
+  .firm-card.disabled:hover {
+    background-color: #cccccc;
+    color: #666666;
+  }
+  
+  .error-message {
+    color: #d32f2f;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }

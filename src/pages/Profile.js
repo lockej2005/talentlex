@@ -8,14 +8,10 @@ const Profile = () => {
   const [education, setEducation] = useState('');
   const [subCategories, setSubCategories] = useState('');
   const [workExperience, setWorkExperience] = useState('');
-  const [linkedInUrl, setLinkedInUrl] = useState('');
   const [years, setYears] = useState([
     { id: 1, name: 'Year 1', expanded: false, subjects: [{ name: '', grade: '' }] }
   ]);
   const [isSaving, setIsSaving] = useState(false);
-  const [isScrapingLinkedIn, setIsScrapingLinkedIn] = useState(false);
-  const [scrapedLinkedInData, setScrapedLinkedInData] = useState(null);
-  const [scrapeError, setScrapeError] = useState(null);
 
   useEffect(() => {
     fetchUserProfile();
@@ -175,39 +171,6 @@ const Profile = () => {
     setYears(updatedYears);
   };
 
-  const handleScrapeLinkedIn = async () => {
-    if (!linkedInUrl) {
-      setScrapeError("Please enter a LinkedIn URL");
-      return;
-    }
-
-    setIsScrapingLinkedIn(true);
-    setScrapeError(null);
-    setScrapedLinkedInData(null);
-
-    try {
-      const response = await fetch('http://localhost:5000/scrape-linkedin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ linkedin_url: linkedInUrl }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to scrape LinkedIn profile');
-      }
-
-      const data = await response.json();
-      setScrapedLinkedInData(data);
-    } catch (error) {
-      console.error('Error scraping LinkedIn:', error);
-      setScrapeError(error.message);
-    } finally {
-      setIsScrapingLinkedIn(false);
-    }
-  };
-
   return (
     <div className="profile-container">
       <div className="main-content-profile">
@@ -298,32 +261,6 @@ const Profile = () => {
             ></textarea>
           </div>
         </div>
-      </div>
-      <div className="linkedin-scraper-profile">
-        <h3 className="profile-subheading">LinkedIn Scraper</h3>
-        <input
-          type="text"
-          className="profile-input2"
-          value={linkedInUrl}
-          onChange={(e) => setLinkedInUrl(e.target.value)}
-          placeholder="Enter LinkedIn URL"
-        />
-        <button 
-          className="scrape-button-profile" 
-          onClick={handleScrapeLinkedIn}
-          disabled={isScrapingLinkedIn}
-        >
-          {isScrapingLinkedIn ? 'Scraping...' : 'Scrape LinkedIn'}
-        </button>
-        {scrapeError && <p className="scrape-error">{scrapeError}</p>}
-        {scrapedLinkedInData && (
-          <div className="scraped-data">
-            <h4>Scraped LinkedIn Data:</h4>
-            <p><strong>Education:</strong> {scrapedLinkedInData.Education}</p>
-            <p><strong>Qualification:</strong> {scrapedLinkedInData.Qualification}</p>
-            <p><strong>Work Experience:</strong> {scrapedLinkedInData.WorkExperience}</p>
-          </div>
-        )}
       </div>
     </div>
   );

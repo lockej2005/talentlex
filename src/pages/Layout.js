@@ -14,6 +14,8 @@ import Videos from './Videos';
 import './Authentication2.css';
 import SpeakToFounders from './SpeakToFounders';
 import { UserInputProvider } from '../context/UserInputContext';
+import FirmSelector from './FirmSelector';
+import Profile from './Profile';
 
 const PopupSocietyJoin = ({ onClose, onJoin }) => {
   const [societyCode, setSocietyCode] = useState('');
@@ -115,8 +117,11 @@ const Layout = () => {
   const [showSocietyDetailsPopup, setShowSocietyDetailsPopup] = useState(false);
   const [userCredits, setUserCredits] = useState(0);
   const [savedDrafts, setSavedDrafts] = useState([]);
+  const [savedApplications, setSavedApplications] = useState([]);
   const [generateDraftExpanded, setGenerateDraftExpanded] = useState(false);
+  const [applicationReviewExpanded, setApplicationReviewExpanded] = useState(false);
   const [selectedDraftId, setSelectedDraftId] = useState(null);
+  const [selectedApplicationFirm, setSelectedApplicationFirm] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -176,11 +181,27 @@ const Layout = () => {
     setSavedDrafts(allDrafts);
   };
 
+  const fetchSavedApplications = async (userEmail) => {
+    const { data: allApplications, error } = await supabase
+      .from('applications_vector')
+      .select('firm, timestamp')
+      .eq('email', userEmail)
+      .order('timestamp', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching saved applications:', error.message);
+      return;
+    }
+
+    setSavedApplications(allApplications);
+  };
+
   useEffect(() => {
     fetchUserProfile();
 
     let profileSubscription;
     let draftsSubscription;
+    let applicationsSubscription;
 
     const setupSubscriptions = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -208,7 +229,23 @@ const Layout = () => {
           )
           .subscribe();
 
+        applicationsSubscription = supabase
+          .channel('public:applications_vector')
+          .on('postgres_changes', 
+            { 
+              event: '*', 
+              schema: 'public', 
+              table: 'applications_vector', 
+              filter: `email=eq.${user.email}`
+            }, 
+            () => {
+              fetchSavedApplications(user.email);
+            }
+          )
+          .subscribe();
+
         fetchSavedDrafts(user.id);
+        fetchSavedApplications(user.email);
       }
     };
 
@@ -217,6 +254,7 @@ const Layout = () => {
     return () => {
       if (profileSubscription) profileSubscription.unsubscribe();
       if (draftsSubscription) draftsSubscription.unsubscribe();
+      if (applicationsSubscription) applicationsSubscription.unsubscribe();
     };
   }, []);
 
@@ -227,6 +265,11 @@ const Layout = () => {
       setSelectedDraftId(draftId);
     } else if (currentPath === '/generate-draft') {
       setSelectedDraftId('new');
+    } else if (currentPath.startsWith('/application-review/')) {
+      const firm = currentPath.split('/application-review/')[1];
+      setSelectedApplicationFirm(firm);
+    } else if (currentPath === '/application-review') {
+      setSelectedApplicationFirm('new');
     }
   }, [location]);
 
@@ -281,7 +324,26 @@ const Layout = () => {
     if (error) {
       console.error('Error deleting draft:', error);
     } else {
-      fetchSavedDrafts(user.id); // Refresh the list after deletion
+      fetchSavedDrafts(user.id);
+    }
+  };
+
+  const handleSelectApplication = (firm) => {
+    setSelectedApplicationFirm(firm);
+    navigate(firm === 'new' ? `/application-review` : `/application-review/${firm}`);
+  };
+
+  const handleDeleteApplication = async (firm) => {
+    const { error } = await supabase
+      .from('applications_vector')
+      .delete()
+      .eq('email', user.email)
+      .eq('firm', firm);
+
+    if (error) {
+      console.error('Error deleting application:', error.message);
+    } else {
+      fetchSavedApplications(user.email);
     }
   };
 
@@ -301,9 +363,33 @@ const Layout = () => {
         ))}
         <li
           className={`saved-draft ${selectedDraftId === 'new' ? 'active' : ''}`}
-          onClick={() => handleSelectDraft('new')}
+          onClick={() => navigate('/firm-selector?mode=draft')}
         >
-          <Link to="/generate-draft" className='add-new'>Add New +</Link>
+          <span className='add-new'>Add New +</span>
+        </li>
+      </>
+    );
+  };
+
+  const renderSavedApplications = () => {
+    return (
+      <>
+        {savedApplications.map(application => (
+          <li
+            key={application.firm}
+            className={`saved-draft ${selectedApplicationFirm === application.firm ? 'active' : ''}`}
+          >
+            <Link to={`/application-review/${application.firm}`} onClick={() => handleSelectApplication(application.firm)}>{application.firm}</Link>
+            <button className="delete-draft-btn" onClick={() => handleDeleteApplication(application.firm)}>
+              <Trash2 size={16} />
+            </button>
+          </li>
+        ))}
+        <li
+          className={`saved-draft ${selectedApplicationFirm === 'new' ? 'active' : ''}`}
+          onClick={() => navigate('/firm-selector?mode=review')}
+        >
+          <span className='add-new'>Add New +</span>
         </li>
       </>
     );
@@ -351,8 +437,16 @@ const Layout = () => {
                     </ul>
                   )}
                 </li>
-                <li className={location.pathname === "/application-review" ? "active" : ""}>
-                  <Link to="/application-review">Application Review</Link>
+                <li className={location.pathname.startsWith("/application-review") ? "active" : ""}>
+                  <div className="dropdown-header" onClick={() => setApplicationReviewExpanded(!applicationReviewExpanded)}>
+                    <Link to="/application-review">Application Review</Link>
+                    {applicationReviewExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                  </div>
+                  {applicationReviewExpanded && (
+                    <ul className="dropdown-content">
+                      {renderSavedApplications()}
+                    </ul>
+                  )}
                 </li>
                 <li className="section-title">Guide</li>
                 <div className='seperator'></div>
@@ -382,13 +476,26 @@ const Layout = () => {
             <Menu size={24} />
           </button>
           <div className="content-area">
-            <Outlet />
+            <Routes>
+              <Route index element={<Profile />} />
+              <Route path="application-review" element={<ApplicationReview />} />
+              <Route path="application-review/:firm" element={<ApplicationReview />} />
+              <Route path="generate-draft" element={<GenerateDraft />} />
+              <Route path="generate-draft/:id" element={<GenerateDraft />} />
+              <Route path="firm-selector" element={<FirmSelector />} />
+              <Route path="privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="ai-usage-policy" element={<AIUsagePolicy />} />
+              <Route path="negotiation-simulator" element={<NegotiationSimulator />} />
+              <Route path="videos" element={<Videos />} />
+              <Route path="speak-to-founders" element={<SpeakToFounders />} />
+              <Route path="due-diligence" element={<DueDiligence />} />
+            </Routes>
           </div>
         </div>
         {showOverlay && (
           <div className="menu-overlay" onClick={closeMenu}></div>
         )}
-{showJoinPopup && (
+        {showJoinPopup && (
           <PopupSocietyJoin 
             onClose={() => setShowJoinPopup(false)}
             onJoin={handleJoinSociety}

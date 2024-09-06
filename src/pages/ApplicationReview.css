@@ -92,7 +92,7 @@ h2 {
     gap: 15px;
 }
 
-.submit-button {
+.submit-button2 {
     flex: 1;
     padding: 20px 15px;
     font-size: 0.9rem;
@@ -106,11 +106,11 @@ h2 {
     align-self: center;
 }
 
-.submit-button:hover {
+.submit-button2:hover {
     background-color: #3a3a3a;
 }
 
-.submit-button:disabled {
+.submit-button2:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
 }
