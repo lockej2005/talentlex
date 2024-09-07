@@ -1,113 +1,60 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { firms, questions } from '../data/ApplicationReviewData';
 import './FirmSelector.css';
 
 const FirmSelector = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [existingDrafts, setExistingDrafts] = useState([]);
-  const [existingApplications, setExistingApplications] = useState([]);
+  const [firms, setFirms] = useState([]);
   const [error, setError] = useState('');
-  const [userEmail, setUserEmail] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
-  const mode = new URLSearchParams(location.search).get('mode') || 'review';
 
   useEffect(() => {
-    const getUserEmail = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserEmail(user.email);
-        fetchExistingItems(user.email, user.id);
-      }
-    };
-    getUserEmail();
+    fetchFirms();
   }, []);
 
-  const fetchExistingItems = async (email, userId) => {
-    const { data: drafts, error: draftsError } = await supabase
-      .from('saved_drafts')
-      .select('firm')
-      .eq('user_id', userId);
+  const fetchFirms = async () => {
+    const { data, error } = await supabase
+      .from('firms')
+      .select('*')
+      .order('name');
 
-    if (draftsError) {
-      console.error('Error fetching existing drafts:', draftsError.message);
+    if (error) {
+      console.error('Error fetching firms:', error);
+      setError('Failed to fetch firms. Please try again.');
     } else {
-      setExistingDrafts(drafts.map(draft => draft.firm));
-    }
-
-    const { data: applications, error: applicationsError } = await supabase
-      .from('applications_vector')
-      .select('firm')
-      .eq('email', email);
-
-    if (applicationsError) {
-      console.error('Error fetching existing applications:', applicationsError.message);
-    } else {
-      setExistingApplications(applications.map(app => app.firm));
+      setFirms(data);
     }
   };
 
-  const handleFirmSelect = async (firmName) => {
+  const handleFirmSelect = async (firmId, firmName) => {
     setError('');
 
-    const firmQuestions = questions[firmName] || [];
-    const defaultQuestion = firmQuestions.length > 0 ? firmQuestions[0].value : "Default question";
-
     try {
-      if (mode === 'draft') {
-        const { data, error } = await supabase
-          .from('saved_drafts')
-          .insert([
-            { 
-              user_id: (await supabase.auth.getUser()).data.user.id,
-              title: firmName,
-              firm: firmName,
-              question: defaultQuestion
-            }
-          ])
-          .select();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user logged in');
 
-        if (error) throw error;
-        if (data) {
-          navigate(`/generate-draft/${data[0].id}`);
-        }
-      } else {
-        const { data, error } = await supabase
-          .from('applications_vector')
-          .insert([
-            { 
-              email: userEmail,
-              firm: firmName,
-              question: defaultQuestion,
-              application_text: '',
-              feedback: '',
-              device: 'web',
-              screen_size: `${window.innerWidth}x${window.innerHeight}`,
-              timestamp: new Date().toISOString()
-            }
-          ])
-          .select();
+      const { data, error } = await supabase
+        .from('firm_user_table')
+        .upsert({ user_id: user.id, firm_id: firmId }, { onConflict: 'user_id,firm_id' })
+        .select();
 
-        if (error) throw error;
-        if (data) {
-          navigate(`/application-review/${firmName}`);
-        }
-      }
+      if (error) throw error;
+      
+      navigate(`/firm/${firmId}`);
     } catch (error) {
-      console.error(`Error creating ${mode}:`, error.message);
-      setError(`Failed to create ${mode}. Please try again.`);
+      console.error('Error selecting firm:', error.message);
+      setError('Failed to select firm. Please try again.');
     }
   };
 
   const filteredFirms = firms.filter(firm =>
-    firm.label.toLowerCase().includes(searchTerm.toLowerCase())
+    firm.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="firm-selector-container">
-      <h2>Select a Firm for {mode === 'draft' ? 'Draft' : 'Application Review'}</h2>
+      <h2>Select a Firm</h2>
       <input
         type="text"
         placeholder="Search firms..."
@@ -117,21 +64,15 @@ const FirmSelector = () => {
       />
       {error && <div className="error-message">{error}</div>}
       <div className="firms-grid">
-        {filteredFirms.map((firm, index) => {
-          const isDisabled = mode === 'draft' 
-            ? existingDrafts.includes(firm.label)
-            : existingApplications.includes(firm.label);
-          return (
-            <div
-              key={index}
-              className={`firm-card ${isDisabled ? 'disabled' : ''}`}
-              onClick={() => !isDisabled && handleFirmSelect(firm.label)}
-            >
-              {firm.label}
-              {isDisabled && <span className="existing-indicator">{mode === 'draft' ? ' Draft Exists' : ' Review Exists'}</span>}
-            </div>
-          );
-        })}
+        {filteredFirms.map((firm) => (
+          <div
+            key={firm.id}
+            className="firm-card"
+            onClick={() => handleFirmSelect(firm.id, firm.name)}
+          >
+            {firm.name}
+          </div>
+        ))}
       </div>
     </div>
   );

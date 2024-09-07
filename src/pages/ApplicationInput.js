@@ -108,29 +108,29 @@ function ApplicationInput({
               <div className="input-field">
                 <label>Why law (paste your full 'why law' here):</label>
                 <textarea
-                  value={additionalInfo?.whyLaw || ""}
-                  onChange={(e) => handleInputChange('whyLaw', e.target.value)}
+                  value={additionalInfo?.note_1 || ""}
+                  onChange={(e) => handleInputChange('note_1', e.target.value)}
                 />
               </div>
               <div className="input-field">
                 <label>Why Jones Day (interactions with the firm, key reasons for applying etc…):</label>
                 <textarea
-                  value={additionalInfo?.whyJonesDay || ""}
-                  onChange={(e) => handleInputChange('whyJonesDay', e.target.value)}
+                  value={additionalInfo?.note_2 || ""}
+                  onChange={(e) => handleInputChange('note_2', e.target.value)}
                 />
               </div>
               <div className="input-field">
                 <label>Why you (any relevant personal reasons):</label>
                 <textarea
-                  value={additionalInfo?.whyYou || ""}
-                  onChange={(e) => handleInputChange('whyYou', e.target.value)}
+                  value={additionalInfo?.note_3 || ""}
+                  onChange={(e) => handleInputChange('note_3', e.target.value)}
                 />
               </div>
               <div className="input-field">
                 <label>Any relevant experiences:</label>
                 <textarea
-                  value={additionalInfo?.relevantExperiences || ""}
-                  onChange={(e) => handleInputChange('relevantExperiences', e.target.value)}
+                  value={additionalInfo?.note_4 || ""}
+                  onChange={(e) => handleInputChange('note_4', e.target.value)}
                 />
               </div>
             </>
@@ -139,29 +139,29 @@ function ApplicationInput({
               <div className="input-field">
                 <label>Key reason(s) for applying to firm:</label>
                 <textarea
-                  value={additionalInfo?.keyReasons || ""}
-                  onChange={(e) => handleInputChange('keyReasons', e.target.value)}
+                  value={additionalInfo?.note_1 || ""}
+                  onChange={(e) => handleInputChange('note_1', e.target.value)}
                 />
               </div>
               <div className="input-field">
                 <label>Relevant experience:</label>
                 <textarea
-                  value={additionalInfo?.relevantExperience || ""}
-                  onChange={(e) => handleInputChange('relevantExperience', e.target.value)}
+                  value={additionalInfo?.note_2 || ""}
+                  onChange={(e) => handleInputChange('note_2', e.target.value)}
                 />
               </div>
               <div className="input-field">
                 <label>Relevant interaction with firm (if any):</label>
                 <textarea
-                  value={additionalInfo?.relevantInteraction || ""}
-                  onChange={(e) => handleInputChange('relevantInteraction', e.target.value)}
+                  value={additionalInfo?.note_3 || ""}
+                  onChange={(e) => handleInputChange('note_3', e.target.value)}
                 />
               </div>
               <div className="input-field">
                 <label>Any other personal information you'd like to include:</label>
                 <textarea
-                  value={additionalInfo?.personalInfo || ""}
-                  onChange={(e) => handleInputChange('personalInfo', e.target.value)}
+                  value={additionalInfo?.note_4 || ""}
+                  onChange={(e) => handleInputChange('note_4', e.target.value)}
                 />
               </div>
             </>

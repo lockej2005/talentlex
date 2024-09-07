@@ -470,6 +470,9 @@ a:hover {
   cursor: pointer;
 }
 
+.importance-wrapper {
+}
+
 .submit-button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;

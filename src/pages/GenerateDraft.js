@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useContext, useCallback } from 'react';
 import { Editor, EditorState, ContentState, RichUtils, SelectionState } from 'draft-js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight, faBold, faItalic, faUnderline, faListUl, faListOl, faQuoteRight } from '@fortawesome/free-solid-svg-icons';
@@ -14,14 +13,10 @@ const countWords = (text) => {
   return text.trim().split(/\s+/).length;
 };
 
-function GenerateDraft() {
-  const { id: draftId } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
+function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
   const { 
     draftText, setDraftText, 
     additionalInfo, setAdditionalInfo, 
-    selectedFirm, setSelectedFirm,
     selectedQuestion, setSelectedQuestion
   } = useContext(UserInputContext);
 
@@ -32,19 +27,19 @@ function GenerateDraft() {
   const [responseTime, setResponseTime] = useState(null);
   const [wordCount, setWordCount] = useState(() => countWords(draftText || ''));
   const [leftWidth, setLeftWidth] = useState(50);
+  const [user, setUser] = useState(null);
+  const [totalTokens, setTotalTokens] = useState(0);
+  const [isEdited, setIsEdited] = useState(false);
+  const [firmQuestions, setFirmQuestions] = useState([]);
+
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
   const editorRef = useRef(null);
   const editorContainerRef = useRef(null);
-  const [user, setUser] = useState(null);
-  const [totalTokens, setTotalTokens] = useState(0);
-  const [showSaveToolbar, setShowSaveToolbar] = useState(false);
-  const [draftTitle, setDraftTitle] = useState('');
-  const [isEdited, setIsEdited] = useState(false);
 
-  const getQuestions = (firm) => {
-    return questions[firm] || [{ value: "Coming Soon", label: "Coming Soon" }];
-  };
+  const getQuestions = useCallback((firm) => {
+    return questions[firm] || [];
+  }, []);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -53,137 +48,108 @@ function GenerateDraft() {
     };
 
     fetchCurrentUser();
-
-    if (!selectedFirm) {
-      const defaultFirm = firms.find(firm => firm.value === "Goodwin") || firms[0];
-      setSelectedFirm(defaultFirm);
-    }
-  }, [selectedFirm, setSelectedFirm]);
+  }, []);
 
   useEffect(() => {
-    if (selectedFirm && !selectedQuestion) {
-      const firmQuestions = getQuestions(selectedFirm.value);
-      const defaultQuestion = firmQuestions.find(q => q.value === "Why are you applying to Goodwin?") || firmQuestions[0];
-      setSelectedQuestion(defaultQuestion);
+    if (selectedFirm) {
+      const firmSpecificQuestions = getQuestions(selectedFirm.value);
+      setFirmQuestions(firmSpecificQuestions);
+      if (firmSpecificQuestions.length > 0 && (!selectedQuestion || selectedQuestion.firm !== selectedFirm.value)) {
+        setSelectedQuestion(firmSpecificQuestions[0]);
+      }
     }
-  }, [selectedFirm, selectedQuestion, setSelectedQuestion]);
+  }, [selectedFirm, getQuestions, setSelectedQuestion]);
 
   useEffect(() => {
     const loadSavedDraft = async () => {
-      if (draftId) {
+      if (user && selectedFirm && selectedQuestion) {
         setIsLoading(true);
         try {
           const { data: savedDraft, error } = await supabase
-            .from('saved_drafts')
+            .from('drafts_generations_vector')
             .select('*')
-            .eq('id', draftId)
+            .eq('user_id', user.id)
+            .eq('firm_id', selectedFirm.value)
+            .eq('question', selectedQuestion.value)
             .single();
 
-          if (error) throw error;
+          if (error && error.code !== 'PGRST116') throw error;
 
           if (savedDraft) {
-            setDraftText(savedDraft.draft || '');
-            setEditorState(EditorState.createWithContent(ContentState.createFromText(savedDraft.draft || '')));
-            setWordCount(countWords(savedDraft.draft || ''));
-            setDraftTitle(savedDraft.title || '');
-
-            const selectedFirm = firms.find(f => f.value === savedDraft.firm);
-            if (selectedFirm) {
-              setSelectedFirm(selectedFirm);
-              const firmQuestions = getQuestions(selectedFirm.value);
-              const selectedQuestion = firmQuestions.find(q => q.value === savedDraft.question);
-              if (selectedQuestion) {
-                setSelectedQuestion(selectedQuestion);
-              }
-            }
-
+            setDraftText(savedDraft.generated_draft || '');
+            setEditorState(EditorState.createWithContent(ContentState.createFromText(savedDraft.generated_draft || '')));
+            setWordCount(countWords(savedDraft.generated_draft || ''));
             setAdditionalInfo({
-              whyLaw: savedDraft.answer_1 || '',
-              whyJonesDay: savedDraft.answer_2 || '',
-              whyYou: savedDraft.answer_3 || '',
-              relevantExperiences: savedDraft.answer_4 || '',
-              keyReasons: savedDraft.answer_1 || '',
-              relevantExperience: savedDraft.answer_2 || '',
-              relevantInteraction: savedDraft.answer_3 || '',
-              personalInfo: savedDraft.answer_4 || ''
+              note_1: savedDraft.note_1 || '',
+              note_2: savedDraft.note_2 || '',
+              note_3: savedDraft.note_3 || '',
+              note_4: savedDraft.note_4 || '',
             });
+          } else {
+            resetDraft();
           }
         } catch (error) {
           console.error('Error loading saved draft:', error);
+          resetDraft();
         } finally {
           setIsLoading(false);
         }
-      } else {
-        const defaultFirm = firms[0];
-        setSelectedFirm(defaultFirm);
-        setDraftTitle(defaultFirm.label);
-        setDraftText('');
-        setEditorState(EditorState.createEmpty());
-        setWordCount(0);
-        setSelectedQuestion(null);
-        setAdditionalInfo({});
       }
     };
 
     loadSavedDraft();
-  }, [draftId, setDraftText, setSelectedFirm, setSelectedQuestion, setAdditionalInfo]);
+  }, [user, selectedFirm, selectedQuestion, setDraftText, setAdditionalInfo]);
 
-  useEffect(() => {
-    if (location.pathname === '/generate-draft') {
-      setDraftText('');
-      setEditorState(EditorState.createEmpty());
-      setWordCount(0);
-      setDraftTitle('');
-      setSelectedFirm(null);
-      setSelectedQuestion(null);
-      setAdditionalInfo({});
-    }
-  }, [location.pathname, setDraftText, setEditorState, setWordCount, setDraftTitle, setSelectedFirm, setSelectedQuestion, setAdditionalInfo]);
+  const resetDraft = useCallback(() => {
+    setDraftText('');
+    setEditorState(EditorState.createEmpty());
+    setWordCount(0);
+    setAdditionalInfo({
+      note_1: '',
+      note_2: '',
+      note_3: '',
+      note_4: '',
+    });
+  }, [setDraftText, setAdditionalInfo]);
 
-  const handleMouseDown = (e) => {
+  const handleMouseDown = useCallback((e) => {
     e.preventDefault();
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-  };
+  }, []);
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = useCallback((e) => {
     if (containerRef.current) {
       const containerRect = containerRef.current.getBoundingClientRect();
       const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
       setLeftWidth(Math.min(Math.max(newLeftWidth, 20), 80));
     }
-  };
+  }, []);
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
-  };
+  }, [handleMouseMove]);
 
   useEffect(() => {
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, []);
+  }, [handleMouseMove, handleMouseUp]);
 
-  const handleAdditionalInfoChange = (field, value) => {
+  const handleAdditionalInfoChange = useCallback((field, value) => {
     setAdditionalInfo(prev => ({ ...prev, [field]: value }));
     setIsEdited(true);
-    setShowSaveToolbar(true);
-  };
+  }, [setAdditionalInfo]);
 
-  const handleCreateDraft = async () => {
+  const handleCreateDraft = useCallback(async () => {
     if (!user) {
       alert('Please log in to generate a draft.');
       return;
     }
 
-    let requiredFields;
-    if (selectedFirm?.value === "Jones Day") {
-      requiredFields = ['whyLaw', 'whyJonesDay', 'whyYou', 'relevantExperiences'];
-    } else {
-      requiredFields = ['keyReasons', 'relevantExperience', 'relevantInteraction', 'personalInfo'];
-    }
+    let requiredFields = ['note_1', 'note_2', 'note_3', 'note_4'];
 
     const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field]?.trim() !== '');
 
@@ -201,14 +167,11 @@ function GenerateDraft() {
         selectedQuestion,
         additionalInfo,
         (newDraftText) => {
-          const updatedDraftText = newDraftText;
-
-          const contentState = ContentState.createFromText(updatedDraftText);
+          const contentState = ContentState.createFromText(newDraftText);
           setEditorState(EditorState.createWithContent(contentState));
-          setDraftText(updatedDraftText);
-          setWordCount(countWords(updatedDraftText));
+          setDraftText(newDraftText);
+          setWordCount(countWords(newDraftText));
           setIsEdited(true);
-          setShowSaveToolbar(true);
         },
         setTotalTokens
       );
@@ -221,72 +184,25 @@ function GenerateDraft() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, selectedFirm, selectedQuestion, additionalInfo, setDraftText, setEditorState]);
 
-  const handleSaveDraft = async () => {
-    try {
-      const draftData = {
-        user_id: user.id,
-        title: draftTitle,
-        draft: draftText,
-        firm: selectedFirm?.value || '',
-        question: selectedQuestion?.value || '',
-        answer_1: selectedFirm?.value === "Jones Day" ? additionalInfo.whyLaw : additionalInfo.keyReasons || '',
-        answer_2: selectedFirm?.value === "Jones Day" ? additionalInfo.whyJonesDay : additionalInfo.relevantExperience || '',
-        answer_3: selectedFirm?.value === "Jones Day" ? additionalInfo.whyYou : additionalInfo.relevantInteraction || '',
-        answer_4: selectedFirm?.value === "Jones Day" ? additionalInfo.relevantExperiences : additionalInfo.personalInfo || ''
-      };
-  
-      if (draftId) {
-        const { error } = await supabase
-          .from('saved_drafts')
-          .update(draftData)
-          .eq('id', draftId);
-  
-        if (error) throw error;
-      } else {
-        const { data, error } = await supabase
-          .from('saved_drafts')
-          .insert(draftData)
-          .select();
-  
-        if (error) throw error;
-        if (data && data[0]) {
-          // If this was a new draft, update the URL with the new draft ID
-          navigate(`/generate-draft/${data[0].id}`, { replace: true });
-        }
-      }
-  
-      alert('Draft saved successfully!');
-      setShowSaveToolbar(false);
-      setIsEdited(false);
-      // We're not navigating away after saving
-    } catch (error) {
-      console.error('Error saving draft:', error);
-      alert('Failed to save draft. Please try again.');
-    }
-  };
-
-  const onEditorChange = (newEditorState) => {
+  const onEditorChange = useCallback((newEditorState) => {
     setEditorState(newEditorState);
     const currentContent = newEditorState.getCurrentContent().getPlainText();
     setDraftText(currentContent);
     setWordCount(countWords(currentContent));
-    if (!isEdited) {
-      setIsEdited(true);
-      setShowSaveToolbar(true);
-    }
-  };
+    setIsEdited(true);
+  }, [setDraftText]);
 
-  const applyInlineStyle = (style) => {
+  const applyInlineStyle = useCallback((style) => {
     setEditorState(RichUtils.toggleInlineStyle(editorState, style));
-  };
+  }, [editorState]);
 
-  const applyBlockType = (blockType) => {
+  const applyBlockType = useCallback((blockType) => {
     setEditorState(RichUtils.toggleBlockType(editorState, blockType));
-  };
+  }, [editorState]);
 
-  const handleEditorClick = (e) => {
+  const handleEditorClick = useCallback((e) => {
     const editorContainer = editorContainerRef.current;
     if (!editorContainer) return;
 
@@ -317,23 +233,39 @@ function GenerateDraft() {
     const newEditorState = EditorState.forceSelection(editorState, newSelection);
     setEditorState(newEditorState);
     editorRef.current.focus();
-  };
+  }, [editorState]);
+
+  const handleQuestionChange = useCallback((newQuestion) => {
+    setSelectedQuestion(newQuestion);
+    resetDraft();
+  }, [setSelectedQuestion, resetDraft]);
+
+  useEffect(() => {
+    if (isEdited && user && selectedFirm && selectedQuestion) {
+      const draftData = {
+        user_id: user.id,
+        firm_id: selectedFirm.value,
+        question: selectedQuestion.value,
+        note_1: additionalInfo.note_1 || '',
+        note_2: additionalInfo.note_2 || '',
+        note_3: additionalInfo.note_3 || '',
+        note_4: additionalInfo.note_4 || '',
+        generated_draft: draftText,
+      };
+      onDraftChange(draftData);
+    }
+  }, [isEdited, user, draftText, selectedFirm, selectedQuestion, additionalInfo, onDraftChange]);
 
   return (
     <div className="comparison-container-draft">
-      <div className="save-toolbar">
-        <div className="draft-title">{draftTitle}</div>
-        <button onClick={handleSaveDraft}>Save Draft</button>
-      </div>
       <div className="content-draft" ref={containerRef}>
         <div className="left-column-draft" style={{ width: `${leftWidth}%` }}>
           <ApplicationInput
             applicationText={draftText}
             setApplicationText={setDraftText}
             selectedFirm={selectedFirm}
-            setSelectedFirm={setSelectedFirm}
             selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
+            setSelectedQuestion={handleQuestionChange}
             firms={firms}
             getQuestions={getQuestions}
             additionalInfo={additionalInfo}

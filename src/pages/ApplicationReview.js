@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
 import ReactMarkdown from 'react-markdown';
@@ -13,9 +12,7 @@ import { firms, questions } from '../data/ApplicationReviewData';
 import { UserInputContext } from '../context/UserInputContext';
 import { supabase } from '../supabaseClient';
 
-function ApplicationReview() {
-  const { firm: firmName } = useParams();
-  const navigate = useNavigate();
+function ApplicationReview({ firmId, onApplicationChange }) {
   const { 
     applicationText, setApplicationText,
     reviewSelectedFirm, setReviewSelectedFirm,
@@ -31,7 +28,6 @@ function ApplicationReview() {
   const [user, setUser] = useState(null);
   const [totalTokens, setTotalTokens] = useState(0);
   const [wordCount, setWordCount] = useState(0);
-  const [isEdited, setIsEdited] = useState(false);
 
   const getQuestions = (firm) => {
     return questions[firm] || [{ value: "Coming Soon", label: "Coming Soon" }];
@@ -41,20 +37,20 @@ function ApplicationReview() {
     const fetchCurrentUser = async () => {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
-      if (currentUser && firmName) {
-        loadSavedReview(currentUser.email, firmName);
+      if (currentUser && firmId) {
+        loadSavedReview(currentUser.email, firmId);
       }
     };
 
     fetchCurrentUser();
-  }, [firmName]);
+  }, [firmId]);
 
   useEffect(() => {
-    if (!reviewSelectedFirm && firmName) {
-      const firm = firms.find(f => f.label === firmName);
+    if (!reviewSelectedFirm && firmId) {
+      const firm = firms.find(f => f.value === firmId);
       setReviewSelectedFirm(firm || firms[0]);
     }
-  }, [reviewSelectedFirm, firmName, setReviewSelectedFirm]);
+  }, [reviewSelectedFirm, firmId, setReviewSelectedFirm]);
 
   useEffect(() => {
     if (reviewSelectedFirm && !reviewSelectedQuestion) {
@@ -85,7 +81,7 @@ function ApplicationReview() {
       if (data) {
         setApplicationText(data.application_text || '');
         setFeedback(data.feedback || '');
-        const selectedFirm = firms.find(f => f.label === data.firm);
+        const selectedFirm = firms.find(f => f.value === data.firm);
         if (selectedFirm) {
           setReviewSelectedFirm(selectedFirm);
           const firmQuestions = getQuestions(selectedFirm.value);
@@ -99,39 +95,6 @@ function ApplicationReview() {
       console.error('Error loading saved review:', error.message);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleSaveReview = async () => {
-    if (!user || !reviewSelectedFirm) {
-      alert('Please select a firm and ensure you are logged in.');
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('applications_vector')
-        .upsert({
-          email: user.email,
-          firm: reviewSelectedFirm.label,
-          question: reviewSelectedQuestion?.value || '',
-          application_text: applicationText,
-          feedback: feedback,
-          device: 'web',
-          screen_size: `${window.innerWidth}x${window.innerHeight}`,
-          timestamp: new Date().toISOString()
-        }, {
-          onConflict: 'email,firm'
-        })
-        .select();
-
-      if (error) throw error;
-
-      alert('Application saved successfully!');
-      setIsEdited(false);
-    } catch (error) {
-      console.error('Error saving application:', error.message);
-      alert('Failed to save application. Please try again.');
     }
   };
 
@@ -179,7 +142,7 @@ function ApplicationReview() {
         setResponseTime
       );
       setFeedback(prevFeedback => `${prevFeedback}\n\nCredits used: ${result.cost}. Remaining credits: ${result.newBalance}`);
-      setIsEdited(true);
+      updateApplicationData();
     } catch (error) {
       console.error("Error:", error);
       setFeedback("Error: " + error.message);
@@ -188,19 +151,34 @@ function ApplicationReview() {
     }
   };
 
+  const updateApplicationData = () => {
+    if (onApplicationChange) {
+      onApplicationChange({
+        email: user?.email,
+        firm: reviewSelectedFirm?.value,
+        question: reviewSelectedQuestion?.value || '',
+        application_text: applicationText,
+        feedback: feedback,
+        device: 'web',
+        screen_size: `${window.innerWidth}x${window.innerHeight}`,
+        timestamp: new Date().toISOString()
+      });
+    }
+  };
+
+  useEffect(() => {
+    updateApplicationData();
+  }, [applicationText, reviewSelectedFirm, reviewSelectedQuestion, feedback, user]);
+
   return (
     <div className="comparison-container">
-      <div className="save-toolbar">
-        <div className="draft-title">{reviewSelectedFirm?.label || 'Select a Firm'}</div>
-        <button onClick={handleSaveReview} disabled={!isEdited}>Save Application</button>
-      </div>
       <div className="content" ref={containerRef}>
         <div className="left-column" style={{width: `${leftWidth}%`}}>
           <ApplicationInput
             applicationText={applicationText}
             setApplicationText={(text) => {
               setApplicationText(text);
-              setIsEdited(true);
+              updateApplicationData();
             }}
             selectedFirm={reviewSelectedFirm}
             setSelectedFirm={setReviewSelectedFirm}
