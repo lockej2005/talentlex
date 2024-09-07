@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useRef, useEffect, useContext, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
 import ReactMarkdown from 'react-markdown';
@@ -12,11 +12,10 @@ import { firms, questions } from '../data/ApplicationReviewData';
 import { UserInputContext } from '../context/UserInputContext';
 import { supabase } from '../supabaseClient';
 
-function ApplicationReview({ firmId, onApplicationChange }) {
+function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   const { 
     applicationText, setApplicationText,
-    reviewSelectedFirm, setReviewSelectedFirm,
-    reviewSelectedQuestion, setReviewSelectedQuestion,
+    selectedQuestion, setSelectedQuestion,
     feedback, setFeedback
   } = useContext(UserInputContext);
 
@@ -29,35 +28,31 @@ function ApplicationReview({ firmId, onApplicationChange }) {
   const [totalTokens, setTotalTokens] = useState(0);
   const [wordCount, setWordCount] = useState(0);
 
-  const getQuestions = (firm) => {
+  const getQuestions = useCallback((firm) => {
     return questions[firm] || [{ value: "Coming Soon", label: "Coming Soon" }];
-  };
+  }, []);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
-      if (currentUser && firmId) {
-        loadSavedReview(currentUser.email, firmId);
-      }
     };
 
     fetchCurrentUser();
-  }, [firmId]);
+  }, []);
 
   useEffect(() => {
-    if (!reviewSelectedFirm && firmId) {
-      const firm = firms.find(f => f.value === firmId);
-      setReviewSelectedFirm(firm || firms[0]);
+    if (user && selectedFirm) {
+      const firmQuestions = getQuestions(selectedFirm.value);
+      setSelectedQuestion(firmQuestions[0]);
     }
-  }, [reviewSelectedFirm, firmId, setReviewSelectedFirm]);
+  }, [user, selectedFirm, getQuestions, setSelectedQuestion]);
 
   useEffect(() => {
-    if (reviewSelectedFirm && !reviewSelectedQuestion) {
-      const firmQuestions = getQuestions(reviewSelectedFirm.value);
-      setReviewSelectedQuestion(firmQuestions[0]);
+    if (user && selectedFirm && selectedQuestion) {
+      loadSavedReview(user.id, selectedFirm.value, selectedQuestion.value);
     }
-  }, [reviewSelectedFirm, reviewSelectedQuestion, setReviewSelectedQuestion]);
+  }, [user, selectedFirm, selectedQuestion]);
 
   useEffect(() => {
     const calculateWordCount = (text) => {
@@ -66,33 +61,30 @@ function ApplicationReview({ firmId, onApplicationChange }) {
     setWordCount(calculateWordCount(applicationText));
   }, [applicationText]);
 
-  const loadSavedReview = async (email, firm) => {
+  const loadSavedReview = async (userId, firmId, questionValue) => {
     setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('applications_vector')
         .select('*')
-        .eq('email', email)
-        .eq('firm', firm)
+        .eq('user_id', userId)
+        .eq('firm_id', firmId)
+        .eq('question', questionValue)
         .single();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') throw error;
 
       if (data) {
         setApplicationText(data.application_text || '');
         setFeedback(data.feedback || '');
-        const selectedFirm = firms.find(f => f.value === data.firm);
-        if (selectedFirm) {
-          setReviewSelectedFirm(selectedFirm);
-          const firmQuestions = getQuestions(selectedFirm.value);
-          const selectedQuestion = firmQuestions.find(q => q.value === data.question);
-          if (selectedQuestion) {
-            setReviewSelectedQuestion(selectedQuestion);
-          }
-        }
+      } else {
+        setApplicationText('');
+        setFeedback('');
       }
     } catch (error) {
       console.error('Error loading saved review:', error.message);
+      setApplicationText('');
+      setFeedback('');
     } finally {
       setIsLoading(false);
     }
@@ -135,8 +127,8 @@ function ApplicationReview({ firmId, onApplicationChange }) {
       const result = await handleApplicationSubmit(
         user,
         applicationText,
-        reviewSelectedFirm,
-        reviewSelectedQuestion,
+        selectedFirm,
+        selectedQuestion,
         setFeedback,
         setTotalTokens,
         setResponseTime
@@ -151,24 +143,29 @@ function ApplicationReview({ firmId, onApplicationChange }) {
     }
   };
 
-  const updateApplicationData = () => {
-    if (onApplicationChange) {
+  const updateApplicationData = useCallback(() => {
+    if (onApplicationChange && user && selectedFirm && selectedQuestion) {
       onApplicationChange({
-        email: user?.email,
-        firm: reviewSelectedFirm?.value,
-        question: reviewSelectedQuestion?.value || '',
+        user_id: user.id,
+        firm_id: selectedFirm.value,
+        question: selectedQuestion.value,
         application_text: applicationText,
         feedback: feedback,
-        device: 'web',
-        screen_size: `${window.innerWidth}x${window.innerHeight}`,
         timestamp: new Date().toISOString()
       });
     }
-  };
+  }, [onApplicationChange, user, selectedFirm, selectedQuestion, applicationText, feedback]);
 
   useEffect(() => {
     updateApplicationData();
-  }, [applicationText, reviewSelectedFirm, reviewSelectedQuestion, feedback, user]);
+  }, [updateApplicationData]);
+
+  const handleQuestionChange = useCallback((newQuestion) => {
+    setSelectedQuestion(newQuestion);
+    if (user && selectedFirm) {
+      loadSavedReview(user.id, selectedFirm.value, newQuestion.value);
+    }
+  }, [user, selectedFirm, setSelectedQuestion]);
 
   return (
     <div className="comparison-container">
@@ -176,18 +173,15 @@ function ApplicationReview({ firmId, onApplicationChange }) {
         <div className="left-column" style={{width: `${leftWidth}%`}}>
           <ApplicationInput
             applicationText={applicationText}
-            setApplicationText={(text) => {
-              setApplicationText(text);
-              updateApplicationData();
-            }}
-            selectedFirm={reviewSelectedFirm}
-            setSelectedFirm={setReviewSelectedFirm}
-            selectedQuestion={reviewSelectedQuestion}
-            setSelectedQuestion={setReviewSelectedQuestion}
+            setApplicationText={setApplicationText}
+            selectedFirm={selectedFirm}
+            selectedQuestion={selectedQuestion}
+            setSelectedQuestion={handleQuestionChange}
             firms={firms}
             getQuestions={getQuestions}
             wordCount={wordCount}
             inputType="simple"
+            onQuestionChange={handleQuestionChange}
           />
         </div>
         <div className="divider" ref={dividerRef} onMouseDown={handleMouseDown}>

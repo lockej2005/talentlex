@@ -70,17 +70,17 @@ const FirmDashboard = () => {
 
   const handleSaveApplication = async () => {
     if (!applicationData) return;
-
+  
     try {
       const { data, error } = await supabase
         .from('applications_vector')
         .upsert(applicationData, {
-          onConflict: 'email,firm'
+          onConflict: 'user_id,firm_id'
         })
         .select();
-
+  
       if (error) throw error;
-
+  
       alert('Application saved successfully!');
       setShowSaveButton(false);
     } catch (error) {

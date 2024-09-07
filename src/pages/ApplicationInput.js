@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Select from 'react-select';
 import './ApplicationInput.css';
 
@@ -14,7 +14,8 @@ function ApplicationInput({
   additionalInfo = {},
   onAdditionalInfoChange,
   wordCount,
-  inputType
+  inputType,
+  onQuestionChange
 }) {
   const customStyles = {
     control: (provided) => ({
@@ -50,15 +51,29 @@ function ApplicationInput({
     onAdditionalInfoChange(field, value);
   };
 
+  useEffect(() => {
+    if (selectedFirm && !selectedQuestion) {
+      const questions = getQuestions(selectedFirm.value);
+      setSelectedQuestion(questions[0]);
+    }
+  }, [selectedFirm, selectedQuestion, getQuestions, setSelectedQuestion]);
+
+  const handleQuestionChange = (newQuestion) => {
+    setSelectedQuestion(newQuestion);
+    if (onQuestionChange) {
+      onQuestionChange(newQuestion);
+    }
+  };
+
   const dropdownSection = (
     <div className="dropdown-container">
-      {inputType === 'simple' && (
+      {inputType === 'expanded' && (
         <Select
           value={selectedFirm}
           onChange={(option) => {
             setSelectedFirm(option);
             const questions = getQuestions(option?.value || "");
-            setSelectedQuestion(questions[0]);
+            handleQuestionChange(questions[0]);
           }}
           options={firms}
           styles={customStyles}
@@ -67,7 +82,7 @@ function ApplicationInput({
       )}
       <Select
         value={selectedQuestion}
-        onChange={setSelectedQuestion}
+        onChange={handleQuestionChange}
         options={selectedFirm ? getQuestions(selectedFirm.value) : []}
         styles={customStyles}
         isSearchable={false}
@@ -79,7 +94,7 @@ function ApplicationInput({
     <div className="application-container">
       <div className="title-card">
         <h3>Your Application</h3>
-        <p>Select which firm you're applying to and the relevant question for a review.</p>
+        <p>Select the relevant question for a review.</p>
         {dropdownSection}
       </div>
       <div className="text-content">
