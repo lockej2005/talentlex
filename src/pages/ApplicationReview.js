@@ -238,11 +238,11 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         
         updateApplicationData();
       } else {
-        throw new Error('Failed to get feedback from the server');
+        throw new Error('Unexpected response format from server');
       }
     } catch (error) {
       console.error("Error:", error);
-      setError(`An error occurred while submitting your application. Please try again later. Error details: ${error.message}`);
+      setError(`An error occurred: ${error.message}`);
       setFeedback("");
     } finally {
       setIsLoading(false);
