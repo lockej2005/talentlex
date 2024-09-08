@@ -154,7 +154,7 @@ const FirmDashboard = () => {
       const workExpContent = workExpData.work_experience || '[]';
 
       // Send data to backend for score calculation
-      const response = await fetch('http://localhost:5000/calculate_score', {
+      const response = await fetch('/api/calculate_score', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
