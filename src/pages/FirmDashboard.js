@@ -126,8 +126,8 @@ const FirmDashboard = () => {
       // Fetch open text applications
       const { data: applicationsData, error: applicationsError } = await supabase
         .from('applications_vector')
-        .select('question, application_text')
-        .eq('firm_id', firmData.name)
+        .select('question, application_text')   
+        .eq('firm_id', firmData.id)
         .eq('user_id', user.id);
 
       if (applicationsError) throw applicationsError;
