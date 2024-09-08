@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import GenerateDraft from './GenerateDraft';
 import ApplicationReview from './ApplicationReview';
+import ScoreWarnings from './ScoreWarnings';
 import { firms } from '../data/ApplicationReviewData';
 import { Trash2 } from 'lucide-react';
 import './FirmDashboard.css';
@@ -238,6 +239,7 @@ const FirmDashboard = () => {
               </div>
             </div>
             <div className="right-column-firmdash">
+              <ScoreWarnings userId={user?.id} firmId={id} />
               <div className="score-display" ref={scoreDisplayRef}>
                 <div className="score-header">
                   <h2 className="score-title">{scores.weighted}</h2>
