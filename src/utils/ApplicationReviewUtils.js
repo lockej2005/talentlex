@@ -91,14 +91,14 @@ export const createApplicationDraft = async (draftData) => {
   return await response.json();
 };
 
-export const handleApplicationSubmit = async (user, applicationText, selectedFirm, selectedQuestion, setFeedback, setTotalTokens, setResponseTime) => {
+
+export const handleApplicationSubmit = async (user, applicationText, selectedFirm, selectedQuestion) => {
   if (!user) {
     throw new Error('Please log in to submit your application.');
   }
 
   return await creditPolice(user.id, async () => {
     const startTime = Date.now();
-    let localTotalTokens = 0;
 
     const userAgent = navigator.userAgent;
     const screenSize = `${window.screen.width}x${window.screen.height}`;
@@ -110,11 +110,6 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
       question: selectedQuestion.value,
       email: user.email
     });
-
-    setFeedback(data.feedback);
-
-    localTotalTokens += data.usage.total_tokens;
-    setTotalTokens(localTotalTokens);
 
     await insertApplication({
       firm: selectedFirm.value,
@@ -128,15 +123,22 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
     });
 
     const endTime = Date.now();
-    setResponseTime((endTime - startTime) / 1000);
+    const responseTime = (endTime - startTime) / 1000;
 
-    const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, localTotalTokens);
+    const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, data.usage.total_tokens);
 
     if (!success) {
       throw new Error(error);
     }
 
-    return { cost, newBalance };
+    return {
+      success: true,
+      feedback: data.feedback,
+      cost,
+      newBalance,
+      usage: data.usage,
+      responseTime
+    };
   });
 };
 

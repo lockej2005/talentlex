@@ -220,28 +220,32 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
     setIsLoading(true);
     setError(null);
     try {
+      console.log('Submitting application...');
       const result = await handleApplicationSubmit(
         user,
         applicationText,
         selectedFirm,
         selectedQuestion
       );
+      console.log('Application submitted, result:', result);
 
-      if (result && result.success && result.feedback) {
-        const newFeedback = `${result.feedback}\n\nCredits used: ${result.usage.total_tokens}. Remaining credits: ${result.remainingCredits}`;
+      if (result && result.success) {
+        const newFeedback = `${result.feedback}\n\nCredits used: ${result.usage.total_tokens}. Remaining credits: ${result.newBalance}`;
         setFeedback(newFeedback);
         setResponseTime(result.responseTime);
         setTotalTokens(result.usage.total_tokens);
 
+        console.log('Saving review...');
         // Now that we have the feedback, save the review
         await saveReview(user.id, actualFirmId, selectedQuestion.value, applicationText, newFeedback);
+        console.log('Review saved');
         
         updateApplicationData();
       } else {
         throw new Error('Unexpected response format from server');
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error in handleSubmit:", error);
       setError(`An error occurred: ${error.message}`);
       setFeedback("");
     } finally {
