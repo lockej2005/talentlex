@@ -3,9 +3,9 @@
     min-height: 100vh;
     padding: 20px;
     font-family: "Inter", sans-serif;
-  }
-  
-  .toolbar-firmdash {
+}
+
+.toolbar-firmdash {
     background-color: #f0f0f0;
     display: flex;
     justify-content: space-between;
@@ -14,16 +14,16 @@
     border-radius: 5px;
     margin-bottom: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .firm-name-firmdash {
+}
+
+.firm-name-firmdash {
     font-size: 24px;
     font-weight: bold;
     color: #276D8B;
     flex: 1;
-  }
-  
-  .tab-toggle-firmdash {
+}
+
+.tab-toggle-firmdash {
     display: flex;
     background-color: #e0e0e0;
     border-radius: 10px;
@@ -32,9 +32,9 @@
     width: 100%;
     max-width: 600px;
     margin: 0 20px;
-  }
-  
-  .tab-button-firmdash {
+}
+
+.tab-button-firmdash {
     flex: 1;
     background: none;
     border: none;
@@ -45,20 +45,20 @@
     color: #333;
     text-align: center;
     white-space: nowrap;
-  }
-  
-  .tab-button-firmdash.active {
+}
+
+.tab-button-firmdash.active {
     background-color: #276D8B;
     color: white;
-  }
-  
-  .save-button-container-firmdash {
+}
+
+.save-button-container-firmdash {
     flex: 1;
     display: flex;
     justify-content: flex-end;
-  }
-  
-  .save-button-firmdash {
+}
+
+.save-button-firmdash {
     background-color: #276D8B;
     color: white;
     border: none;
@@ -67,102 +67,365 @@
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.3s ease;
-  }
-  
-  .save-button-firmdash:hover {
+}
+
+.save-button-firmdash:hover {
     background-color: #1c4d62;
-  }
-  
-  .dashboard-container-firmdash {
+}
+
+.dashboard-container-firmdash {
     background-color: transparent;
     border-radius: 5px;
-  }
-  
-  .dashboard-content-firmdash {
+}
+
+.dashboard-content-firmdash {
+    display: flex;
+    gap: 20px;
+}
+
+.left-column-firmdash {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.right-column-firmdash {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.firm-details-firmdash {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.firm-details-firmdash h2 {
+    color: #276D8B;
+    margin-bottom: 10px;
+}
+
+.work-experience-firmdash {
+    background-color: #1d4d62;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+    overflow-y: auto;
+    max-height: 600px; /* Adjust this value as needed */
+}
+
+.work-experience-firmdash h3 {
+    color: white;
+    margin-bottom: 15px;
+}
+
+.experience-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px #276D8B solid;
   }
   
-  .firm-details-firmdash {
-    flex: 1;
+  .experience-content {
+    flex-grow: 1;
   }
   
-  .firm-details-firmdash h2 {
-    color: #276D8B;
-    margin-bottom: 10px;
-  }
-  
-  .firm-score-firmdash {
-    text-align: center;
-    flex: 0 0 200px;
-  }
-  
-  .firm-score-firmdash h3 {
-    color: #276D8B;
-    margin-bottom: 10px;
-  }
-  
-  .score-circle-firmdash {
-    width: 100px;
-    height: 100px;
-    background-color: #276D8B;
-    border-radius: 50%;
+  .delete-experience-btn {
+    background: none;
+    border: none;
+    color: #ff6b6b;
+    cursor: pointer;
+    padding: 5px;
     display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .delete-experience-btn:hover {
+    color: #ff4757;
+  }
+
+.experience-title {
+    color: white;
+    margin-bottom: 5px;
+    font-size: 16px;
+    line-height: 1.2;
+}
+
+.experience-duration {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+.add-experience {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 35px;
+}
+
+.add-experience textarea,
+.add-experience input {
+    padding: 8px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #276D8B;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: inherit;
+    resize: none;
+}
+
+.add-experience textarea {
+    height: 50px; /* Adjust for two lines */
+}
+
+.add-experience input {
+    height: 36px; /* Adjust for one line */
+}
+
+.add-experience button {
+    background-color: #276D8B;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    align-self: flex-end;
+}
+
+.score-display {
+    background-color: #276D8B;
+    border-radius: 10px;
+    padding: 24px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.score-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    color: white;
-    font-size: 24px;
+    height: 100%;
+    padding: 50px;
+}
+
+.score-title {
+    font-size: 72px;
     font-weight: bold;
-    margin: 0 auto;
-  }
-  
-  @media (max-width: 1024px) {
+    margin: 0;
+    line-height: 1;
+}
+
+.score-subtitle {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.8);
+    margin-top: 8px;
+}
+
+.score-content {
+    margin-top: auto;
+}
+
+.score-sections {
+    display: flex;
+    justify-content: space-between;
+}
+
+.score-section {
+    flex: 1;
+    text-align: center;
+    padding: 0 15px;
+}
+
+.score-section:not(:last-child) {
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.section-score {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.section-title {
+    font-size: 14px;
+    color: rgb(194, 194, 194) !important;
+    margin-bottom: 12px;
+}
+
+.section-detail {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+}
+
+.profile-input,
+.profile-textarea {
+    padding: 8px;
+    border: none;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #276D8B;
+    resize: vertical;
+    min-height: 38px;
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.profile-input:focus,
+.profile-textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #1e5a73;
+}
+
+.delete-subject-btn {
+    background: none;
+    border: none;
+    color: #ff6b6b;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-subject-btn:hover {
+    color: #ff4757;
+}
+
+.delete-subject-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+@media (max-width: 1024px) {
     .toolbar-firmdash {
-      flex-wrap: wrap;
+        flex-wrap: wrap;
     }
-  
+
     .firm-name-firmdash {
-      flex-basis: 100%;
-      margin-bottom: 10px;
-      text-align: center;
+        flex-basis: 100%;
+        margin-bottom: 10px;
+        text-align: center;
     }
-  
+
     .tab-toggle-firmdash {
-      order: 3;
-      margin: 10px 0;
-      max-width: none;
+        order: 3;
+        margin: 10px 0;
+        max-width: none;
     }
-  
+
     .save-button-container-firmdash {
-      flex-basis: 100%;
-      justify-content: center;
+        flex-basis: 100%;
+        justify-content: center;
     }
-  }
-  
-  @media (max-width: 768px) {
-    .toolbar-firmdash {
-      flex-direction: column;
-      align-items: stretch;
-    }
-  
-    .tab-toggle-firmdash {
-      flex-direction: column;
-      border-radius: 5px;
-    }
-  
-    .tab-button-firmdash {
-      padding: 10px 0;
-    }
-  
-    .save-button-firmdash {
-      width: 100%;
-    }
-  
+
     .dashboard-content-firmdash {
-      flex-direction: column;
+        flex-direction: column;
     }
-  
-    .firm-score-firmdash {
-      margin-top: 20px;
+
+    .left-column-firmdash,
+    .right-column-firmdash {
+        width: 100%;
     }
-  }
+}
+
+@media (max-width: 768px) {
+    .firm-dashboard-firmdash {
+        padding: 10px;
+    }
+
+    .toolbar-firmdash {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tab-toggle-firmdash {
+        flex-direction: column;
+        border-radius: 5px;
+    }
+
+    .tab-button-firmdash {
+        padding: 10px 0;
+    }
+
+    .save-button-firmdash {
+        width: 100%;
+    }
+
+    .score-sections {
+        flex-direction: column;
+    }
+
+    .score-section {
+        margin-bottom: 20px;
+        padding: 0;
+    }
+
+    .score-section:not(:last-child) {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding-bottom: 20px;
+    }
+
+    .add-experience {
+        flex-direction: column;
+    }
+
+    .add-experience textarea,
+    .add-experience input,
+    .add-experience button {
+        width: 100%;
+    }
+
+    .add-experience button {
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .firm-dashboard-firmdash {
+        padding: 5px;
+    }
+
+    .toolbar-firmdash {
+        padding: 10px;
+    }
+
+    .firm-name-firmdash {
+        font-size: 20px;
+    }
+
+    .score-title {
+        font-size: 48px;
+    }
+
+    .score-subtitle {
+        font-size: 16px;
+    }
+
+    .section-score {
+        font-size: 28px;
+    }
+
+    .section-title {
+        font-size: 12px;
+    }
+
+    .section-detail {
+        font-size: 10px;
+    }
+}

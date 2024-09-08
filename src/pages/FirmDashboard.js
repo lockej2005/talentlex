@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import GenerateDraft from './GenerateDraft';
 import ApplicationReview from './ApplicationReview';
-import './FirmDashboard.css';
 import { firms } from '../data/ApplicationReviewData';
+import { Trash2 } from 'lucide-react';
+import './FirmDashboard.css';
 
 const FirmDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -13,31 +14,105 @@ const FirmDashboard = () => {
   const [draftData, setDraftData] = useState(null);
   const [applicationData, setApplicationData] = useState(null);
   const [selectedFirm, setSelectedFirm] = useState(null);
+  const [workExperiences, setWorkExperiences] = useState([]);
+  const [newExperience, setNewExperience] = useState({ title: '', duration: '' });
+  const [user, setUser] = useState(null);
   const { id } = useParams();
+  const workExperienceRef = useRef(null);
+  const scoreDisplayRef = useRef(null);
+
+  // Example scores data (you would typically fetch this from your backend)
+  const scores = {
+    weighted: 82,
+    openText: 63,
+    workExperience: 90,
+    education: 79
+  };
 
   useEffect(() => {
-    const fetchFirmDetails = async () => {
-      const { data, error } = await supabase
-        .from('firms')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching firm details:', error);
-      } else {
-        setFirmDetails(data);
-        const firm = firms.find(f => f.value === data.name);
-        setSelectedFirm(firm || null);
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user);
       }
     };
 
-    fetchFirmDetails();
-  }, [id]);
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    if (user && id) {
+      fetchFirmDetails();
+      fetchWorkExperiences(user.id, id);
+    }
+  }, [user, id]);
 
   useEffect(() => {
     setShowSaveButton(activeTab === 'generate-draft' || activeTab === 'application-review');
   }, [activeTab]);
+
+  const fetchFirmDetails = async () => {
+    const { data, error } = await supabase
+      .from('firms')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching firm details:', error);
+    } else {
+      setFirmDetails(data);
+      const firm = firms.find(f => f.value === data.name);
+      setSelectedFirm(firm || null);
+    }
+  };
+
+  const fetchWorkExperiences = async (userId, firmId) => {
+    const { data, error } = await supabase
+      .from('firm_user_table')
+      .select('work_experience')
+      .eq('user_id', userId)
+      .eq('firm_id', firmId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching work experiences:', error);
+      setWorkExperiences([]);
+    } else if (data && data.work_experience) {
+      const parsedExperiences = JSON.parse(data.work_experience);
+      setWorkExperiences(parsedExperiences.map(exp => ({
+        title: exp.title,
+        duration: exp.time // Map 'time' to 'duration' for consistency
+      })));
+    } else {
+      setWorkExperiences([]);
+    }
+  };
+
+  const updateWorkExperiences = async (experiences) => {
+    if (!user) return;
+
+    const formattedExperiences = experiences.map(exp => ({
+      title: exp.title,
+      time: exp.duration // Map 'duration' to 'time' for database storage
+    }));
+    
+    const { error } = await supabase
+      .from('firm_user_table')
+      .upsert({
+        user_id: user.id,
+        firm_id: id,
+        work_experience: JSON.stringify(formattedExperiences)
+      }, {
+        onConflict: 'user_id,firm_id'
+      });
+
+    if (error) {
+      console.error('Error updating work experiences:', error);
+    } else {
+      fetchWorkExperiences(user.id, id);
+    }
+  };
 
   const handleSave = async () => {
     if (activeTab === 'generate-draft' && draftData) {
@@ -48,12 +123,16 @@ const FirmDashboard = () => {
   };
 
   const handleSaveDraft = async () => {
-    if (!draftData) return;
+    if (!draftData || !user) return;
 
     try {
       const { data, error } = await supabase
         .from('drafts_generations_vector')
-        .upsert(draftData, {
+        .upsert({
+          ...draftData,
+          user_id: user.id,
+          firm_id: id
+        }, {
           onConflict: 'user_id,firm_id,question'
         })
         .select();
@@ -69,12 +148,16 @@ const FirmDashboard = () => {
   };
 
   const handleSaveApplication = async () => {
-    if (!applicationData) return;
+    if (!applicationData || !user) return;
   
     try {
       const { data, error } = await supabase
         .from('applications_vector')
-        .upsert(applicationData, {
+        .upsert({
+          ...applicationData,
+          user_id: user.id,
+          firm_id: id
+        }, {
           onConflict: 'user_id,firm_id'
         })
         .select();
@@ -99,18 +182,87 @@ const FirmDashboard = () => {
     setShowSaveButton(true);
   }, []);
 
+  const handleAddExperience = () => {
+    if (newExperience.title && newExperience.duration) {
+      const updatedExperiences = [...workExperiences, newExperience];
+      setWorkExperiences(updatedExperiences);
+      updateWorkExperiences(updatedExperiences);
+      setNewExperience({ title: '', duration: '' });
+    }
+  };
+
+  const handleDeleteExperience = (index) => {
+    const updatedExperiences = workExperiences.filter((_, i) => i !== index);
+    setWorkExperiences(updatedExperiences);
+    updateWorkExperiences(updatedExperiences);
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
         return (
           <div className="dashboard-content-firmdash">
-            <div className="firm-details-firmdash">
-              <h2>{firmDetails?.name}</h2>
-              <p>{firmDetails?.description}</p>
+            <div className="left-column-firmdash">
+              <div className="firm-details-firmdash">
+                <h2>{firmDetails?.name}</h2>
+                <p>{firmDetails?.description}</p>
+              </div>
+              <div className="work-experience-firmdash" ref={workExperienceRef}>
+                <h3>Work Experience</h3>
+                {workExperiences.map((exp, index) => (
+                  <div key={index} className="experience-item">
+                    <div className="experience-content">
+                      <h4 className="experience-title">{exp.title}</h4>
+                      <p className="experience-duration">{exp.duration}</p>
+                    </div>
+                    <button className="delete-experience-btn" onClick={() => handleDeleteExperience(index)}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+                <div className="add-experience">
+                  <textarea 
+                    placeholder="Job Title and Company" 
+                    value={newExperience.title}
+                    onChange={(e) => setNewExperience({...newExperience, title: e.target.value})}
+                    rows="2"
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="Duration/Dates" 
+                    value={newExperience.duration}
+                    onChange={(e) => setNewExperience({...newExperience, duration: e.target.value})}
+                  />
+                  <button onClick={handleAddExperience}>+</button>
+                </div>
+              </div>
             </div>
-            <div className="firm-score-firmdash">
-              <h3>Score</h3>
-              <div className="score-circle-firmdash">70</div>
+            <div className="right-column-firmdash">
+              <div className="score-display" ref={scoreDisplayRef}>
+                <div className="score-header">
+                  <h2 className="score-title">{scores.weighted}</h2>
+                  <p className="score-subtitle">Weighted Average Score</p>
+                </div>
+                <div className="score-content">
+                  <div className="score-sections">
+                    <div className="score-section">
+                      <p className="section-score">{scores.openText}</p>
+                      <span className="section-title">Open Text Section</span>
+                      <p className="section-detail">Needs better grammar, also no mention of their alignment with Goodwin's DEI</p>
+                    </div>
+                    <div className="score-section">
+                      <p className="section-score">{scores.workExperience}</p>
+                      <span className="section-title">Work Experience Section</span>
+                      <p className="section-detail">Good Work Experience with startups</p>
+                    </div>
+                    <div className="score-section">
+                      <p className="section-score">{scores.education}</p>
+                      <span className="section-title">Education Section</span>
+                      <p className="section-detail">Goodwin often Hires from LSE</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         );

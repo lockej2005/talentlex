@@ -8,7 +8,6 @@ import {
   getCurrentUser,
   handleApplicationSubmit,
 } from '../utils/ApplicationReviewUtils';
-import { firms, questions } from '../data/ApplicationReviewData';
 import { UserInputContext } from '../context/UserInputContext';
 import { supabase } from '../supabaseClient';
 
@@ -27,10 +26,32 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   const [user, setUser] = useState(null);
   const [totalTokens, setTotalTokens] = useState(0);
   const [wordCount, setWordCount] = useState(0);
+  const [questions, setQuestions] = useState([]);
 
-  const getQuestions = useCallback((firm) => {
-    return questions[firm] || [{ value: "Coming Soon", label: "Coming Soon" }];
-  }, []);
+  const fetchQuestions = useCallback(async (firmName) => {
+    try {
+      const { data, error } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('firm', firmName)
+        .order('priority', { ascending: true });
+
+      if (error) throw error;
+
+      const formattedQuestions = data.map(q => ({
+        value: q.question,
+        label: q.question,
+        priority: q.priority
+      }));
+
+      setQuestions(formattedQuestions);
+      if (formattedQuestions.length > 0) {
+        setSelectedQuestion(formattedQuestions[0]);
+      }
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+    }
+  }, [setSelectedQuestion]);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -42,17 +63,16 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   }, []);
 
   useEffect(() => {
-    if (user && selectedFirm) {
-      const firmQuestions = getQuestions(selectedFirm.value);
-      setSelectedQuestion(firmQuestions[0]);
+    if (selectedFirm) {
+      fetchQuestions(selectedFirm.label);
     }
-  }, [user, selectedFirm, getQuestions, setSelectedQuestion]);
+  }, [selectedFirm, fetchQuestions]);
 
   useEffect(() => {
     if (user && selectedFirm && selectedQuestion) {
-      loadSavedReview(user.id, selectedFirm.value, selectedQuestion.value);
+      loadSavedReview(user.id, firmId, selectedQuestion.value);
     }
-  }, [user, selectedFirm, selectedQuestion]);
+  }, [user, firmId, selectedFirm, selectedQuestion]);
 
   useEffect(() => {
     const calculateWordCount = (text) => {
@@ -147,14 +167,14 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
     if (onApplicationChange && user && selectedFirm && selectedQuestion) {
       onApplicationChange({
         user_id: user.id,
-        firm_id: selectedFirm.value,
+        firm_id: firmId,
         question: selectedQuestion.value,
         application_text: applicationText,
         feedback: feedback,
         timestamp: new Date().toISOString()
       });
     }
-  }, [onApplicationChange, user, selectedFirm, selectedQuestion, applicationText, feedback]);
+  }, [onApplicationChange, user, selectedFirm, selectedQuestion, applicationText, feedback, firmId]);
 
   useEffect(() => {
     updateApplicationData();
@@ -163,9 +183,9 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   const handleQuestionChange = useCallback((newQuestion) => {
     setSelectedQuestion(newQuestion);
     if (user && selectedFirm) {
-      loadSavedReview(user.id, selectedFirm.value, newQuestion.value);
+      loadSavedReview(user.id, firmId, newQuestion.value);
     }
-  }, [user, selectedFirm, setSelectedQuestion]);
+  }, [user, selectedFirm, firmId]);
 
   return (
     <div className="comparison-container">
@@ -174,11 +194,9 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
           <ApplicationInput
             applicationText={applicationText}
             setApplicationText={setApplicationText}
-            selectedFirm={selectedFirm}
             selectedQuestion={selectedQuestion}
-            setSelectedQuestion={handleQuestionChange}
-            firms={firms}
-            getQuestions={getQuestions}
+            setSelectedQuestion={setSelectedQuestion}
+            questions={questions}
             wordCount={wordCount}
             inputType="simple"
             onQuestionChange={handleQuestionChange}

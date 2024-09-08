@@ -167,7 +167,7 @@ const Layout = () => {
           <div className="content-area">
             <Routes>
               <Route path="/" element={<Profile />} />
-              <Route path="/firm/:id/*" element={<FirmDashboard />} />
+              <Route path="/firm/:id/*" element={<FirmDashboard key={location.pathname} />} />
               <Route path="/firm-selector" element={<FirmSelector />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/ai-usage-policy" element={<AIUsagePolicy />} />

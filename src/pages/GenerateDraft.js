@@ -6,7 +6,6 @@ import ApplicationInput from './ApplicationInput';
 import './GenerateDraft.css';
 import { UserInputContext } from '../context/UserInputContext';
 import { getCurrentUser, handleDraftCreation } from '../utils/ApplicationReviewUtils';
-import { firms, questions } from '../data/ApplicationReviewData';
 import { supabase } from '../supabaseClient';
 
 const countWords = (text) => {
@@ -30,16 +29,37 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
   const [user, setUser] = useState(null);
   const [totalTokens, setTotalTokens] = useState(0);
   const [isEdited, setIsEdited] = useState(false);
-  const [firmQuestions, setFirmQuestions] = useState([]);
+  const [questions, setQuestions] = useState([]);
 
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
   const editorRef = useRef(null);
   const editorContainerRef = useRef(null);
 
-  const getQuestions = useCallback((firm) => {
-    return questions[firm] || [];
-  }, []);
+  const fetchQuestions = useCallback(async (firmName) => {
+    try {
+      const { data, error } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('firm', firmName)
+        .order('priority', { ascending: true });
+
+      if (error) throw error;
+
+      const formattedQuestions = data.map(q => ({
+        value: q.question,
+        label: q.question,
+        priority: q.priority
+      }));
+
+      setQuestions(formattedQuestions);
+      if (formattedQuestions.length > 0) {
+        setSelectedQuestion(formattedQuestions[0]);
+      }
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+    }
+  }, [setSelectedQuestion]);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -52,13 +72,9 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
 
   useEffect(() => {
     if (selectedFirm) {
-      const firmSpecificQuestions = getQuestions(selectedFirm.value);
-      setFirmQuestions(firmSpecificQuestions);
-      if (firmSpecificQuestions.length > 0 && (!selectedQuestion || selectedQuestion.firm !== selectedFirm.value)) {
-        setSelectedQuestion(firmSpecificQuestions[0]);
-      }
+      fetchQuestions(selectedFirm.label);
     }
-  }, [selectedFirm, getQuestions, setSelectedQuestion]);
+  }, [selectedFirm, fetchQuestions]);
 
   useEffect(() => {
     const loadSavedDraft = async () => {
@@ -69,7 +85,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
             .from('drafts_generations_vector')
             .select('*')
             .eq('user_id', user.id)
-            .eq('firm_id', selectedFirm.value)
+            .eq('firm_id', firmId)
             .eq('question', selectedQuestion.value)
             .single();
 
@@ -98,7 +114,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     };
 
     loadSavedDraft();
-  }, [user, selectedFirm, selectedQuestion, setDraftText, setAdditionalInfo]);
+  }, [user, selectedFirm, selectedQuestion, setDraftText, setAdditionalInfo, firmId]);
 
   const resetDraft = useCallback(() => {
     setDraftText('');
@@ -244,7 +260,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     if (isEdited && user && selectedFirm && selectedQuestion) {
       const draftData = {
         user_id: user.id,
-        firm_id: selectedFirm.value,
+        firm_id: firmId,
         question: selectedQuestion.value,
         note_1: additionalInfo.note_1 || '',
         note_2: additionalInfo.note_2 || '',
@@ -254,7 +270,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
       };
       onDraftChange(draftData);
     }
-  }, [isEdited, user, draftText, selectedFirm, selectedQuestion, additionalInfo, onDraftChange]);
+  }, [isEdited, user, draftText, selectedFirm, selectedQuestion, additionalInfo, onDraftChange, firmId]);
 
   return (
     <div className="comparison-container-draft">
@@ -263,11 +279,9 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
           <ApplicationInput
             applicationText={draftText}
             setApplicationText={setDraftText}
-            selectedFirm={selectedFirm}
             selectedQuestion={selectedQuestion}
             setSelectedQuestion={handleQuestionChange}
-            firms={firms}
-            getQuestions={getQuestions}
+            questions={questions}
             additionalInfo={additionalInfo}
             onAdditionalInfoChange={handleAdditionalInfoChange}
             wordCount={wordCount}
