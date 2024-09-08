@@ -58,7 +58,7 @@ const FirmDashboard = () => {
     } else {
       setFirmDetails(data);
       const firm = firms.find(f => f.value === data.name);
-      setSelectedFirm(firm || null);
+      setSelectedFirm({ ...firm, id: data.id } || null);
     }
   };
 
@@ -117,7 +117,7 @@ const FirmDashboard = () => {
       // Fetch firm details including prompts and models
       const { data: firmData, error: firmError } = await supabase
         .from('firms')
-        .select('workexp_model, workexp_prompt, opentext_model, opentext_prompt, education_model, education_prompt, name')
+        .select('workexp_model, workexp_prompt, opentext_model, opentext_prompt, education_model, education_prompt, id')
         .eq('id', id)
         .single();
 
@@ -126,7 +126,7 @@ const FirmDashboard = () => {
       // Fetch open text applications
       const { data: applicationsData, error: applicationsError } = await supabase
         .from('applications_vector')
-        .select('question, application_text')   
+        .select('question, application_text')
         .eq('firm_id', firmData.id)
         .eq('user_id', user.id);
 
@@ -248,7 +248,7 @@ const FirmDashboard = () => {
           user_id: user.id,
           firm_id: id
         }, {
-          onConflict: 'user_id,firm_id'
+          onConflict: 'user_id,firm_id,question'
         })
         .select();
   
@@ -393,29 +393,29 @@ const FirmDashboard = () => {
           <button
             className={`tab-button-firmdash ${activeTab === 'generate-draft' ? 'active' : ''}`}
             onClick={() => setActiveTab('generate-draft')}
-          >
-            Generate Draft
-          </button>
-          <button
-            className={`tab-button-firmdash ${activeTab === 'application-review' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('application-review')}
-                    >
-                        Application Review
-                    </button>
-                    </div>
-                    <div className="save-button-container-firmdash">
-                    {showSaveButton && (
-                        <button className="save-button-firmdash" onClick={handleSave}>
-                        Save {activeTab === 'generate-draft' ? 'Draft' : 'Application'}
-                        </button>
-                    )}
-                    </div>
-                </div>
-                <div className="dashboard-container-firmdash">
-                    {renderContent()}
-                </div>
-                </div>
-            );
-            };
-
-            export default FirmDashboard;
+            >
+              Generate Draft
+            </button>
+            <button
+              className={`tab-button-firmdash ${activeTab === 'application-review' ? 'active' : ''}`}
+              onClick={() => setActiveTab('application-review')}
+            >
+              Application Review
+            </button>
+          </div>
+          <div className="save-button-container-firmdash">
+            {showSaveButton && (
+              <button className="save-button-firmdash" onClick={handleSave}>
+                Save {activeTab === 'generate-draft' ? 'Draft' : 'Application'}
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="dashboard-container-firmdash">
+          {renderContent()}
+        </div>
+      </div>
+    );
+  };
+  
+  export default FirmDashboard;
