@@ -17,12 +17,48 @@ class ScoreRequest:
         self.education_model = data.get('education_model', '')
         self.education_prompt = data.get('education_prompt', '')
 
-def calculate_score(content, model, prompt, role_description):
+def calculate_workexp_score(content, model, prompt):
     try:
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": f"You are an AI expert in {role_description}. Your task is to rate the given content and provide a justification for your rating. {prompt} Provide your response in JSON format with the following structure: {{\"score\": (a number between 0 and 100), \"justification\": \"Your explanation here\"}}"},
+                {"role": "system", "content": f"You are an AI expert in evaluating work experience for job applications. Your task is to rate the given work experience and provide a justification for your rating. {prompt} Provide your response in JSON format with the following structure: {{\"score\": (a number between 0 and 100), \"justification\": \"Your explanation here\"}}"},
+                {"role": "user", "content": content}
+            ],
+            temperature=0.3,
+            max_tokens=250,
+            n=1,
+            stop=None,
+        )
+        return json.loads(response.choices[0].message.content.strip())
+    except Exception as e:
+        print(f"Error calculating work experience score: {str(e)}")
+        return {"error": f"Error calculating work experience score: {str(e)}"}, 500
+
+def calculate_education_score(content, model, prompt):
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": f"You are an AI expert in evaluating educational qualifications for job applications. Your task is to rate the given education details and provide a justification for your rating. {prompt} Provide your response in JSON format with the following structure: {{\"score\": (a number between 0 and 100), \"justification\": \"Your explanation here\"}}"},
+                {"role": "user", "content": content}
+            ],
+            temperature=0.5,
+            max_tokens=250,
+            n=1,
+            stop=None,
+        )
+        return json.loads(response.choices[0].message.content.strip())
+    except Exception as e:
+        print(f"Error calculating education score: {str(e)}")
+        return {"error": f"Error calculating education score: {str(e)}"}, 500
+
+def calculate_opentext_score(content, model, prompt):
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": f"You are an AI expert in analyzing open-ended responses in job applications. Your task is to rate the given response and provide a justification for your rating. Consider factors such as clarity, relevance, and depth of insight. {prompt} Provide your response in JSON format with the following structure: {{\"score\": (a number between 0 and 100), \"justification\": \"Your explanation here\"}}"},
                 {"role": "user", "content": content}
             ],
             temperature=0.4,
@@ -32,13 +68,13 @@ def calculate_score(content, model, prompt, role_description):
         )
         return json.loads(response.choices[0].message.content.strip())
     except Exception as e:
-        print(f"Error calculating score: {str(e)}")
-        return {"error": f"Error calculating score: {str(e)}"}, 500
+        print(f"Error calculating open text score: {str(e)}")
+        return {"error": f"Error calculating open text score: {str(e)}"}, 500
 
 class handler(BaseHTTPRequestHandler):
     def set_CORS_headers(self):
         self.send_header('Access-Control-Allow-Credentials', 'true')
-        self.send_header('Access-Control-Allow-Origin', 'http://localhost:3000')
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT')
         self.send_header('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version')
 
@@ -55,9 +91,9 @@ class handler(BaseHTTPRequestHandler):
         score_request = ScoreRequest(data)
 
         try:
-            workexp_result = calculate_score(score_request.workexp_content, score_request.workexp_model, score_request.workexp_prompt, "evaluating work experience for job applications")
-            education_result = calculate_score(score_request.education_content, score_request.education_model, score_request.education_prompt, "evaluating educational qualifications for job applications")
-            opentext_result = calculate_score(score_request.opentext_content, score_request.opentext_model, score_request.opentext_prompt, "analyzing open-ended responses in job applications")
+            workexp_result = calculate_workexp_score(score_request.workexp_content, score_request.workexp_model, score_request.workexp_prompt)
+            education_result = calculate_education_score(score_request.education_content, score_request.education_model, score_request.education_prompt)
+            opentext_result = calculate_opentext_score(score_request.opentext_content, score_request.opentext_model, score_request.opentext_prompt)
 
             if isinstance(workexp_result, tuple) or isinstance(education_result, tuple) or isinstance(opentext_result, tuple):
                 self.send_error(500, "An error occurred during score calculation")
