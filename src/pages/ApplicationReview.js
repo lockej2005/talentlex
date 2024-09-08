@@ -29,6 +29,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   const [questions, setQuestions] = useState([]);
   const [actualFirmId, setActualFirmId] = useState(null);
   const [existingRecordId, setExistingRecordId] = useState(null);
+  const [error, setError] = useState(null);
 
   const fetchQuestions = useCallback(async (firmName) => {
     try {
@@ -52,6 +53,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
       }
     } catch (error) {
       console.error('Error fetching questions:', error);
+      setError('Failed to fetch questions. Please try again later.');
     }
   }, [setSelectedQuestion]);
 
@@ -68,13 +70,19 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
       setActualFirmId(data.id);
     } catch (error) {
       console.error('Error fetching firm ID:', error);
+      setError('Failed to fetch firm information. Please try again later.');
     }
   }, []);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+        setError('Failed to fetch user information. Please try logging in again.');
+      }
     };
 
     fetchCurrentUser();
@@ -102,6 +110,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
 
   const loadSavedReview = async (userId, firmId, questionValue) => {
     setIsLoading(true);
+    setError(null);
     try {
       const { data, error } = await supabase
         .from('applications_vector')
@@ -127,6 +136,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
       }
     } catch (error) {
       console.error('Error loading saved review:', error.message);
+      setError('Failed to load saved review. Please try again later.');
       setApplicationText('');
       setFeedback('');
       setExistingRecordId(null);
@@ -136,6 +146,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   };
 
   const saveReview = async (userId, firmId, questionValue, applicationText, newFeedback) => {
+    setError(null);
     try {
       let upsertData = {
         user_id: userId,
@@ -170,6 +181,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
       console.log('Review saved successfully');
     } catch (error) {
       console.error('Error saving review:', error.message);
+      setError('Failed to save review. Please try again later.');
     }
   };
 
@@ -206,6 +218,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
     }
 
     setIsLoading(true);
+    setError(null);
     try {
       const result = await handleApplicationSubmit(
         user,
@@ -229,7 +242,8 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
       }
     } catch (error) {
       console.error("Error:", error);
-      setFeedback("Error: " + error.message);
+      setError(`An error occurred while submitting your application. Please try again later. Error details: ${error.message}`);
+      setFeedback("");
     } finally {
       setIsLoading(false);
     }
@@ -292,7 +306,9 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
             </p>
           </div>
           <div className="text-content">
-            {feedback ? (
+            {error ? (
+              <p className="error-message">{error}</p>
+            ) : feedback ? (
               <ReactMarkdown>{feedback}</ReactMarkdown>
             ) : (
               <p>{isLoading ? 'Generating your review...' : 'Submit your application to receive feedback.'}</p>
