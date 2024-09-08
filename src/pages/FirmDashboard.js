@@ -151,34 +151,37 @@ const FirmDashboard = () => {
 
       if (workExpError) throw workExpError;
 
-      // Prepare data for backend
-      const openTextContent = applicationsData.map(app => `Question: ${app.question}\nAnswer: ${app.application_text}`).join('\n\n');
-      const educationContent = `Education: ${profileData.education || 'N/A'}\nSub-categories: ${Array.isArray(profileData.sub_categories) ? profileData.sub_categories.join(', ') : (profileData.sub_categories || 'N/A')}\nUndergraduate Grades: ${profileData.undergraduate_grades || 'N/A'}`;
-      const workExpContent = workExpData.work_experience || '[]';
+    // Prepare data for backend
+    const openTextContent = applicationsData.map(app => `Question: ${app.question}\nAnswer: ${app.application_text}`).join('\n\n');
+    const educationContent = `Education: ${profileData.education || 'N/A'}\nSub-categories: ${Array.isArray(profileData.sub_categories) ? profileData.sub_categories.join(', ') : (profileData.sub_categories || 'N/A')}\nUndergraduate Grades: ${profileData.undergraduate_grades || 'N/A'}`;
+    const workExpContent = workExpData.work_experience || '[]';
 
-      // Send data to backend for score calculation
-      const response = await fetch('/api/calculate_scores', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          workexp_content: workExpContent,
-          workexp_model: firmData.workexp_model,
-          workexp_prompt: firmData.workexp_prompt,
-          opentext_content: openTextContent,
-          opentext_model: firmData.opentext_model,
-          opentext_prompt: firmData.opentext_prompt,
-          education_content: educationContent,
-          education_model: firmData.education_model,
-          education_prompt: firmData.education_prompt
-        }),
-      });
+    // Send data to backend for score calculation
+    const response = await fetch('/api/calculate_scores', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        workexp_content: workExpContent,
+        workexp_model: firmData.workexp_model || 'gpt-4o-mini',
+        workexp_prompt: firmData.workexp_prompt || '',
+        opentext_content: openTextContent,
+        opentext_model: firmData.opentext_model || 'gpt-4o-mini',
+        opentext_prompt: firmData.opentext_prompt || '',
+        education_content: educationContent,
+        education_model: firmData.education_model || 'gpt-4o-mini',
+        education_prompt: firmData.education_prompt || ''
+      }),
+    });
 
-      if (!response.ok) throw new Error('Failed to calculate scores');
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to calculate scores: ${errorText}`);
+    }
 
-      const scoreData = await response.json();
-      setScores(scoreData);
+    const scoreData = await response.json();
+    setScores(scoreData);
 
       // Update firm_user_table with the new scores
       const { error: updateError } = await supabase

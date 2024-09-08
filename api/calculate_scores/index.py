@@ -19,6 +19,9 @@ class ScoreRequest:
 
 def calculate_workexp_score(content, model, prompt):
     try:
+        if not content.strip():
+            return {"score": 0, "justification": "No work experience content provided."}
+        
         response = client.chat.completions.create(
             model=model,
             messages=[
@@ -31,12 +34,18 @@ def calculate_workexp_score(content, model, prompt):
             stop=None,
         )
         return json.loads(response.choices[0].message.content.strip())
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON in work experience score: {str(e)}")
+        return {"error": f"Error decoding JSON in work experience score: {str(e)}"}, 500
     except Exception as e:
         print(f"Error calculating work experience score: {str(e)}")
         return {"error": f"Error calculating work experience score: {str(e)}"}, 500
 
 def calculate_education_score(content, model, prompt):
     try:
+        if not content.strip():
+            return {"score": 0, "justification": "No education content provided."}
+        
         response = client.chat.completions.create(
             model=model,
             messages=[
@@ -49,12 +58,18 @@ def calculate_education_score(content, model, prompt):
             stop=None,
         )
         return json.loads(response.choices[0].message.content.strip())
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON in education score: {str(e)}")
+        return {"error": f"Error decoding JSON in education score: {str(e)}"}, 500
     except Exception as e:
         print(f"Error calculating education score: {str(e)}")
         return {"error": f"Error calculating education score: {str(e)}"}, 500
 
 def calculate_opentext_score(content, model, prompt):
     try:
+        if not content.strip():
+            return {"score": 0, "justification": "No open text content provided."}
+        
         response = client.chat.completions.create(
             model=model,
             messages=[
@@ -67,6 +82,9 @@ def calculate_opentext_score(content, model, prompt):
             stop=None,
         )
         return json.loads(response.choices[0].message.content.strip())
+    except json.JSONDecodeError as e:
+        print(f"Error decoding JSON in open text score: {str(e)}")
+        return {"error": f"Error decoding JSON in open text score: {str(e)}"}, 500
     except Exception as e:
         print(f"Error calculating open text score: {str(e)}")
         return {"error": f"Error calculating open text score: {str(e)}"}, 500
@@ -95,8 +113,17 @@ class handler(BaseHTTPRequestHandler):
             education_result = calculate_education_score(score_request.education_content, score_request.education_model, score_request.education_prompt)
             opentext_result = calculate_opentext_score(score_request.opentext_content, score_request.opentext_model, score_request.opentext_prompt)
 
-            if isinstance(workexp_result, tuple) or isinstance(education_result, tuple) or isinstance(opentext_result, tuple):
-                self.send_error(500, "An error occurred during score calculation")
+            error_results = []
+            if isinstance(workexp_result, tuple):
+                error_results.append(("Work Experience", workexp_result[0]['error']))
+            if isinstance(education_result, tuple):
+                error_results.append(("Education", education_result[0]['error']))
+            if isinstance(opentext_result, tuple):
+                error_results.append(("Open Text", opentext_result[0]['error']))
+
+            if error_results:
+                error_message = "; ".join([f"{section}: {error}" for section, error in error_results])
+                self.send_error(500, f"Errors occurred during score calculation: {error_message}")
                 return
 
             workexp_score = workexp_result['score']
@@ -119,4 +146,5 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(response_data).encode('utf-8'))
 
         except Exception as e:
-            self.send_error(500, str(e))
+            print(f"Unexpected error: {str(e)}")
+            self.send_error(500, f"An unexpected error occurred: {str(e)}")
