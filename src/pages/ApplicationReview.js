@@ -28,6 +28,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   const [wordCount, setWordCount] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [actualFirmId, setActualFirmId] = useState(null);
+  const [existingRecordId, setExistingRecordId] = useState(null);
 
   const fetchQuestions = useCallback(async (firmName) => {
     try {
@@ -110,19 +111,25 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         .eq('question', questionValue)
         .single();
 
-      if (error && error.code !== 'PGRST116') throw error;
-
-      if (data) {
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // No matching row found, clear the form and existingRecordId
+          setApplicationText('');
+          setFeedback('');
+          setExistingRecordId(null);
+        } else {
+          throw error;
+        }
+      } else if (data) {
         setApplicationText(data.application_text || '');
         setFeedback(data.feedback || '');
-      } else {
-        setApplicationText('');
-        setFeedback('');
+        setExistingRecordId(data.id);
       }
     } catch (error) {
       console.error('Error loading saved review:', error.message);
       setApplicationText('');
       setFeedback('');
+      setExistingRecordId(null);
     } finally {
       setIsLoading(false);
     }
@@ -130,20 +137,35 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
 
   const saveReview = async (userId, firmId, questionValue, applicationText, feedback) => {
     try {
-      const { error } = await supabase
-        .from('applications_vector')
-        .upsert({
-          user_id: userId,
-          firm_id: firmId,
-          question: questionValue,
-          application_text: applicationText,
-          feedback: feedback,
-          timestamp: new Date().toISOString()
-        }, {
-          onConflict: 'user_id,firm_id,question'
-        });
+      let upsertData = {
+        user_id: userId,
+        firm_id: firmId,
+        question: questionValue,
+        application_text: applicationText,
+        feedback: feedback,
+        timestamp: new Date().toISOString()
+      };
 
-      if (error) throw error;
+      if (existingRecordId) {
+        // Update existing record
+        const { error } = await supabase
+          .from('applications_vector')
+          .update(upsertData)
+          .eq('id', existingRecordId);
+
+        if (error) throw error;
+      } else {
+        // Insert new record
+        const { data, error } = await supabase
+          .from('applications_vector')
+          .insert(upsertData)
+          .select();
+
+        if (error) throw error;
+        if (data && data[0]) {
+          setExistingRecordId(data[0].id);
+        }
+      }
 
       console.log('Review saved successfully');
     } catch (error) {
@@ -221,12 +243,6 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
       });
     }
   }, [onApplicationChange, user, actualFirmId, selectedQuestion, applicationText, feedback]);
-
-  useEffect(() => {
-    if (user && actualFirmId && selectedQuestion) {
-      saveReview(user.id, actualFirmId, selectedQuestion.value, applicationText, feedback);
-    }
-  }, [user, actualFirmId, selectedQuestion, applicationText, feedback]);
 
   const handleQuestionChange = useCallback((newQuestion) => {
     setSelectedQuestion(newQuestion);
