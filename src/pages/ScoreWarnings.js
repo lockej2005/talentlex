@@ -31,7 +31,7 @@ const ScoreWarnings = ({ userId, firmId }) => {
         }
 
         if (!profileData.undergraduate_grades || profileData.undergraduate_grades.trim() === '') {
-          newWarnings.push("Your undergraduate grades are not provided. Adding this information can strengthen your application.");
+          newWarnings.push("Your undergraduate grades are not provided. Add this informaiton in the Profile Tab");
         } else {
           newSuccesses.push("Excellent! You've included your undergraduate grades.");
         }

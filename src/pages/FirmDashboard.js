@@ -18,17 +18,10 @@ const FirmDashboard = () => {
   const [workExperiences, setWorkExperiences] = useState([]);
   const [newExperience, setNewExperience] = useState({ title: '', duration: '' });
   const [user, setUser] = useState(null);
+  const [scores, setScores] = useState(null);
   const { id } = useParams();
   const workExperienceRef = useRef(null);
   const scoreDisplayRef = useRef(null);
-
-  // Example scores data (you would typically fetch this from your backend)
-  const scores = {
-    weighted: 82,
-    openText: 63,
-    workExperience: 90,
-    education: 79
-  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -45,6 +38,7 @@ const FirmDashboard = () => {
     if (user && id) {
       fetchFirmDetails();
       fetchWorkExperiences(user.id, id);
+      calculateScores(user.id, id);
     }
   }, [user, id]);
 
@@ -83,7 +77,7 @@ const FirmDashboard = () => {
       const parsedExperiences = JSON.parse(data.work_experience);
       setWorkExperiences(parsedExperiences.map(exp => ({
         title: exp.title,
-        duration: exp.time // Map 'time' to 'duration' for consistency
+        duration: exp.time
       })));
     } else {
       setWorkExperiences([]);
@@ -95,7 +89,7 @@ const FirmDashboard = () => {
 
     const formattedExperiences = experiences.map(exp => ({
       title: exp.title,
-      time: exp.duration // Map 'duration' to 'time' for database storage
+      time: exp.duration
     }));
     
     const { error } = await supabase
@@ -112,6 +106,79 @@ const FirmDashboard = () => {
       console.error('Error updating work experiences:', error);
     } else {
       fetchWorkExperiences(user.id, id);
+    }
+  };
+
+  const calculateScores = async (userId, firmId) => {
+    try {
+      // Fetch firm details including prompts and models
+      const { data: firmData, error: firmError } = await supabase
+        .from('firms')
+        .select('workexp_model, workexp_prompt, opentext_model, opentext_prompt, education_model, education_prompt, name')
+        .eq('id', firmId)
+        .single();
+
+      if (firmError) throw firmError;
+
+      // Fetch open text applications
+      const { data: applicationsData, error: applicationsError } = await supabase
+        .from('applications_vector')
+        .select('question, application_text')
+        .eq('firm_id', firmData.name)
+        .eq('user_id', userId);
+
+      if (applicationsError) throw applicationsError;
+
+      // Fetch education details
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('education, sub_categories, undergraduate_grades')
+        .eq('id', userId)
+        .single();
+
+      if (profileError) throw profileError;
+
+      // Fetch work experience
+      const { data: workExpData, error: workExpError } = await supabase
+        .from('firm_user_table')
+        .select('work_experience')
+        .eq('user_id', userId)
+        .eq('firm_id', firmId)
+        .single();
+
+      if (workExpError) throw workExpError;
+
+      // Prepare data for backend
+      const openTextContent = applicationsData.map(app => `Question: ${app.question}\nAnswer: ${app.application_text}`).join('\n\n');
+      const educationContent = `Education: ${profileData.education || 'N/A'}\nSub-categories: ${Array.isArray(profileData.sub_categories) ? profileData.sub_categories.join(', ') : (profileData.sub_categories || 'N/A')}\nUndergraduate Grades: ${profileData.undergraduate_grades || 'N/A'}`;
+      const workExpContent = workExpData.work_experience || '[]';
+
+      // Send data to backend for score calculation
+      const response = await fetch('http://localhost:5000/calculate_score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          workexp_content: workExpContent,
+          workexp_model: firmData.workexp_model,
+          workexp_prompt: firmData.workexp_prompt,
+          opentext_content: openTextContent,
+          opentext_model: firmData.opentext_model,
+          opentext_prompt: firmData.opentext_prompt,
+          education_content: educationContent,
+          education_model: firmData.education_model,
+          education_prompt: firmData.education_prompt
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to calculate scores');
+
+      const scoreData = await response.json();
+      setScores(scoreData);
+    } catch (error) {
+      console.error('Error calculating scores:', error);
+      setScores(null);
     }
   };
 
@@ -208,6 +275,40 @@ const FirmDashboard = () => {
                 <h2>{firmDetails?.name}</h2>
                 <p>{firmDetails?.description}</p>
               </div>
+              <div className="score-display" ref={scoreDisplayRef}>
+                {scores ? (
+                  <>
+                    <div className="score-header">
+                      <h2 className="score-title">{scores.weighted_score.toFixed(2)}</h2>
+                      <p className="score-subtitle">Weighted Average Score</p>
+                    </div>
+                    <div className="score-content">
+                      <div className="score-sections">
+                        <div className="score-section">
+                          <p className="section-score">{scores.opentext.score}</p>
+                          <span className="section-title">Open Text Section</span>
+                          <p className="section-detail">{scores.opentext.justification}</p>
+                        </div>
+                        <div className="score-section">
+                          <p className="section-score">{scores.workexp.score}</p>
+                          <span className="section-title">Work Experience Section</span>
+                          <p className="section-detail">{scores.workexp.justification}</p>
+                        </div>
+                        <div className="score-section">
+                          <p className="section-score">{scores.education.score}</p>
+                          <span className="section-title">Education Section</span>
+                          <p className="section-detail">{scores.education.justification}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <p>Loading scores...</p>
+                )}
+              </div>
+            </div>
+            <div className="right-column-firmdash">
+              <ScoreWarnings userId={user?.id} firmId={id} />
               <div className="work-experience-firmdash" ref={workExperienceRef}>
                 <h3>Work Experience</h3>
                 {workExperiences.map((exp, index) => (
@@ -235,34 +336,6 @@ const FirmDashboard = () => {
                     onChange={(e) => setNewExperience({...newExperience, duration: e.target.value})}
                   />
                   <button onClick={handleAddExperience}>+</button>
-                </div>
-              </div>
-            </div>
-            <div className="right-column-firmdash">
-              <ScoreWarnings userId={user?.id} firmId={id} />
-              <div className="score-display" ref={scoreDisplayRef}>
-                <div className="score-header">
-                  <h2 className="score-title">{scores.weighted}</h2>
-                  <p className="score-subtitle">Weighted Average Score</p>
-                </div>
-                <div className="score-content">
-                  <div className="score-sections">
-                    <div className="score-section">
-                      <p className="section-score">{scores.openText}</p>
-                      <span className="section-title">Open Text Section</span>
-                      <p className="section-detail">Needs better grammar, also no mention of their alignment with Goodwin's DEI</p>
-                    </div>
-                    <div className="score-section">
-                      <p className="section-score">{scores.workExperience}</p>
-                      <span className="section-title">Work Experience Section</span>
-                      <p className="section-detail">Good Work Experience with startups</p>
-                    </div>
-                    <div className="score-section">
-                      <p className="section-score">{scores.education}</p>
-                      <span className="section-title">Education Section</span>
-                      <p className="section-detail">Goodwin often Hires from LSE</p>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
