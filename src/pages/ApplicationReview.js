@@ -27,6 +27,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   const [totalTokens, setTotalTokens] = useState(0);
   const [wordCount, setWordCount] = useState(0);
   const [questions, setQuestions] = useState([]);
+  const [actualFirmId, setActualFirmId] = useState(null);
 
   const fetchQuestions = useCallback(async (firmName) => {
     try {
@@ -53,6 +54,22 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
     }
   }, [setSelectedQuestion]);
 
+  const fetchActualFirmId = useCallback(async (firmName) => {
+    try {
+      const { data, error } = await supabase
+        .from('firms')
+        .select('id')
+        .eq('name', firmName)
+        .single();
+
+      if (error) throw error;
+
+      setActualFirmId(data.id);
+    } catch (error) {
+      console.error('Error fetching firm ID:', error);
+    }
+  }, []);
+
   useEffect(() => {
     const fetchCurrentUser = async () => {
       const currentUser = await getCurrentUser();
@@ -65,14 +82,15 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   useEffect(() => {
     if (selectedFirm) {
       fetchQuestions(selectedFirm.label);
+      fetchActualFirmId(selectedFirm.label);
     }
-  }, [selectedFirm, fetchQuestions]);
+  }, [selectedFirm, fetchQuestions, fetchActualFirmId]);
 
   useEffect(() => {
-    if (user && selectedFirm && selectedQuestion) {
-      loadSavedReview(user.id, firmId, selectedQuestion.value);
+    if (user && actualFirmId && selectedQuestion) {
+      loadSavedReview(user.id, actualFirmId, selectedQuestion.value);
     }
-  }, [user, firmId, selectedFirm, selectedQuestion]);
+  }, [user, actualFirmId, selectedQuestion]);
 
   useEffect(() => {
     const calculateWordCount = (text) => {
@@ -164,17 +182,17 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   };
 
   const updateApplicationData = useCallback(() => {
-    if (onApplicationChange && user && selectedFirm && selectedQuestion) {
+    if (onApplicationChange && user && actualFirmId && selectedQuestion) {
       onApplicationChange({
         user_id: user.id,
-        firm_id: firmId,
+        firm_id: actualFirmId,
         question: selectedQuestion.value,
         application_text: applicationText,
         feedback: feedback,
         timestamp: new Date().toISOString()
       });
     }
-  }, [onApplicationChange, user, selectedFirm, selectedQuestion, applicationText, feedback, firmId]);
+  }, [onApplicationChange, user, actualFirmId, selectedQuestion, applicationText, feedback]);
 
   useEffect(() => {
     updateApplicationData();
@@ -182,10 +200,10 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
 
   const handleQuestionChange = useCallback((newQuestion) => {
     setSelectedQuestion(newQuestion);
-    if (user && selectedFirm) {
-      loadSavedReview(user.id, firmId, newQuestion.value);
+    if (user && actualFirmId) {
+      loadSavedReview(user.id, actualFirmId, newQuestion.value);
     }
-  }, [user, selectedFirm, firmId]);
+  }, [user, actualFirmId]);
 
   return (
     <div className="comparison-container">
