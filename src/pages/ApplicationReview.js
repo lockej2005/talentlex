@@ -211,23 +211,22 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         user,
         applicationText,
         selectedFirm,
-        selectedQuestion,
-        setFeedback,
-        setTotalTokens,
-        setResponseTime
+        selectedQuestion
       );
-      const newFeedback = `${result.feedback}\n\nCredits used: ${result.cost}. Remaining credits: ${result.newBalance}`;
-      
-      // Set the feedback and wait for the state to update
-      await new Promise(resolve => {
+
+      if (result && result.success && result.feedback) {
+        const newFeedback = `${result.feedback}\n\nCredits used: ${result.usage.total_tokens}. Remaining credits: ${result.remainingCredits}`;
         setFeedback(newFeedback);
-        setTimeout(resolve, 0);
-      });
-      
-      // Now that feedback is set, save the review
-      await saveReview(user.id, actualFirmId, selectedQuestion.value, applicationText, newFeedback);
-      
-      updateApplicationData();
+        setResponseTime(result.responseTime);
+        setTotalTokens(result.usage.total_tokens);
+
+        // Now that we have the feedback, save the review
+        await saveReview(user.id, actualFirmId, selectedQuestion.value, applicationText, newFeedback);
+        
+        updateApplicationData();
+      } else {
+        throw new Error('Failed to get feedback from the server');
+      }
     } catch (error) {
       console.error("Error:", error);
       setFeedback("Error: " + error.message);
