@@ -2,6 +2,11 @@ from http.server import BaseHTTPRequestHandler
 from openai import OpenAI
 import os
 import json
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
@@ -17,63 +22,32 @@ class ScoreRequest:
         self.education_model = data.get('education_model', '')
         self.education_prompt = data.get('education_prompt', '')
 
-def calculate_workexp_score(content, model, prompt):
+def parse_openai_response(response_content):
     try:
-        if not content.strip():
-            return {"score": 0, "justification": "No work experience content provided."}
-        
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": f"You are an AI expert in evaluating work experience for job applications. Your task is to rate the given work experience and provide a justification for your rating. {prompt} Provide your response in JSON format with the following structure: {{\"score\": (a number between 0 and 100), \"justification\": \"Your explanation here\"}}"},
-                {"role": "user", "content": content}
-            ],
-            temperature=0.3,
-            max_tokens=250,
-            n=1,
-            stop=None,
-        )
-        return json.loads(response.choices[0].message.content.strip())
-    except json.JSONDecodeError as e:
-        print(f"Error decoding JSON in work experience score: {str(e)}")
-        return {"error": f"Error decoding JSON in work experience score: {str(e)}"}, 500
-    except Exception as e:
-        print(f"Error calculating work experience score: {str(e)}")
-        return {"error": f"Error calculating work experience score: {str(e)}"}, 500
+        # First, try to parse the entire response as JSON
+        return json.loads(response_content)
+    except json.JSONDecodeError:
+        # If that fails, try to extract JSON from the response
+        try:
+            json_start = response_content.index('{')
+            json_end = response_content.rindex('}') + 1
+            json_str = response_content[json_start:json_end]
+            return json.loads(json_str)
+        except (ValueError, json.JSONDecodeError):
+            # If JSON extraction fails, return an error
+            return {"error": "Failed to parse response", "raw_response": response_content}
 
-def calculate_education_score(content, model, prompt):
+def calculate_score(content, model, prompt, role_description):
     try:
-        if not content.strip():
-            return {"score": 0, "justification": "No education content provided."}
-        
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": f"You are an AI expert in evaluating educational qualifications for job applications. Your task is to rate the given education details and provide a justification for your rating. {prompt} Provide your response in JSON format with the following structure: {{\"score\": (a number between 0 and 100), \"justification\": \"Your explanation here\"}}"},
-                {"role": "user", "content": content}
-            ],
-            temperature=0.5,
-            max_tokens=250,
-            n=1,
-            stop=None,
-        )
-        return json.loads(response.choices[0].message.content.strip())
-    except json.JSONDecodeError as e:
-        print(f"Error decoding JSON in education score: {str(e)}")
-        return {"error": f"Error decoding JSON in education score: {str(e)}"}, 500
-    except Exception as e:
-        print(f"Error calculating education score: {str(e)}")
-        return {"error": f"Error calculating education score: {str(e)}"}, 500
+        logger.info(f"Calculating score for {role_description}")
+        logger.debug(f"Model: {model}")
+        logger.debug(f"Prompt: {prompt}")
+        logger.debug(f"Content: {content}")
 
-def calculate_opentext_score(content, model, prompt):
-    try:
-        if not content.strip():
-            return {"score": 0, "justification": "No open text content provided."}
-        
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": f"You are an AI expert in analyzing open-ended responses in job applications. Your task is to rate the given response and provide a justification for your rating. Consider factors such as clarity, relevance, and depth of insight. {prompt} Provide your response in JSON format with the following structure: {{\"score\": (a number between 0 and 100), \"justification\": \"Your explanation here\"}}"},
+                {"role": "system", "content": f"You are an AI expert in {role_description}. Your task is to rate the given content and provide a justification for your rating. {prompt} Provide your response in JSON format with the following structure: {{\"score\": (a number between 0 and 100), \"justification\": \"Your explanation here\"}}"},
                 {"role": "user", "content": content}
             ],
             temperature=0.4,
@@ -81,13 +55,19 @@ def calculate_opentext_score(content, model, prompt):
             n=1,
             stop=None,
         )
-        return json.loads(response.choices[0].message.content.strip())
-    except json.JSONDecodeError as e:
-        print(f"Error decoding JSON in open text score: {str(e)}")
-        return {"error": f"Error decoding JSON in open text score: {str(e)}"}, 500
+        raw_response = response.choices[0].message.content.strip()
+        logger.debug(f"Raw API response: {raw_response}")
+
+        parsed_response = parse_openai_response(raw_response)
+        if 'error' in parsed_response:
+            logger.error(f"Error parsing API response: {parsed_response['error']}")
+            return {"error": f"Error parsing API response: {parsed_response['error']}", "raw_response": raw_response}
+        
+        logger.info(f"Score calculated successfully for {role_description}")
+        return parsed_response
     except Exception as e:
-        print(f"Error calculating open text score: {str(e)}")
-        return {"error": f"Error calculating open text score: {str(e)}"}, 500
+        logger.error(f"Error calculating score: {str(e)}")
+        return {"error": f"Error calculating score: {str(e)}"}
 
 class handler(BaseHTTPRequestHandler):
     def set_CORS_headers(self):
@@ -109,26 +89,27 @@ class handler(BaseHTTPRequestHandler):
         score_request = ScoreRequest(data)
 
         try:
-            workexp_result = calculate_workexp_score(score_request.workexp_content, score_request.workexp_model, score_request.workexp_prompt)
-            education_result = calculate_education_score(score_request.education_content, score_request.education_model, score_request.education_prompt)
-            opentext_result = calculate_opentext_score(score_request.opentext_content, score_request.opentext_model, score_request.opentext_prompt)
+            workexp_result = calculate_score(score_request.workexp_content, score_request.workexp_model, score_request.workexp_prompt, "evaluating work experience for job applications")
+            education_result = calculate_score(score_request.education_content, score_request.education_model, score_request.education_prompt, "evaluating educational qualifications for job applications")
+            opentext_result = calculate_score(score_request.opentext_content, score_request.opentext_model, score_request.opentext_prompt, "analyzing open-ended responses in job applications")
 
-            error_results = []
-            if isinstance(workexp_result, tuple):
-                error_results.append(("Work Experience", workexp_result[0]['error']))
-            if isinstance(education_result, tuple):
-                error_results.append(("Education", education_result[0]['error']))
-            if isinstance(opentext_result, tuple):
-                error_results.append(("Open Text", opentext_result[0]['error']))
+            errors = []
+            if 'error' in workexp_result:
+                errors.append(f"Work Experience: {workexp_result['error']}")
+            if 'error' in education_result:
+                errors.append(f"Education: {education_result['error']}")
+            if 'error' in opentext_result:
+                errors.append(f"Open Text: {opentext_result['error']}")
 
-            if error_results:
-                error_message = "; ".join([f"{section}: {error}" for section, error in error_results])
+            if errors:
+                error_message = '; '.join(errors)
+                logger.error(f"Errors occurred during score calculation: {error_message}")
                 self.send_error(500, f"Errors occurred during score calculation: {error_message}")
                 return
 
-            workexp_score = workexp_result['score']
-            education_score = education_result['score']
-            opentext_score = opentext_result['score']
+            workexp_score = workexp_result.get('score', 0)
+            education_score = education_result.get('score', 0)
+            opentext_score = opentext_result.get('score', 0)
 
             weighted_score = (workexp_score * 0.4) + (education_score * 0.3) + (opentext_score * 0.3)
 
@@ -146,5 +127,5 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(response_data).encode('utf-8'))
 
         except Exception as e:
-            print(f"Unexpected error: {str(e)}")
-            self.send_error(500, f"An unexpected error occurred: {str(e)}")
+            logger.error(f"Unexpected error: {str(e)}")
+            self.send_error(500, str(e))
