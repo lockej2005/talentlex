@@ -128,6 +128,29 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
     }
   };
 
+  const saveReview = async (userId, firmId, questionValue, applicationText, feedback) => {
+    try {
+      const { error } = await supabase
+        .from('applications_vector')
+        .upsert({
+          user_id: userId,
+          firm_id: firmId,
+          question: questionValue,
+          application_text: applicationText,
+          feedback: feedback,
+          timestamp: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,firm_id,question'
+        });
+
+      if (error) throw error;
+
+      console.log('Review saved successfully');
+    } catch (error) {
+      console.error('Error saving review:', error.message);
+    }
+  };
+
   const handleMouseDown = (e) => {
     e.preventDefault();
     document.addEventListener('mousemove', handleMouseMove);
@@ -171,7 +194,12 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         setTotalTokens,
         setResponseTime
       );
-      setFeedback(prevFeedback => `${prevFeedback}\n\nCredits used: ${result.cost}. Remaining credits: ${result.newBalance}`);
+      const newFeedback = `${result.feedback}\n\nCredits used: ${result.cost}. Remaining credits: ${result.newBalance}`;
+      setFeedback(newFeedback);
+      
+      // Save the review after submission
+      await saveReview(user.id, actualFirmId, selectedQuestion.value, applicationText, newFeedback);
+      
       updateApplicationData();
     } catch (error) {
       console.error("Error:", error);
@@ -195,8 +223,10 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   }, [onApplicationChange, user, actualFirmId, selectedQuestion, applicationText, feedback]);
 
   useEffect(() => {
-    updateApplicationData();
-  }, [updateApplicationData]);
+    if (user && actualFirmId && selectedQuestion) {
+      saveReview(user.id, actualFirmId, selectedQuestion.value, applicationText, feedback);
+    }
+  }, [user, actualFirmId, selectedQuestion, applicationText, feedback]);
 
   const handleQuestionChange = useCallback((newQuestion) => {
     setSelectedQuestion(newQuestion);
