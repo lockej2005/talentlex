@@ -135,14 +135,14 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
     }
   };
 
-  const saveReview = async (userId, firmId, questionValue, applicationText, feedback) => {
+  const saveReview = async (userId, firmId, questionValue, applicationText, newFeedback) => {
     try {
       let upsertData = {
         user_id: userId,
         firm_id: firmId,
         question: questionValue,
         application_text: applicationText,
-        feedback: feedback,
+        feedback: newFeedback,
         timestamp: new Date().toISOString()
       };
 
@@ -217,9 +217,14 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         setResponseTime
       );
       const newFeedback = `${result.feedback}\n\nCredits used: ${result.cost}. Remaining credits: ${result.newBalance}`;
-      setFeedback(newFeedback);
       
-      // Save the review after receiving feedback
+      // Set the feedback and wait for the state to update
+      await new Promise(resolve => {
+        setFeedback(newFeedback);
+        setTimeout(resolve, 0);
+      });
+      
+      // Now that feedback is set, save the review
       await saveReview(user.id, actualFirmId, selectedQuestion.value, applicationText, newFeedback);
       
       updateApplicationData();
