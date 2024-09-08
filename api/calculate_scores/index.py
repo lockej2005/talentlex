@@ -111,7 +111,7 @@ class handler(BaseHTTPRequestHandler):
             education_score = education_result.get('score', 0)
             opentext_score = opentext_result.get('score', 0)
 
-            weighted_score = (workexp_score * 0.4) + (education_score * 0.3) + (opentext_score * 0.3)
+            weighted_score = (workexp_score * 0.2) + (education_score * 0.2) + (opentext_score * 0.6)
 
             response_data = {
                 "workexp": workexp_result,
