@@ -19,6 +19,7 @@ const FirmDashboard = () => {
   const [newExperience, setNewExperience] = useState({ title: '', duration: '' });
   const [user, setUser] = useState(null);
   const [scores, setScores] = useState(null);
+  const [isCalculatingScores, setIsCalculatingScores] = useState(false);
   const { id } = useParams();
   const workExperienceRef = useRef(null);
   const scoreDisplayRef = useRef(null);
@@ -38,7 +39,6 @@ const FirmDashboard = () => {
     if (user && id) {
       fetchFirmDetails();
       fetchWorkExperiences(user.id, id);
-      calculateScores(user.id, id);
     }
   }, [user, id]);
 
@@ -109,13 +109,16 @@ const FirmDashboard = () => {
     }
   };
 
-  const calculateScores = async (userId, firmId) => {
+  const calculateScores = async () => {
+    if (!user || !id) return;
+    setIsCalculatingScores(true);
+
     try {
       // Fetch firm details including prompts and models
       const { data: firmData, error: firmError } = await supabase
         .from('firms')
         .select('workexp_model, workexp_prompt, opentext_model, opentext_prompt, education_model, education_prompt, name')
-        .eq('id', firmId)
+        .eq('id', id)
         .single();
 
       if (firmError) throw firmError;
@@ -125,7 +128,7 @@ const FirmDashboard = () => {
         .from('applications_vector')
         .select('question, application_text')
         .eq('firm_id', firmData.name)
-        .eq('user_id', userId);
+        .eq('user_id', user.id);
 
       if (applicationsError) throw applicationsError;
 
@@ -133,7 +136,7 @@ const FirmDashboard = () => {
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('education, sub_categories, undergraduate_grades')
-        .eq('id', userId)
+        .eq('id', user.id)
         .single();
 
       if (profileError) throw profileError;
@@ -142,8 +145,8 @@ const FirmDashboard = () => {
       const { data: workExpData, error: workExpError } = await supabase
         .from('firm_user_table')
         .select('work_experience')
-        .eq('user_id', userId)
-        .eq('firm_id', firmId)
+        .eq('user_id', user.id)
+        .eq('firm_id', id)
         .single();
 
       if (workExpError) throw workExpError;
@@ -176,9 +179,28 @@ const FirmDashboard = () => {
 
       const scoreData = await response.json();
       setScores(scoreData);
+
+      // Update firm_user_table with the new scores
+      const { error: updateError } = await supabase
+        .from('firm_user_table')
+        .upsert({
+          user_id: user.id,
+          firm_id: id,
+          opentext_score: scoreData.opentext.score,
+          workexp_score: scoreData.workexp.score,
+          education_score: scoreData.education.score,
+          weighted_score: scoreData.weighted_score
+        }, {
+          onConflict: 'user_id,firm_id'
+        });
+
+      if (updateError) throw updateError;
+
     } catch (error) {
       console.error('Error calculating scores:', error);
       setScores(null);
+    } finally {
+      setIsCalculatingScores(false);
     }
   };
 
@@ -303,8 +325,15 @@ const FirmDashboard = () => {
                     </div>
                   </>
                 ) : (
-                  <p>Loading scores...</p>
+                  <p>No scores calculated yet. Click the button below to calculate scores.</p>
                 )}
+                <button 
+                  className="calculate-scores-button" 
+                  onClick={calculateScores}
+                  disabled={isCalculatingScores}
+                >
+                  {isCalculatingScores ? 'Calculating...' : 'Calculate Scores'}
+                </button>
               </div>
             </div>
             <div className="right-column-firmdash">
@@ -369,24 +398,24 @@ const FirmDashboard = () => {
           </button>
           <button
             className={`tab-button-firmdash ${activeTab === 'application-review' ? 'active' : ''}`}
-            onClick={() => setActiveTab('application-review')}
-          >
-            Application Review
-          </button>
-        </div>
-        <div className="save-button-container-firmdash">
-          {showSaveButton && (
-            <button className="save-button-firmdash" onClick={handleSave}>
-              Save {activeTab === 'generate-draft' ? 'Draft' : 'Application'}
-            </button>
-          )}
-        </div>
-      </div>
-      <div className="dashboard-container-firmdash">
-        {renderContent()}
-      </div>
-    </div>
-  );
-};
+                        onClick={() => setActiveTab('application-review')}
+                    >
+                        Application Review
+                    </button>
+                    </div>
+                    <div className="save-button-container-firmdash">
+                    {showSaveButton && (
+                        <button className="save-button-firmdash" onClick={handleSave}>
+                        Save {activeTab === 'generate-draft' ? 'Draft' : 'Application'}
+                        </button>
+                    )}
+                    </div>
+                </div>
+                <div className="dashboard-container-firmdash">
+                    {renderContent()}
+                </div>
+                </div>
+            );
+            };
 
-export default FirmDashboard;
+            export default FirmDashboard;
