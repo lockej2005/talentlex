@@ -219,7 +219,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
       const newFeedback = `${result.feedback}\n\nCredits used: ${result.cost}. Remaining credits: ${result.newBalance}`;
       setFeedback(newFeedback);
       
-      // Save the review after submission
+      // Save the review after receiving feedback
       await saveReview(user.id, actualFirmId, selectedQuestion.value, applicationText, newFeedback);
       
       updateApplicationData();
