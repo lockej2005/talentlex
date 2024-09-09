@@ -10,7 +10,9 @@ function ApplicationInput({
   questions,
   wordCount,
   inputType,
-  onQuestionChange
+  onQuestionChange,
+  additionalInfo,
+  onAdditionalInfoChange
 }) {
   const customStyles = {
     control: (provided) => ({
@@ -92,21 +94,30 @@ function ApplicationInput({
           <div className="input-field">
             <label>Key reason(s) for applying to firm:</label>
             <textarea
-              value={applicationText}
-              onChange={(e) => setApplicationText(e.target.value)}
+              value={additionalInfo.note_1 || ''}
+              onChange={(e) => onAdditionalInfoChange('note_1', e.target.value)}
             />
           </div>
           <div className="input-field">
             <label>Relevant experience:</label>
-            <textarea />
+            <textarea
+              value={additionalInfo.note_2 || ''}
+              onChange={(e) => onAdditionalInfoChange('note_2', e.target.value)}
+            />
           </div>
           <div className="input-field">
             <label>Relevant interaction with firm (if any):</label>
-            <textarea />
+            <textarea
+              value={additionalInfo.note_3 || ''}
+              onChange={(e) => onAdditionalInfoChange('note_3', e.target.value)}
+            />
           </div>
           <div className="input-field">
             <label>Any other personal information you'd like to include:</label>
-            <textarea />
+            <textarea
+              value={additionalInfo.note_4 || ''}
+              onChange={(e) => onAdditionalInfoChange('note_4', e.target.value)}
+            />
           </div>
         </div>
       </div>
