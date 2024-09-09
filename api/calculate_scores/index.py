@@ -47,7 +47,7 @@ def calculate_score(content, model, prompt, role_description):
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": f"You are an AI expert in {role_description}. Your task is to rate the given content and provide a justification for your rating. {prompt} Provide your response in JSON format with the following structure: {{\"score\": (a number between 0 and 100), \"justification\": \"Your explanation here\"}}"},
+                {"role": "system", "content": f"You are an AI expert in {role_description}. Your task is to rate the given content and provide a justification for your rating. {prompt} Provide your response in JSON format with the following structure: {{\"score\": (a number between 0 and 100), \"justification\": \"Your explanation here, in 100 words or less\"}}"},
                 {"role": "user", "content": content}
             ],
             temperature=0.4,
