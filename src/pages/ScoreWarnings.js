@@ -25,21 +25,21 @@ const ScoreWarnings = ({ userId, firmId }) => {
         console.error('Error fetching profile data:', profileError);
       } else {
         if (!profileData.education || profileData.education.trim() === '') {
-          newWarnings.push("Your education information is missing. Please add your educational background to improve your application.");
+          newWarnings.push("Your education information is missing. Adding your education section is required for an overall score.");
         } else {
-          newSuccesses.push("Great job! Your education information is provided.");
+          newSuccesses.push("Great job! Your education information is updated.");
         }
 
         if (!profileData.undergraduate_grades || profileData.undergraduate_grades.trim() === '') {
-          newWarnings.push("Your undergraduate grades are not provided. Add this informaiton in the Profile Tab");
+          newWarnings.push("Your undergraduate grades are not provided. Add this information in the Profile Tab");
         } else {
           newSuccesses.push("Excellent! You've included your undergraduate grades.");
         }
 
         if (!profileData.sub_categories || profileData.sub_categories.length === 0) {
-          newWarnings.push("You haven't selected any sub-categories. Choosing relevant sub-categories can help tailor your application.");
+          newWarnings.push("You haven't added your subject. You must add your subject to receive an overall score.");
         } else {
-          newSuccesses.push("Well done! You've selected sub-categories to tailor your application.");
+          newSuccesses.push("Well done! You've added your subject.");
         }
       }
 
@@ -55,9 +55,9 @@ const ScoreWarnings = ({ userId, firmId }) => {
         console.error('Error fetching work experience data:', workExperienceError);
       } else {
         if (!workExperienceData.work_experience || workExperienceData.work_experience.trim() === '[]') {
-          newWarnings.push("You haven't added any work experience for this firm. Adding relevant work experience can significantly improve your application.");
+          newWarnings.push("You haven't added any work experience for this firm. You must add your work experience to receive an accurate overall score.");
         } else {
-          newSuccesses.push("Fantastic! You've added work experience for this firm, which strengthens your application.");
+          newSuccesses.push("Fantastic! You've added work experience for this firm.");
         }
       }
 
