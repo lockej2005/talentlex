@@ -39,6 +39,7 @@ const FirmDashboard = () => {
     if (user && id) {
       fetchFirmDetails();
       fetchWorkExperiences(user.id, id);
+      fetchExistingScores(user.id, id);
     }
   }, [user, id]);
 
@@ -81,6 +82,26 @@ const FirmDashboard = () => {
       })));
     } else {
       setWorkExperiences([]);
+    }
+  };
+
+  const fetchExistingScores = async (userId, firmId) => {
+    const { data, error } = await supabase
+      .from('firm_user_table')
+      .select('weighted_score, opentext_score, workexp_score, education_score')
+      .eq('user_id', userId)
+      .eq('firm_id', firmId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching existing scores:', error);
+    } else if (data) {
+      setScores({
+        weighted_score: parseFloat(data.weighted_score) || 0,
+        opentext: { score: parseFloat(data.opentext_score) || 0 },
+        workexp: { score: parseFloat(data.workexp_score) || 0 },
+        education: { score: parseFloat(data.education_score) || 0 }
+      });
     }
   };
 
@@ -151,37 +172,37 @@ const FirmDashboard = () => {
 
       if (workExpError) throw workExpError;
 
-    // Prepare data for backend
-    const openTextContent = applicationsData.map(app => `Question: ${app.question}\nAnswer: ${app.application_text}`).join('\n\n');
-    const educationContent = `Education: ${profileData.education || 'N/A'}\nSub-categories: ${Array.isArray(profileData.sub_categories) ? profileData.sub_categories.join(', ') : (profileData.sub_categories || 'N/A')}\nUndergraduate Grades: ${profileData.undergraduate_grades || 'N/A'}`;
-    const workExpContent = workExpData.work_experience || '[]';
+      // Prepare data for backend
+      const openTextContent = applicationsData.map(app => `Question: ${app.question}\nAnswer: ${app.application_text}`).join('\n\n');
+      const educationContent = `Education: ${profileData.education || 'N/A'}\nSub-categories: ${Array.isArray(profileData.sub_categories) ? profileData.sub_categories.join(', ') : (profileData.sub_categories || 'N/A')}\nUndergraduate Grades: ${profileData.undergraduate_grades || 'N/A'}`;
+      const workExpContent = workExpData.work_experience || '[]';
 
-    // Send data to backend for score calculation
-    const response = await fetch('/api/calculate_scores', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        workexp_content: workExpContent,
-        workexp_model: firmData.workexp_model || 'gpt-4o-mini',
-        workexp_prompt: firmData.workexp_prompt || '',
-        opentext_content: openTextContent,
-        opentext_model: firmData.opentext_model || 'gpt-4o-mini',
-        opentext_prompt: firmData.opentext_prompt || '',
-        education_content: educationContent,
-        education_model: firmData.education_model || 'gpt-4o-mini',
-        education_prompt: firmData.education_prompt || ''
-      }),
-    });
+      // Send data to backend for score calculation
+      const response = await fetch('/api/calculate_scores', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          workexp_content: workExpContent,
+          workexp_model: firmData.workexp_model || 'gpt-4o-mini',
+          workexp_prompt: firmData.workexp_prompt || '',
+          opentext_content: openTextContent,
+          opentext_model: firmData.opentext_model || 'gpt-4o-mini',
+          opentext_prompt: firmData.opentext_prompt || '',
+          education_content: educationContent,
+          education_model: firmData.education_model || 'gpt-4o-mini',
+          education_prompt: firmData.education_prompt || ''
+        }),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to calculate scores: ${errorText}`);
-    }
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to calculate scores: ${errorText}`);
+      }
 
-    const scoreData = await response.json();
-    setScores(scoreData);
+      const scoreData = await response.json();
+      setScores(scoreData);
 
       // Update firm_user_table with the new scores
       const { error: updateError } = await supabase
@@ -312,17 +333,17 @@ const FirmDashboard = () => {
                         <div className="score-section">
                           <p className="section-score">{scores.opentext.score}</p>
                           <span className="section-title">Open Text Section</span>
-                          <p className="section-detail">{scores.opentext.justification}</p>
+                          <p className="section-detail">{scores.opentext.justification || 'No justification available'}</p>
                         </div>
                         <div className="score-section">
                           <p className="section-score">{scores.workexp.score}</p>
                           <span className="section-title">Work Experience Section</span>
-                          <p className="section-detail">{scores.workexp.justification}</p>
+                          <p className="section-detail">{scores.workexp.justification || 'No justification available'}</p>
                         </div>
                         <div className="score-section">
                           <p className="section-score">{scores.education.score}</p>
                           <span className="section-title">Education Section</span>
-                          <p className="section-detail">{scores.education.justification}</p>
+                          <p className="section-detail">{scores.education.justification || 'No justification available'}</p>
                         </div>
                       </div>
                     </div>
@@ -396,29 +417,29 @@ const FirmDashboard = () => {
           <button
             className={`tab-button-firmdash ${activeTab === 'generate-draft' ? 'active' : ''}`}
             onClick={() => setActiveTab('generate-draft')}
-            >
-              Generate Draft
-            </button>
-            <button
-              className={`tab-button-firmdash ${activeTab === 'application-review' ? 'active' : ''}`}
-              onClick={() => setActiveTab('application-review')}
-            >
-              Application Review
-            </button>
-          </div>
-          <div className="save-button-container-firmdash">
-            {showSaveButton && (
-              <button className="save-button-firmdash" onClick={handleSave}>
-                Save {activeTab === 'generate-draft' ? 'Draft' : 'Application'}
-              </button>
-            )}
-          </div>
+          >
+            Generate Draft
+          </button>
+          <button
+            className={`tab-button-firmdash ${activeTab === 'application-review' ? 'active' : ''}`}
+            onClick={() => setActiveTab('application-review')}
+          >
+            Application Review
+          </button>
         </div>
-        <div className="dashboard-container-firmdash">
-          {renderContent()}
+        <div className="save-button-container-firmdash">
+          {showSaveButton && (
+            <button className="save-button-firmdash" onClick={handleSave}>
+              Save {activeTab === 'generate-draft' ? 'Draft' : 'Application'}
+            </button>
+          )}
         </div>
       </div>
-    );
-  };
-  
-  export default FirmDashboard;
+      <div className="dashboard-container-firmdash">
+        {renderContent()}
+      </div>
+    </div>
+  );
+};
+
+export default FirmDashboard;
