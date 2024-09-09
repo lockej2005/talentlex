@@ -384,7 +384,7 @@ const FirmDashboard = () => {
                   />
                   <input 
                     type="text" 
-                    placeholder="Duration/Dates" 
+                    placeholder="Description" 
                     value={newExperience.duration}
                     onChange={(e) => setNewExperience({...newExperience, duration: e.target.value})}
                   />
@@ -415,16 +415,16 @@ const FirmDashboard = () => {
             Dashboard
           </button>
           <button
-            className={`tab-button-firmdash ${activeTab === 'generate-draft' ? 'active' : ''}`}
-            onClick={() => setActiveTab('generate-draft')}
-          >
-            Generate Draft
-          </button>
-          <button
             className={`tab-button-firmdash ${activeTab === 'application-review' ? 'active' : ''}`}
             onClick={() => setActiveTab('application-review')}
           >
             Application Review
+          </button>
+          <button
+            className={`tab-button-firmdash ${activeTab === 'generate-draft' ? 'active' : ''}`}
+            onClick={() => setActiveTab('generate-draft')}
+          >
+            Generate Draft
           </button>
         </div>
         <div className="save-button-container-firmdash">
