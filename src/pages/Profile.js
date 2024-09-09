@@ -7,7 +7,6 @@ const Profile = () => {
   const [userId, setUserId] = useState(null);
   const [education, setEducation] = useState('');
   const [subCategories, setSubCategories] = useState('');
-  const [workExperience, setWorkExperience] = useState('');
   const [years, setYears] = useState([
     { id: 1, name: 'Year 1', expanded: false, subjects: [{ name: '', grade: '' }] }
   ]);
@@ -23,7 +22,7 @@ const Profile = () => {
       setUserId(user.id);
       const { data, error } = await supabase
         .from('profiles')
-        .select('education, sub_categories, undergraduate_grades, work_experience')
+        .select('education, sub_categories, undergraduate_grades')
         .eq('id', user.id)
         .single();
 
@@ -32,7 +31,6 @@ const Profile = () => {
       } else if (data) {
         setEducation(data.education || '');
         setSubCategories(data.sub_categories || '');
-        setWorkExperience(data.work_experience || '');
         if (data.undergraduate_grades) {
           const parsedGrades = parseUndergraduateGrades(data.undergraduate_grades);
           setYears(parsedGrades);
@@ -88,8 +86,7 @@ const Profile = () => {
         .update({
           education: education,
           sub_categories: subCategories,
-          undergraduate_grades: formatUndergraduateGrades(),
-          work_experience: workExperience
+          undergraduate_grades: formatUndergraduateGrades()
         })
         .eq('id', userId);
 
@@ -250,15 +247,6 @@ const Profile = () => {
               </div>
             ))}
             <button className="add-year-profile" onClick={addYear}>+ Add Year</button>
-          </div>
-          <div className="input-group-profile">
-            <label className="profile-label">Work Experience (Bullet Point format):</label>
-            <textarea
-              className="profile-textarea"
-              value={workExperience}
-              onChange={(e) => setWorkExperience(e.target.value)}
-              placeholder="Enter your work experience"
-            ></textarea>
           </div>
         </div>
       </div>
