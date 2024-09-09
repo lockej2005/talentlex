@@ -36,7 +36,7 @@ export const subtractCredits = async (userId, cost) => {
 
 export const subtractCreditsAndUpdateUser = async (userId, totalTokens) => {
   try {
-    const cost = Math.round(totalTokens * 0.09);
+    const cost = Math.round(totalTokens * 0.009);
     const { success, newBalance, error } = await subtractCredits(userId, cost);
 
     if (!success) {
