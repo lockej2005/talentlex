@@ -159,6 +159,35 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     setIsEdited(true);
   }, [setAdditionalInfo]);
 
+  const saveDraft = useCallback(async (newDraftText) => {
+    if (user && selectedFirm && selectedQuestion) {
+      const draftData = {
+        user_id: user.id,
+        firm_id: firmId,
+        question: selectedQuestion.value,
+        note_1: additionalInfo.note_1 || '',
+        note_2: additionalInfo.note_2 || '',
+        note_3: additionalInfo.note_3 || '',
+        note_4: additionalInfo.note_4 || '',
+        generated_draft: newDraftText,
+      };
+
+      try {
+        const { data, error } = await supabase
+          .from('drafts_generations_vector')
+          .upsert(draftData, { onConflict: ['user_id', 'firm_id', 'question'] });
+
+        if (error) throw error;
+
+        console.log('Draft saved successfully:', data);
+        onDraftChange(draftData);
+      } catch (error) {
+        console.error('Error saving draft:', error);
+        alert('Error saving draft. Please try again.');
+      }
+    }
+  }, [user, selectedFirm, selectedQuestion, firmId, additionalInfo, onDraftChange]);
+
   const handleCreateDraft = useCallback(async () => {
     if (!user) {
       alert('Please log in to generate a draft.');
@@ -182,25 +211,28 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
         selectedFirm,
         selectedQuestion,
         additionalInfo,
-        (newDraftText) => {
+        async (newDraftText) => {
           const contentState = ContentState.createFromText(newDraftText);
           setEditorState(EditorState.createWithContent(contentState));
           setDraftText(newDraftText);
           setWordCount(countWords(newDraftText));
           setIsEdited(true);
+          
+          // Save the draft after receiving the response
+          await saveDraft(newDraftText);
         },
         setTotalTokens
       );
       const endTime = Date.now();
       setResponseTime((endTime - startTime) / 1000);
-      alert(`Draft generated successfully. Credits used: ${result.cost}. Remaining credits: ${result.newBalance}`);
+      alert(`Draft generated and saved successfully. Credits used: ${result.cost}. Remaining credits: ${result.newBalance}`);
     } catch (error) {
       console.error('Error:', error);
       alert("Error: " + error.message);
     } finally {
       setIsLoading(false);
     }
-  }, [user, selectedFirm, selectedQuestion, additionalInfo, setDraftText, setEditorState]);
+  }, [user, selectedFirm, selectedQuestion, additionalInfo, setDraftText, setEditorState, saveDraft]);
 
   const onEditorChange = useCallback((newEditorState) => {
     setEditorState(newEditorState);
@@ -255,22 +287,6 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     setSelectedQuestion(newQuestion);
     resetDraft();
   }, [setSelectedQuestion, resetDraft]);
-
-  useEffect(() => {
-    if (isEdited && user && selectedFirm && selectedQuestion) {
-      const draftData = {
-        user_id: user.id,
-        firm_id: firmId,
-        question: selectedQuestion.value,
-        note_1: additionalInfo.note_1 || '',
-        note_2: additionalInfo.note_2 || '',
-        note_3: additionalInfo.note_3 || '',
-        note_4: additionalInfo.note_4 || '',
-        generated_draft: draftText,
-      };
-      onDraftChange(draftData);
-    }
-  }, [isEdited, user, draftText, selectedFirm, selectedQuestion, additionalInfo, onDraftChange, firmId]);
 
   return (
     <div className="comparison-container-draft">
