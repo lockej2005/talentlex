@@ -210,13 +210,12 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, []);
-
   const handleSubmit = async () => {
     if (!user) {
       alert('Please log in to submit your application.');
       return;
     }
-
+  
     setIsLoading(true);
     setError(null);
     try {
@@ -228,13 +227,13 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         selectedQuestion
       );
       console.log('Application submitted, result:', result);
-
+  
       if (result && result.success) {
         const newFeedback = `${result.feedback}\n\nCredits used: ${result.usage.total_tokens}. Remaining credits: ${result.newBalance}`;
         setFeedback(newFeedback);
         setResponseTime(result.responseTime);
         setTotalTokens(result.usage.total_tokens);
-
+  
         console.log('Saving review...');
         // Now that we have the feedback, save the review
         await saveReview(user.id, actualFirmId, selectedQuestion.value, applicationText, newFeedback);

@@ -2,6 +2,7 @@ import { supabase } from '../supabaseClient';
 import { subtractCreditsAndUpdateUser } from './CreditManager';
 import { creditPolice } from './CreditPolice';
 import { getProfileContext } from './GetProfileContext';
+import { getReviewSpecs } from './ReviewGetSpecs';
 
 export const getCurrentUser = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -52,6 +53,8 @@ export const insertDraftGeneration = async (draftData) => {
 export const submitApplication = async (applicationData) => {
   const userProfile = await getProfileContext(applicationData.userId);
   
+  const { system_prompt, model } = await getReviewSpecs(applicationData.firm, applicationData.question);
+
   const response = await fetch('/api/submit_application', {
     method: 'POST',
     headers: {
@@ -62,7 +65,9 @@ export const submitApplication = async (applicationData) => {
       userProfile,
       education: userProfile.education,
       sub_category: userProfile.sub_categories,
-      work_experience: userProfile.work_experience
+      work_experience: userProfile.work_experience,
+      system_prompt,
+      model
     }),
   });
 
@@ -76,12 +81,14 @@ export const submitApplication = async (applicationData) => {
 export const createApplicationDraft = async (draftData) => {
   const userProfile = await getProfileContext(draftData.userId);
 
+  const { system_prompt, model } = await getReviewSpecs(draftData.firm, draftData.question);
+
   const response = await fetch('/api/create_application', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({...draftData, userProfile}),
+    body: JSON.stringify({...draftData, userProfile, system_prompt, model}),
   });
 
   if (!response.ok) {
@@ -90,7 +97,6 @@ export const createApplicationDraft = async (draftData) => {
 
   return await response.json();
 };
-
 
 export const handleApplicationSubmit = async (user, applicationText, selectedFirm, selectedQuestion) => {
   if (!user) {
