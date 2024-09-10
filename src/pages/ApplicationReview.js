@@ -32,6 +32,12 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   const [error, setError] = useState(null);
 
   const fetchQuestions = useCallback(async (firmName) => {
+    if (!firmName) {
+      console.error('Firm name is undefined');
+      setError('Invalid firm name. Please select a valid firm.');
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('questions')
@@ -58,6 +64,12 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   }, [setSelectedQuestion]);
 
   const fetchActualFirmId = useCallback(async (firmName) => {
+    if (!firmName) {
+      console.error('Firm name is undefined');
+      setError('Invalid firm name. Please select a valid firm.');
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('firms')
@@ -66,6 +78,11 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         .single();
 
       if (error) throw error;
+      if (!data) {
+        console.error('No firm found with name:', firmName);
+        setError(`No firm found with name: ${firmName}`);
+        return;
+      }
       setActualFirmId(data.id);
     } catch (error) {
       console.error('Error fetching firm ID:', error);
@@ -89,7 +106,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
 
   useEffect(() => {
     if (selectedFirm) {
-      console.log(selectedFirm)
+      console.log("Selected Firm:", selectedFirm);
       fetchQuestions(selectedFirm.label);
       fetchActualFirmId(selectedFirm.label);
     }
@@ -210,6 +227,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, []);
+
   const handleSubmit = async () => {
     if (!user) {
       alert('Please log in to submit your application.');
