@@ -66,7 +66,6 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         .single();
 
       if (error) throw error;
-
       setActualFirmId(data.id);
     } catch (error) {
       console.error('Error fetching firm ID:', error);
@@ -90,6 +89,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
 
   useEffect(() => {
     if (selectedFirm) {
+      console.log(selectedFirm)
       fetchQuestions(selectedFirm.label);
       fetchActualFirmId(selectedFirm.label);
     }
