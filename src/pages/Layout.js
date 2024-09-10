@@ -118,6 +118,28 @@ const Layout = () => {
     navigate('/firm-selector');
   };
 
+  const handleGetMoreCredits = async () => {
+    try {
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.id })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const { url } = await response.json();
+      window.location = url; // Redirect to Stripe Checkout
+    } catch (error) {
+      console.error('Error redirecting to Stripe:', error);
+      // You might want to show an error message to the user here
+    }
+  };
+
   return (
     <UserInputProvider>
       <div className="layout">
@@ -154,6 +176,7 @@ const Layout = () => {
           </div>
           <div className="user-info">
             <div className="credits">{userCredits} credits</div>
+            <button onClick={handleGetMoreCredits} className="get-credits-btn">Get more Credits</button>
             <div className='seperator'></div>
             <div className='user-name'>{userName || 'Loading...'}</div>
             {societyName && <div className="society-name">{societyName}</div>}
