@@ -53,7 +53,7 @@ export const insertDraftGeneration = async (draftData) => {
 export const submitApplication = async (applicationData) => {
   const userProfile = await getProfileContext(applicationData.userId);
   
-  const { system_prompt, model } = await getReviewSpecs(applicationData.firm, applicationData.question);
+  const { system_prompt, model } = await getReviewSpecs(applicationData.firmName, applicationData.question);
 
   const response = await fetch('/api/submit_application', {
     method: 'POST',
@@ -81,7 +81,7 @@ export const submitApplication = async (applicationData) => {
 export const createApplicationDraft = async (draftData) => {
   const userProfile = await getProfileContext(draftData.userId);
 
-  const { system_prompt, model } = await getReviewSpecs(draftData.firm, draftData.question);
+  const { system_prompt, model } = await getReviewSpecs(draftData.firmName, draftData.question);
 
   const response = await fetch('/api/create_application', {
     method: 'POST',
@@ -112,13 +112,14 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
     const data = await submitApplication({
       userId: user.id,
       applicationText,
-      firm: selectedFirm.value,
+      firmId: selectedFirm.id,
+      firmName: selectedFirm.name,
       question: selectedQuestion.value,
       email: user.email
     });
 
     await insertApplication({
-      firm: selectedFirm.value,
+      firm: selectedFirm.name,
       question: selectedQuestion.value,
       application_text: applicationText,
       feedback: data.feedback,
@@ -170,7 +171,7 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
 
   return await creditPolice(user.id, async () => {
     let requiredFields;
-    if (selectedFirm.value === "Jones Day") {
+    if (selectedFirm.name === "Jones Day") {
       requiredFields = ['whyLaw', 'whyJonesDay', 'whyYou', 'relevantExperiences'];
     } else {
       requiredFields = ['keyReasons', 'relevantExperience', 'relevantInteraction', 'personalInfo'];
@@ -186,7 +187,8 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
 
     const data = await createApplicationDraft({
       userId: user.id,
-      firm: selectedFirm.value,
+      firmId: selectedFirm.id,
+      firmName: selectedFirm.name,
       question: selectedQuestion.value,
       ...additionalInfo
     });
@@ -203,10 +205,10 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
     }
 
     let draftGenerationData;
-    if (selectedFirm.value === "Jones Day") {
+    if (selectedFirm.name === "Jones Day") {
       draftGenerationData = {
         email: user.email,
-        firm: selectedFirm.value,
+        firm: selectedFirm.name,
         question: selectedQuestion.value,
         key_reasons: additionalInfo.whyLaw,
         relevant_experience: additionalInfo.relevantExperiences,
@@ -217,7 +219,7 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
     } else {
       draftGenerationData = {
         email: user.email,
-        firm: selectedFirm.value,
+        firm: selectedFirm.name,
         question: selectedQuestion.value,
         key_reasons: additionalInfo.keyReasons,
         relevant_experience: additionalInfo.relevantExperience,
