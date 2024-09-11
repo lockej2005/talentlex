@@ -30,23 +30,48 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
   const [totalTokens, setTotalTokens] = useState(0);
   const [isEdited, setIsEdited] = useState(false);
   const [questions, setQuestions] = useState([]);
+  const [firmName, setFirmName] = useState(null);
+  const [error, setError] = useState(null);
 
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
   const editorRef = useRef(null);
   const editorContainerRef = useRef(null);
 
-  const fetchQuestions = useCallback(async (firmName) => {
+  const fetchFirmNameAndQuestions = useCallback(async (firmId) => {
+    if (!firmId) {
+      console.error('Firm ID is undefined');
+      setError('Invalid firm ID. Please select a valid firm.');
+      return;
+    }
+
     try {
-      const { data, error } = await supabase
+      // First, fetch the firm name
+      const { data: firmData, error: firmError } = await supabase
+        .from('firms')
+        .select('name')
+        .eq('id', firmId)
+        .single();
+
+      if (firmError) throw firmError;
+      if (!firmData) {
+        console.error('No firm found with ID:', firmId);
+        setError(`No firm found with ID: ${firmId}`);
+        return;
+      }
+
+      setFirmName(firmData.name);
+
+      // Now, fetch the questions using the firm name
+      const { data: questionsData, error: questionsError } = await supabase
         .from('questions')
         .select('*')
-        .eq('firm', firmName)
+        .eq('firm', firmData.name)
         .order('priority', { ascending: true });
 
-      if (error) throw error;
+      if (questionsError) throw questionsError;
 
-      const formattedQuestions = data.map(q => ({
+      const formattedQuestions = questionsData.map((q) => ({
         value: q.question,
         label: q.question,
         priority: q.priority
@@ -57,7 +82,8 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
         setSelectedQuestion(formattedQuestions[0]);
       }
     } catch (error) {
-      console.error('Error fetching questions:', error);
+      console.error('Error fetching firm name and questions:', error);
+      setError('Failed to fetch firm information and questions. Please try again later.');
     }
   }, [setSelectedQuestion]);
 
@@ -71,10 +97,11 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
   }, []);
 
   useEffect(() => {
-    if (selectedFirm) {
-      fetchQuestions(selectedFirm.label);
+    if (selectedFirm && selectedFirm.id) {
+      console.log("Selected Firm:", selectedFirm);
+      fetchFirmNameAndQuestions(selectedFirm.id);
     }
-  }, [selectedFirm, fetchQuestions]);
+  }, [selectedFirm, fetchFirmNameAndQuestions]);
 
   useEffect(() => {
     const loadSavedDraft = async () => {
