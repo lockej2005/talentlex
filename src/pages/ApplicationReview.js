@@ -32,7 +32,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   const [error, setError] = useState(null);
   const [firmName, setFirmName] = useState(null);
 
-  const fetchQuestions = useCallback(async (firmId) => {
+  const fetchFirmNameAndQuestions = useCallback(async (firmId) => {
     if (!firmId) {
       console.error('Firm ID is undefined');
       setError('Invalid firm ID. Please select a valid firm.');
@@ -40,42 +40,44 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
     }
 
     try {
-      const { data, error } = await supabase
+      // First, fetch the firm name
+      const { data: firmData, error: firmError } = await supabase
         .from('firms')
-        .select('name, questions_array')
+        .select('name')
         .eq('id', firmId)
         .single();
 
-      if (error) throw error;
-      if (!data) {
+      if (firmError) throw firmError;
+      if (!firmData) {
         console.error('No firm found with ID:', firmId);
         setError(`No firm found with ID: ${firmId}`);
         return;
       }
-      console.log(data)
-      setFirmName(data.name);
 
-      let formattedQuestions = [];
-      if (data.questions_array) {
-        try {
-          const parsedQuestions = JSON.parse(data.questions_array);
-          formattedQuestions = parsedQuestions.map((q, index) => ({
-            value: q,
-            label: q,
-            priority: index + 1
-          }));
-        } catch (parseError) {
-          console.error('Error parsing questions_array:', parseError);
-        }
-      }
+      setFirmName(firmData.name);
+
+      // Now, fetch the questions using the firm name
+      const { data: questionsData, error: questionsError } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('firm', firmData.name)
+        .order('priority', { ascending: true });
+
+      if (questionsError) throw questionsError;
+
+      const formattedQuestions = questionsData.map((q) => ({
+        value: q.question,
+        label: q.question,
+        priority: q.priority
+      }));
 
       setQuestions(formattedQuestions);
       if (formattedQuestions.length > 0) {
         setSelectedQuestion(formattedQuestions[0]);
       }
     } catch (error) {
-      console.error('Error fetching questions:', error);
-      setError('Failed to fetch questions. Please try again later.');
+      console.error('Error fetching firm name and questions:', error);
+      setError('Failed to fetch firm information and questions. Please try again later.');
     }
   }, [setSelectedQuestion]);
 
@@ -100,10 +102,10 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   useEffect(() => {
     if (selectedFirm && selectedFirm.id) {
       console.log("Selected Firm:", selectedFirm);
-      fetchQuestions(selectedFirm.id);
+      fetchFirmNameAndQuestions(selectedFirm.id);
       fetchActualFirmId(selectedFirm.id);
     }
-  }, [selectedFirm, fetchQuestions, fetchActualFirmId]);
+  }, [selectedFirm, fetchFirmNameAndQuestions, fetchActualFirmId]);
 
   useEffect(() => {
     if (user && actualFirmId && selectedQuestion) {
