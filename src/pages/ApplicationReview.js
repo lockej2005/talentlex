@@ -52,7 +52,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         setError(`No firm found with ID: ${firmId}`);
         return;
       }
-
+      console.log(data)
       setFirmName(data.name);
 
       let formattedQuestions = [];
