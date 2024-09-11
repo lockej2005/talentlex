@@ -30,6 +30,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   const [actualFirmId, setActualFirmId] = useState(null);
   const [existingRecordId, setExistingRecordId] = useState(null);
   const [error, setError] = useState(null);
+  const [firmName, setFirmName] = useState(null);
 
   const fetchQuestions = useCallback(async (firmId) => {
     if (!firmId) {
@@ -51,6 +52,8 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         setError(`No firm found with ID: ${firmId}`);
         return;
       }
+
+      setFirmName(data.name);
 
       let formattedQuestions = [];
       if (data.questions_array) {
@@ -231,7 +234,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
       const result = await handleApplicationSubmit(
         user,
         applicationText,
-        selectedFirm,
+        { id: actualFirmId, name: firmName },
         selectedQuestion
       );
       console.log('Application submitted, result:', result);
@@ -309,7 +312,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
             </button>
           </div>
           <div className="title-card">
-            <h3>Your Review</h3>
+            <h3>Your Review for {firmName}</h3>
             <p className="subtext">
               {isLoading ? '⏳🙄👀' : 
                feedback ? `Your review took ${responseTime ? responseTime.toFixed(2) : '...'} seconds to generate` : 
