@@ -30,28 +30,44 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   const [actualFirmId, setActualFirmId] = useState(null);
   const [existingRecordId, setExistingRecordId] = useState(null);
   const [error, setError] = useState(null);
+  const [firmName, setFirmName] = useState(null);
 
-  const fetchQuestions = useCallback(async (firmName) => {
-    if (!firmName) {
-      console.error('Firm name is undefined');
-      setError('Invalid firm name. Please select a valid firm.');
+  const fetchQuestions = useCallback(async (firmId) => {
+    if (!firmId) {
+      console.error('Firm ID is undefined');
+      setError('Invalid firm ID. Please select a valid firm.');
       return;
     }
 
     try {
       const { data, error } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('firm', firmName)
-        .order('priority', { ascending: true });
+        .from('firms')
+        .select('name, questions_array')
+        .eq('id', firmId)
+        .single();
 
       if (error) throw error;
+      if (!data) {
+        console.error('No firm found with ID:', firmId);
+        setError(`No firm found with ID: ${firmId}`);
+        return;
+      }
 
-      const formattedQuestions = data.map(q => ({
-        value: q.question,
-        label: q.question,
-        priority: q.priority
-      }));
+      setFirmName(data.name);
+
+      let formattedQuestions = [];
+      if (data.questions_array) {
+        try {
+          const parsedQuestions = JSON.parse(data.questions_array);
+          formattedQuestions = parsedQuestions.map((q, index) => ({
+            value: q,
+            label: q,
+            priority: index + 1
+          }));
+        } catch (parseError) {
+          console.error('Error parsing questions_array:', parseError);
+        }
+      }
 
       setQuestions(formattedQuestions);
       if (formattedQuestions.length > 0) {
@@ -63,31 +79,8 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
     }
   }, [setSelectedQuestion]);
 
-  const fetchActualFirmId = useCallback(async (firmName) => {
-    if (!firmName) {
-      console.error('Firm name is undefined');
-      setError('Invalid firm name. Please select a valid firm.');
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('firms')
-        .select('id')
-        .eq('name', firmName)
-        .single();
-
-      if (error) throw error;
-      if (!data) {
-        console.error('No firm found with name:', firmName);
-        setError(`No firm found with name: ${firmName}`);
-        return;
-      }
-      setActualFirmId(data.id);
-    } catch (error) {
-      console.error('Error fetching firm ID:', error);
-      setError('Failed to fetch firm information. Please try again later.');
-    }
+  const fetchActualFirmId = useCallback(async (firmId) => {
+    setActualFirmId(firmId);
   }, []);
 
   useEffect(() => {
@@ -105,10 +98,10 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   }, []);
 
   useEffect(() => {
-    if (selectedFirm) {
+    if (selectedFirm && selectedFirm.id) {
       console.log("Selected Firm:", selectedFirm);
-      fetchQuestions(selectedFirm.label);
-      fetchActualFirmId(selectedFirm.label);
+      fetchQuestions(selectedFirm.id);
+      fetchActualFirmId(selectedFirm.id);
     }
   }, [selectedFirm, fetchQuestions, fetchActualFirmId]);
 
@@ -241,7 +234,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
       const result = await handleApplicationSubmit(
         user,
         applicationText,
-        selectedFirm,
+        { id: actualFirmId, name: firmName },
         selectedQuestion
       );
       console.log('Application submitted, result:', result);
@@ -319,7 +312,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
             </button>
           </div>
           <div className="title-card">
-            <h3>Your Review</h3>
+            <h3>Your Review for {firmName}</h3>
             <p className="subtext">
               {isLoading ? '⏳🙄👀' : 
                feedback ? `Your review took ${responseTime ? responseTime.toFixed(2) : '...'} seconds to generate` : 
