@@ -61,18 +61,21 @@ export const submitApplication = async (applicationData) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      ...applicationData,
-      userProfile,
+      applicationText: applicationData.applicationText,
+      firm: applicationData.firmName,
+      question: applicationData.question,
+      work_experience: userProfile.work_experience,
       education: userProfile.education,
       sub_category: userProfile.sub_categories,
-      work_experience: userProfile.work_experience,
       system_prompt,
-      model
+      model,
+      // Include any other fields that might be required by the backend
     }),
   });
 
   if (!response.ok) {
-    throw new Error('Network response was not ok');
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Network response was not ok');
   }
 
   return await response.json();
