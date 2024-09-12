@@ -275,26 +275,36 @@ const Admin = () => {
                     to see top contributors.
                   </p>
                   <div className="dashboard-content">
-                    <div className="left-column">
-                      <ContributionHistory
-                        data={signupData}
-                        title="Sign Ups"
-                        todayCount={`${todaySignups} signups today so far`}
-                      />
-                      <ContributionHistory
-                        data={activityData}
-                        title="Applications and Draft Generations"
-                        todayCount={`${todayApplications + todayDraftGenerations} total items today (${todayApplications} applications, ${todayDraftGenerations} draft generations)`}
-                        isActivity={true}
-                      />
-                      <FirmPopularityTracker
-                        firmPopularityData={firmPopularityData}
-                        timeRange={timeRange}
-                        setTimeRange={setTimeRange}
-                      />
+                    {/* First Row */}
+                    <div className="dashboard-row">
+                      <div className="half-column">
+                        <ContributionHistory
+                          data={signupData}
+                          title="Sign Ups"
+                          todayCount={`${todaySignups} signups today so far`}
+                        />
+                      </div>
+                      <div className="half-column">
+                        <ContributionHistory
+                          data={activityData}
+                          title="Applications and Draft Generations"
+                          todayCount={`${todayApplications + todayDraftGenerations} total items today (${todayApplications} applications, ${todayDraftGenerations} draft generations)`}
+                          isActivity={true}
+                        />
+                      </div>
                     </div>
-                    <div className="right-column">
-                      <SignUpLog />
+                    {/* Second Row */}
+                    <div className="dashboard-row">
+                      <div className="half-column">
+                        <FirmPopularityTracker
+                          firmPopularityData={firmPopularityData}
+                          timeRange={timeRange}
+                          setTimeRange={setTimeRange}
+                        />
+                      </div>
+                      <div className="half-column">
+                        <SignUpLog />
+                      </div>
                     </div>
                   </div>
                 </>

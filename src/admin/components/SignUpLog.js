@@ -1,5 +1,3 @@
-// admin/components/SignUpLog.js
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../supabaseClient';
 import './SignUpLog.css';
@@ -13,7 +11,6 @@ const SignUpLog = () => {
   }, []);
 
   const fetchRecentActivity = async () => {
-    // Fetch users ordered by last_active
     const { data, error } = await supabase
       .from('profiles')
       .select('id, name, email, last_active')
@@ -30,20 +27,23 @@ const SignUpLog = () => {
   };
 
   const formatDateTime = (dateTime) => {
-    return DateTime.fromISO(dateTime).toLocaleString(DateTime.DATETIME_MED);
+    // Convert time to San Francisco timezone (America/Los_Angeles)
+    return DateTime.fromISO(dateTime)
+      .setZone('America/Los_Angeles')
+      .toLocaleString(DateTime.DATETIME_MED);
   };
 
   return (
     <div className="signup-log">
-      <h3>Recent User Activity</h3>
-      <ul className="activity-list">
+      <h3 className="h3-log">Recent User Activity</h3>
+      <ul className="activity-list-log">
         {recentActivity.map((user) => (
-          <li key={user.id} className="activity-item">
-            <div className="user-info">
-              <span className="user-name">{user.name || 'No Name'}</span>
-              <span className="user-email">{user.email}</span>
+          <li key={user.id} className="activity-item-log">
+            <div className="user-info-log">
+              <div className="user-name-log">{user.name || 'No Name'}</div>
+              <div className="user-email-log">{user.email}</div>
             </div>
-            <div className="activity-time">
+            <div className="activity-time-log">
               {user.last_active ? formatDateTime(user.last_active) : 'Unknown'}
             </div>
           </li>
