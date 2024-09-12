@@ -7,6 +7,7 @@ import QueryPage from './data-science/QueryPage';
 import UserSearch from './data-science/UserSearch';
 import UserLeaderboard from './UserLeaderboard';
 import './Admin.css';
+import { DateTime } from 'luxon';
 
 const Admin = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -27,20 +28,19 @@ const Admin = () => {
   }, [timeRange]);
 
   const getDateString = (date) => {
-    return date.toISOString().split('T')[0];
+    return DateTime.fromJSDate(date).setZone('America/Los_Angeles').toISODate();
   };
 
   const fetchSignupData = async () => {
-    const now = new Date();
-    const endDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
-    const startDate = new Date(endDate);
-    startDate.setUTCDate(startDate.getUTCDate() - 365);
+    const now = DateTime.now().setZone('America/Los_Angeles');
+    const endDate = now.endOf('day');
+    const startDate = endDate.minus({ days: 365 });
 
     const { data, error } = await supabase
       .from('profiles')
       .select('created_at')
-      .gte('created_at', startDate.toISOString())
-      .lte('created_at', endDate.toISOString());
+      .gte('created_at', startDate.toISO())
+      .lte('created_at', endDate.toISO());
 
     if (error) {
       console.error('Error fetching signup data:', error);
@@ -49,17 +49,16 @@ const Admin = () => {
 
     const signupsByDate = {};
     let todayCount = 0;
-    const todayPDT = getDateString(new Date(now.getTime() + 16 * 60 * 60 * 1000));
+    const todayPDT = now.toISODate();
 
     // Initialize signupsByDate with all dates in the range
-    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-      const pdtDate = getDateString(new Date(d.getTime() + 16 * 60 * 60 * 1000));
-      signupsByDate[pdtDate] = 0;
+    for (let d = startDate; d <= endDate; d = d.plus({ days: 1 })) {
+      signupsByDate[d.toISODate()] = 0;
     }
 
     // Count signups for each day
     data.forEach(item => {
-      const pdtDate = getDateString(new Date(new Date(item.created_at).getTime() + 16 * 60 * 60 * 1000));
+      const pdtDate = DateTime.fromISO(item.created_at).setZone('America/Los_Angeles').toISODate();
       
       if (signupsByDate[pdtDate] !== undefined) {
         signupsByDate[pdtDate]++;
@@ -75,22 +74,21 @@ const Admin = () => {
   };
 
   const fetchActivityData = async () => {
-    const now = new Date();
-    const endDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
-    const startDate = new Date(endDate);
-    startDate.setUTCDate(startDate.getUTCDate() - 365);
+    const now = DateTime.now().setZone('America/Los_Angeles');
+    const endDate = now.endOf('day');
+    const startDate = endDate.minus({ days: 365 });
 
     const { data: applicationData, error: applicationError } = await supabase
       .from('applications')
       .select('timestamp')
-      .gte('timestamp', startDate.toISOString())
-      .lte('timestamp', endDate.toISOString());
+      .gte('timestamp', startDate.toISO())
+      .lte('timestamp', endDate.toISO());
 
     const { data: draftGenerationData, error: draftGenerationError } = await supabase
       .from('draft_generations')
       .select('created_at')
-      .gte('created_at', startDate.toISOString())
-      .lte('created_at', endDate.toISOString());
+      .gte('created_at', startDate.toISO())
+      .lte('created_at', endDate.toISO());
 
     if (applicationError || draftGenerationError) {
       console.error('Error fetching activity data:', applicationError || draftGenerationError);
@@ -100,17 +98,16 @@ const Admin = () => {
     const activityByDate = {};
     let todayApplicationCount = 0;
     let todayDraftGenerationCount = 0;
-    const todayPDT = getDateString(new Date(now.getTime() + 16 * 60 * 60 * 1000));
+    const todayPDT = now.toISODate();
 
     // Initialize activityByDate with all dates in the range
-    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-      const pdtDate = getDateString(new Date(d.getTime() + 16 * 60 * 60 * 1000));
-      activityByDate[pdtDate] = { applications: 0, draftGenerations: 0 };
+    for (let d = startDate; d <= endDate; d = d.plus({ days: 1 })) {
+      activityByDate[d.toISODate()] = { applications: 0, draftGenerations: 0 };
     }
 
     // Count applications for each day
     applicationData.forEach(item => {
-      const pdtDate = getDateString(new Date(new Date(item.timestamp).getTime() + 16 * 60 * 60 * 1000));
+      const pdtDate = DateTime.fromISO(item.timestamp).setZone('America/Los_Angeles').toISODate();
       
       if (activityByDate[pdtDate] !== undefined) {
         activityByDate[pdtDate].applications++;
@@ -123,7 +120,7 @@ const Admin = () => {
 
     // Count draft generations for each day
     draftGenerationData.forEach(item => {
-      const pdtDate = getDateString(new Date(new Date(item.created_at).getTime() + 16 * 60 * 60 * 1000));
+      const pdtDate = DateTime.fromISO(item.created_at).setZone('America/Los_Angeles').toISODate();
       
       if (activityByDate[pdtDate] !== undefined) {
         activityByDate[pdtDate].draftGenerations++;
@@ -140,22 +137,19 @@ const Admin = () => {
   };
 
   const fetchFirmPopularityData = async () => {
+    const now = DateTime.now().setZone('America/Los_Angeles');
+    const endDate = now.endOf('day');
     let startDate;
-    const now = new Date();
-    const endDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
 
     switch (timeRange) {
       case 'today':
-        startDate = new Date(endDate);
-        startDate.setUTCHours(0, 0, 0, 0);
+        startDate = now.startOf('day');
         break;
       case 'week':
-        startDate = new Date(endDate);
-        startDate.setDate(startDate.getDate() - 7);
+        startDate = now.minus({ weeks: 1 }).startOf('day');
         break;
       case 'month':
-        startDate = new Date(endDate);
-        startDate.setMonth(startDate.getMonth() - 1);
+        startDate = now.minus({ months: 1 }).startOf('day');
         break;
       case 'total':
       default:
@@ -174,12 +168,12 @@ const Admin = () => {
       .not('firm', 'is', null);
 
     if (startDate) {
-      draftQuery.gte('created_at', startDate.toISOString());
-      applicationsQuery.gte('timestamp', startDate.toISOString());
+      draftQuery.gte('created_at', startDate.toISO());
+      applicationsQuery.gte('timestamp', startDate.toISO());
     }
 
-    draftQuery.lte('created_at', endDate.toISOString());
-    applicationsQuery.lte('timestamp', endDate.toISOString());
+    draftQuery.lte('created_at', endDate.toISO());
+    applicationsQuery.lte('timestamp', endDate.toISO());
 
     const [{ data: draftData, error: draftError }, { data: applicationsData, error: applicationsError }] = await Promise.all([
       draftQuery,
@@ -217,36 +211,46 @@ const Admin = () => {
   const renderContributionHistory = (data, title, todayCount, isActivity = false) => {
     if (!data || Object.keys(data).length === 0) return null;
 
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    const contributionDays = Object.keys(data).map(date => ({
-      date: new Date(date),
-      count: isActivity ? (data[date].applications + data[date].draftGenerations) : data[date],
-    }));
+    const now = DateTime.now().setZone('America/Los_Angeles');
+    const startOfYear = now.startOf('year');
+    const endOfYear = now.endOf('year');
 
-    // Sort contributionDays by date
-    contributionDays.sort((a, b) => a.date - b.date);
-
-    const lastDate = new Date(contributionDays[contributionDays.length - 1].date);
-    const firstDate = new Date(lastDate);
-    firstDate.setDate(firstDate.getDate() - 358); // 51 weeks + 1 day to ensure we have 52 weeks
+    // Adjust startDate to the first day of the year
+    const startDate = startOfYear;
 
     const weeks = [];
-    for (let i = 0; i < 52; i++) {
-      const week = [];
-      for (let j = 0; j < 7; j++) {
-        const currentDate = new Date(firstDate);
-        currentDate.setDate(currentDate.getDate() + i * 7 + j);
-        const dateString = getDateString(currentDate);
-        week.push({
-          date: currentDate,
-          count: isActivity ? 
-                 (data[dateString] ? data[dateString].applications + data[dateString].draftGenerations : 0) :
-                 (data[dateString] || 0),
-        });
+    let currentWeek = [];
+
+    // Fill in empty days at the start if the year doesn't begin on a Sunday
+    const firstDayOfWeek = startDate.weekday % 7;
+    for (let i = 0; i < firstDayOfWeek; i++) {
+      currentWeek.push({ date: null, count: 0 });
+    }
+
+    for (let d = startDate; d <= endOfYear; d = d.plus({ days: 1 })) {
+      const dateString = d.toISODate();
+      currentWeek.push({
+        date: d,
+        count: isActivity ? 
+               (data[dateString] ? data[dateString].applications + data[dateString].draftGenerations : 0) :
+               (data[dateString] || 0),
+      });
+
+      if (currentWeek.length === 7) {
+        weeks.push(currentWeek);
+        currentWeek = [];
       }
-      weeks.push(week);
+    }
+
+    // Fill in empty days at the end if the year doesn't end on a Saturday
+    while (currentWeek.length < 7) {
+      currentWeek.push({ date: null, count: 0 });
+    }
+    if (currentWeek.length > 0) {
+      weeks.push(currentWeek);
     }
 
     const getContributionLevel = (count) => {
@@ -258,8 +262,7 @@ const Admin = () => {
     };
 
     const formatDate = (date) => {
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      return date.toLocaleDateString("en-US", options);
+      return date ? date.toLocaleString(DateTime.DATE_FULL) : '';
     };
 
     return (
@@ -275,8 +278,8 @@ const Admin = () => {
                 {week.map((day, dayIndex) => (
                   <div
                     key={dayIndex}
-                    className={`contribution-day-admin level-${getContributionLevel(day.count)}-admin`}
-                    data-tooltip={`${day.count} ${day.count === 1 ? 'item' : 'items'} on ${formatDate(day.date)}`}
+                    className={`contribution-day-admin ${day.date ? `level-${getContributionLevel(day.count)}` : 'empty'}-admin`}
+                    data-tooltip={day.date ? `${day.count} ${day.count === 1 ? 'item' : 'items'} on ${formatDate(day.date)}` : ''}
                   />
                 ))}
               </div>

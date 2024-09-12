@@ -135,7 +135,7 @@
 /* Contribution History Styles */
 .contribution-history-admin {
   margin-top: 30px;
-  max-width: 900px;
+  max-width: 675px;
   background-color: #ffffff;
   padding: 20px;
   border-radius: 8px;
@@ -153,7 +153,6 @@
   border: 1px solid #e0e0e0;
   border-radius: 3px;
   overflow: hidden;
-  padding-top: 20px;
 }
 
 .graph-labels-admin {
@@ -166,14 +165,15 @@
 }
 
 .day-label-admin {
-  height: 14px;
+  height: 15px;
   font-size: 9px;
   color: #333;
   text-align: right;
-  line-height: 0px;
+  line-height: 15px;
 }
 
 .graph-body-admin {
+  margin-top: 10px;
   display: flex;
   flex-grow: 1;
   padding: 5px;
@@ -191,6 +191,10 @@
   border-radius: 2px;
   margin: 1px;
   position: relative;
+}
+
+.contribution-day-admin.empty-admin {
+  background-color: transparent;
 }
 
 .contribution-day-admin::after {
@@ -216,14 +220,17 @@
   visibility: visible;
 }
 
-/* ... (previous styles remain the same) ... */
-
 .month-labels-admin {
   display: flex;
   justify-content: space-between;
   padding: 5px 20px;
   font-size: 10px;
   color: #333;
+}
+
+.month-label-admin {
+  flex: 1;
+  text-align: center;
 }
 
 .contribution-summary-admin {
