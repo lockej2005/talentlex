@@ -1,0 +1,60 @@
+/* FirmPopularityTracker.css */
+
+.firm-popularity-tracker {
+    margin-top: 30px;
+    max-width: 900px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .firm-popularity-tracker h3 {
+    color: #276d8b;
+    margin-bottom: 15px;
+    font-size: 20px;
+  }
+  
+  .time-range-selector {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 20px;
+  }
+  
+  .time-range-selector button {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 8px 16px;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .time-range-selector button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .time-range-selector button.active {
+    background-color: #276d8b;
+    color: white;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .firm-popularity-tracker {
+      max-width: 100%;
+      overflow-x: auto;
+    }
+  
+    .time-range-selector {
+      flex-wrap: wrap;
+    }
+  
+    .time-range-selector button {
+      margin-bottom: 10px;
+    }
+  }
+  

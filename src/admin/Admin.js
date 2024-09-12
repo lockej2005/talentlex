@@ -1,11 +1,15 @@
+// admin/Admin.js
+
 import React, { useState, useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import QueryPage from './data-science/QueryPage';
 import UserSearch from './data-science/UserSearch';
 import UserLeaderboard from './UserLeaderboard';
+import ContributionHistory from './components/ContributionHistory';
+import FirmPopularityTracker from './components/FirmPopularityTracker';
+import SignUpLog from './components/SignUpLog';
 import './Admin.css';
 import { DateTime } from 'luxon';
 
@@ -24,12 +28,11 @@ const Admin = () => {
   useEffect(() => {
     fetchSignupData();
     fetchActivityData();
+  }, []);
+
+  useEffect(() => {
     fetchFirmPopularityData();
   }, [timeRange]);
-
-  const getDateString = (date) => {
-    return DateTime.fromJSDate(date).setZone('America/Los_Angeles').toISODate();
-  };
 
   const fetchSignupData = async () => {
     const now = DateTime.now().setZone('America/Los_Angeles');
@@ -57,13 +60,15 @@ const Admin = () => {
     }
 
     // Count signups for each day
-    data.forEach(item => {
-      const pdtDate = DateTime.fromISO(item.created_at).setZone('America/Los_Angeles').toISODate();
-      
+    data.forEach((item) => {
+      const pdtDate = DateTime.fromISO(item.created_at)
+        .setZone('America/Los_Angeles')
+        .toISODate();
+
       if (signupsByDate[pdtDate] !== undefined) {
         signupsByDate[pdtDate]++;
       }
-      
+
       if (pdtDate === todayPDT) {
         todayCount++;
       }
@@ -106,26 +111,30 @@ const Admin = () => {
     }
 
     // Count applications for each day
-    applicationData.forEach(item => {
-      const pdtDate = DateTime.fromISO(item.timestamp).setZone('America/Los_Angeles').toISODate();
-      
+    applicationData.forEach((item) => {
+      const pdtDate = DateTime.fromISO(item.timestamp)
+        .setZone('America/Los_Angeles')
+        .toISODate();
+
       if (activityByDate[pdtDate] !== undefined) {
         activityByDate[pdtDate].applications++;
       }
-      
+
       if (pdtDate === todayPDT) {
         todayApplicationCount++;
       }
     });
 
     // Count draft generations for each day
-    draftGenerationData.forEach(item => {
-      const pdtDate = DateTime.fromISO(item.created_at).setZone('America/Los_Angeles').toISODate();
-      
+    draftGenerationData.forEach((item) => {
+      const pdtDate = DateTime.fromISO(item.created_at)
+        .setZone('America/Los_Angeles')
+        .toISODate();
+
       if (activityByDate[pdtDate] !== undefined) {
         activityByDate[pdtDate].draftGenerations++;
       }
-      
+
       if (pdtDate === todayPDT) {
         todayDraftGenerationCount++;
       }
@@ -175,10 +184,10 @@ const Admin = () => {
     draftQuery.lte('created_at', endDate.toISO());
     applicationsQuery.lte('timestamp', endDate.toISO());
 
-    const [{ data: draftData, error: draftError }, { data: applicationsData, error: applicationsError }] = await Promise.all([
-      draftQuery,
-      applicationsQuery
-    ]);
+    const [
+      { data: draftData, error: draftError },
+      { data: applicationsData, error: applicationsError },
+    ] = await Promise.all([draftQuery, applicationsQuery]);
 
     if (draftError || applicationsError) {
       console.error('Error fetching firm popularity data:', draftError || applicationsError);
@@ -186,7 +195,7 @@ const Admin = () => {
     }
 
     const firmCounts = {};
-    [...draftData, ...applicationsData].forEach(item => {
+    [...draftData, ...applicationsData].forEach((item) => {
       firmCounts[item.firm] = (firmCounts[item.firm] || 0) + 1;
     });
 
@@ -208,178 +217,96 @@ const Admin = () => {
     setShowOverlay(false);
   };
 
-  const renderContributionHistory = (data, title, todayCount, isActivity = false) => {
-    if (!data || Object.keys(data).length === 0) return null;
-
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-    const now = DateTime.now().setZone('America/Los_Angeles');
-    const startOfYear = now.startOf('year');
-    const endOfYear = now.endOf('year');
-
-    // Adjust startDate to the first day of the year
-    const startDate = startOfYear;
-
-    const weeks = [];
-    let currentWeek = [];
-
-    // Fill in empty days at the start if the year doesn't begin on a Sunday
-    const firstDayOfWeek = startDate.weekday % 7;
-    for (let i = 0; i < firstDayOfWeek; i++) {
-      currentWeek.push({ date: null, count: 0 });
-    }
-
-    for (let d = startDate; d <= endOfYear; d = d.plus({ days: 1 })) {
-      const dateString = d.toISODate();
-      currentWeek.push({
-        date: d,
-        count: isActivity ? 
-               (data[dateString] ? data[dateString].applications + data[dateString].draftGenerations : 0) :
-               (data[dateString] || 0),
-      });
-
-      if (currentWeek.length === 7) {
-        weeks.push(currentWeek);
-        currentWeek = [];
-      }
-    }
-
-    // Fill in empty days at the end if the year doesn't end on a Saturday
-    while (currentWeek.length < 7) {
-      currentWeek.push({ date: null, count: 0 });
-    }
-    if (currentWeek.length > 0) {
-      weeks.push(currentWeek);
-    }
-
-    const getContributionLevel = (count) => {
-      if (count === 0) return 0;
-      if (count < 10) return 1;
-      if (count < 25) return 2;
-      if (count < 50) return 3;
-      return 4;
-    };
-
-    const formatDate = (date) => {
-      return date ? date.toLocaleString(DateTime.DATE_FULL) : '';
-    };
-
-    return (
-      <div className="contribution-history-admin">
-        <h3>{title}</h3>
-        <div className="contribution-graph-admin">
-          <div className="graph-labels-admin">
-            {days.map(day => <div key={day} className="day-label-admin">{day}</div>)}
-          </div>
-          <div className="graph-body-admin">
-            {weeks.map((week, weekIndex) => (
-              <div key={weekIndex} className="graph-week-admin">
-                {week.map((day, dayIndex) => (
-                  <div
-                    key={dayIndex}
-                    className={`contribution-day-admin ${day.date ? `level-${getContributionLevel(day.count)}` : 'empty'}-admin`}
-                    data-tooltip={day.date ? `${day.count} ${day.count === 1 ? 'item' : 'items'} on ${formatDate(day.date)}` : ''}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="month-labels-admin">
-          {months.map(month => <div key={month} className="month-label-admin">{month}</div>)}
-        </div>
-        <div className="contribution-summary-admin">
-          <span>Less</span>
-          <ul className="contribution-scale-admin">
-            <li className="level-0-admin" />
-            <li className="level-1-admin" />
-            <li className="level-2-admin" />
-            <li className="level-3-admin" />
-            <li className="level-4-admin" />
-          </ul>
-          <span>More</span>
-        </div>
-        <p className="today-signups-admin">{todayCount}</p>
-      </div>
-    );
-  };
-
-  const renderFirmPopularityTracker = () => {
-    return (
-      <div className="firm-popularity-tracker-admin">
-        <h3>Firm Popularity Tracker</h3>
-        <div className="time-range-selector-admin">
-          <button onClick={() => setTimeRange('today')} className={timeRange === 'today' ? 'active-admin' : ''}>Today</button>
-          <button onClick={() => setTimeRange('week')} className={timeRange === 'week' ? 'active-admin' : ''}>This Week</button>
-          <button onClick={() => setTimeRange('month')} className={timeRange === 'month' ? 'active-admin' : ''}>This Month</button>
-          <button onClick={() => setTimeRange('total')} className={timeRange === 'total' ? 'active-admin' : ''}>Total</button>
-        </div>
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={firmPopularityData}>
-            <XAxis dataKey="firm" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="count" fill="#276D8B" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    );
-  };
-
   return (
-    <div className="layout-admin">
-      <div className={`sidebar-admin ${menuOpen ? 'open-admin' : ''}`}>
-        <div className="sidebar-content-admin">
-          <div className="logo-admin">TalentLex Admin</div>
-          <nav className="nav-admin">
-            <ul className="nav-list-admin">
-              <li className="section-title-admin">Admin Tools</li>
-              <div className='separator-admin'></div>
-              <li className={`nav-item-admin ${location.pathname === '/talentlex-admin' ? 'active-admin' : ''}`}>
+    <div className="layout">
+      <div className={`sidebar ${menuOpen ? 'open' : ''}`}>
+        <div className="sidebar-content">
+          <div className="logo">TalentLex Admin</div>
+          <nav className="nav">
+            <ul className="nav-list">
+              <li className="section-title">Admin Tools</li>
+              <div className="separator"></div>
+              <li className={`nav-item ${location.pathname === '/talentlex-admin' ? 'active' : ''}`}>
                 <Link to="/talentlex-admin">Home</Link>
               </li>
-              <li className={`nav-item-admin ${location.pathname === '/talentlex-admin/query' ? 'active-admin' : ''}`}>
+              <li
+                className={`nav-item ${
+                  location.pathname === '/talentlex-admin/query' ? 'active' : ''
+                }`}
+              >
                 <Link to="/talentlex-admin/query">Query Page</Link>
               </li>
-              <li className={`nav-item-admin ${location.pathname === '/talentlex-admin/users' ? 'active-admin' : ''}`}>
+              <li
+                className={`nav-item ${
+                  location.pathname === '/talentlex-admin/users' ? 'active' : ''
+                }`}
+              >
                 <Link to="/talentlex-admin/users">User Search</Link>
               </li>
-              <li className={`nav-item-admin ${location.pathname === '/talentlex-admin/leaderboard' ? 'active-admin' : ''}`}>
+              <li
+                className={`nav-item ${
+                  location.pathname === '/talentlex-admin/leaderboard' ? 'active' : ''
+                }`}
+              >
                 <Link to="/talentlex-admin/leaderboard">User Leaderboard</Link>
               </li>
             </ul>
           </nav>
         </div>
-        <div className="user-info-admin">
-          <div className='user-name-admin'>Admin User</div>
-          <button className="logout-btn-admin">Log Out</button>
+        <div className="user-info">
+          <div className="user-name">Admin User</div>
+          <button className="logout-btn">Log Out</button>
         </div>
       </div>
-      <div className="main-content-admin">
-        <button className="menu-toggle-admin" onClick={toggleMenu}>
+      <div className="main-content">
+        <button className="menu-toggle" onClick={toggleMenu}>
           <Menu size={24} />
         </button>
-        <div className="content-area-admin">
+        <div className="content-area">
           <Routes>
-            <Route path="/" element={
-              <>
-                <h1 className="page-title-admin">Admin Dashboard</h1>
-                <p className="welcome-text-admin">Welcome to the TalentLex Admin Dashboard. Use the Query Page to access and analyze data, the User Search to find and view user profiles, or check the User Leaderboard to see top contributors.</p>
-                {renderContributionHistory(signupData, "Sign Ups", `${todaySignups} signups today so far`)}
-                {renderContributionHistory(activityData, "Applications and Draft Generations", `${todayApplications + todayDraftGenerations} total items today (${todayApplications} applications, ${todayDraftGenerations} draft generations)`, true)}
-                {renderFirmPopularityTracker()}
-              </>
-            } />
+            <Route
+              path="/"
+              element={
+                <>
+                  <h1 className="page-title">Admin Dashboard</h1>
+                  <p className="welcome-text">
+                    Welcome to the TalentLex Admin Dashboard. Use the Query Page to access and analyze
+                    data, the User Search to find and view user profiles, or check the User Leaderboard
+                    to see top contributors.
+                  </p>
+                  <div className="dashboard-content">
+                    <div className="left-column">
+                      <ContributionHistory
+                        data={signupData}
+                        title="Sign Ups"
+                        todayCount={`${todaySignups} signups today so far`}
+                      />
+                      <ContributionHistory
+                        data={activityData}
+                        title="Applications and Draft Generations"
+                        todayCount={`${todayApplications + todayDraftGenerations} total items today (${todayApplications} applications, ${todayDraftGenerations} draft generations)`}
+                        isActivity={true}
+                      />
+                      <FirmPopularityTracker
+                        firmPopularityData={firmPopularityData}
+                        timeRange={timeRange}
+                        setTimeRange={setTimeRange}
+                      />
+                    </div>
+                    <div className="right-column">
+                      <SignUpLog />
+                    </div>
+                  </div>
+                </>
+              }
+            />
             <Route path="/query" element={<QueryPage />} />
             <Route path="/users" element={<UserSearch />} />
             <Route path="/leaderboard" element={<UserLeaderboard />} />
           </Routes>
         </div>
       </div>
-      {showOverlay && (
-        <div className="menu-overlay-admin" onClick={closeMenu}></div>
-      )}
+      {showOverlay && <div className="menu-overlay" onClick={closeMenu}></div>}
     </div>
   );
 };
