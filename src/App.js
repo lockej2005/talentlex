@@ -17,7 +17,6 @@ import Videos from './pages/Videos';
 import SpeakToFounders from './pages/SpeakToFounders';
 import DueDiligence from './pages/DueDiligence';
 import Profile from './pages/Profile';
-import Admin from './admin/Admin';
 import useUserActivity from './hooks/useUserActivity';
 
 const PrivateRoute = ({ children }) => {
@@ -55,7 +54,6 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/talentlex-admin/*" element={<Admin />} />
           <Route
             path="/*"
             element={
