@@ -4,8 +4,6 @@ import { supabase } from '../supabaseClient';
 import PrivacyPolicy from './PrivacyPolicy';
 import AIUsagePolicy from './AIUsagePolicy';
 import NegotiationSimulator from './NegotiationSimulator';
-import Videos from './Videos';
-import SpeakToFounders from './SpeakToFounders';
 import { UserInputProvider } from '../context/UserInputContext';
 import Profile from './Profile';
 import FirmDashboard from './FirmDashboard';
@@ -163,14 +161,6 @@ const Layout = () => {
                 <li className="add-new" onClick={handleAddNewFirm}>
                   Add New +
                 </li>
-                <li className="section-title">Guide</li>
-                <div className='seperator'></div>
-                <li className={location.pathname === "/videos" ? "active" : ""}>
-                  <Link to="/videos">Videos</Link>
-                </li>
-                <li className={location.pathname === "/speak-to-founders" ? "active" : ""}>
-                  <Link to="/speak-to-founders">Speak to the Founders</Link>
-                </li>
               </ul>
             </nav>
           </div>
@@ -195,8 +185,6 @@ const Layout = () => {
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/ai-usage-policy" element={<AIUsagePolicy />} />
               <Route path="/negotiation-simulator" element={<NegotiationSimulator />} />
-              <Route path="/videos" element={<Videos />} />
-              <Route path="/speak-to-founders" element={<SpeakToFounders />} />
             </Routes>
           </div>
         </div>
