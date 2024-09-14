@@ -1,18 +1,13 @@
-// /api/stripe-webhook.js
-
 const { createClient } = require('@supabase/supabase-js');
 const Stripe = require('stripe');
 
-// Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Initialize Supabase client with service role
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Disable the default body parser to handle raw body for Stripe signature verification
 export const config = {
   api: {
     bodyParser: false,
@@ -37,7 +32,6 @@ export default async function handler(req, res) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // Handle the event
   switch (event.type) {
     case 'customer.subscription.created':
     case 'customer.subscription.updated':
@@ -49,11 +43,9 @@ export default async function handler(req, res) {
       console.log(`Unhandled event type ${event.type}`);
   }
 
-  // Return a response to acknowledge receipt of the event
   res.json({ received: true });
 }
 
-// Helper function to parse raw body
 const buffer = async (req) => {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -69,13 +61,10 @@ const buffer = async (req) => {
   });
 };
 
-// Function to handle subscription events
 const handleSubscriptionEvent = async (subscription) => {
   try {
-    // Extract customer ID from subscription
     const customerId = subscription.customer;
 
-    // Fetch the user profile based on Stripe customer ID
     const { data, error } = await supabase
       .from('profiles')
       .select('id, stripe_customer_id')
@@ -89,7 +78,6 @@ const handleSubscriptionEvent = async (subscription) => {
 
     const userId = data.id;
 
-    // Determine if the user has an active subscription
     let hasPlus = false;
 
     if (subscription.status === 'active' || subscription.status === 'trialing') {
@@ -98,7 +86,6 @@ const handleSubscriptionEvent = async (subscription) => {
       hasPlus = false;
     }
 
-    // Update the profiles table
     const { error: updateError } = await supabase
       .from('profiles')
       .update({ hasPlus })

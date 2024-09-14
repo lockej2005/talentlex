@@ -18,6 +18,7 @@ const Layout = () => {
   const [userName, setUserName] = useState('');
   const [societyName, setSocietyName] = useState('');
   const [userCredits, setUserCredits] = useState(0);
+  const [hasPlus, setHasPlus] = useState(false);
   const [selectedFirms, setSelectedFirms] = useState([]);
   const [user, setUser] = useState(null);
   const location = useLocation();
@@ -30,7 +31,7 @@ const Layout = () => {
         setUser(user);
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('name, society, credits')
+          .select('name, society, credits, hasPlus')
           .eq('id', user.id)
           .single();
 
@@ -40,6 +41,7 @@ const Layout = () => {
           setUserName(profileData.name || 'User');
           setUserCredits(profileData.credits || 0);
           setSocietyName(profileData.society || '');
+          setHasPlus(profileData.hasPlus || false);
         }
 
         fetchSelectedFirms(user.id);
@@ -73,7 +75,9 @@ const Layout = () => {
       .channel('public:profiles')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user?.id}` }, payload => {
         const updatedCredits = payload.new.credits;
+        const updatedHasPlus = payload.new.hasPlus;
         setUserCredits(updatedCredits);
+        setHasPlus(updatedHasPlus);
       })
       .subscribe();
 
@@ -116,26 +120,9 @@ const Layout = () => {
     navigate('/firm-selector');
   };
 
-  const handleGetMoreCredits = async () => {
-    try {
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: user.id })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const { url } = await response.json();
-      window.location = url; // Redirect to Stripe Checkout
-    } catch (error) {
-      console.error('Error redirecting to Stripe:', error);
-      // You might want to show an error message to the user here
-    }
+  const handleGetMoreCredits = () => {
+    // Redirect to Stripe Checkout for monthly subscription
+    window.location.href = 'https://buy.stripe.com/eVafZqcBd1EPeNq6ot';
   };
 
   return (
@@ -165,8 +152,10 @@ const Layout = () => {
             </nav>
           </div>
           <div className="user-info">
-            <div className="credits">{userCredits} credits</div>
-            <button onClick={handleGetMoreCredits} className="get-credits-btn">Get more Credits</button>
+            <div className="credits">{hasPlus ? 'UNLIMITED' : `${userCredits} credits`}</div>
+            <button onClick={handleGetMoreCredits} className="get-credits-btn">
+              {hasPlus ? 'Manage Subscription' : 'Upgrade to Plus'}
+            </button>
             <div className='seperator'></div>
             <div className='user-name'>{userName || 'Loading...'}</div>
             {societyName && <div className="society-name">{societyName}</div>}
