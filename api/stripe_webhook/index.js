@@ -1,3 +1,9 @@
+export const config = {
+    api: {
+      bodyParser: false,
+    },
+  };  
+
 const { createClient } = require('@supabase/supabase-js');
 const Stripe = require('stripe');
 
