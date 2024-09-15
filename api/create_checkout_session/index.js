@@ -10,6 +10,9 @@ module.exports = async (req, res) => {
 
   const { priceId, userId } = req.body;
 
+  // Get the origin from the request headers
+  const origin = req.headers.origin || 'https://talentlex.app';
+
   try {
     const { data: user, error } = await supabase
       .from('profiles')
@@ -46,8 +49,8 @@ module.exports = async (req, res) => {
         },
       ],
       mode: 'subscription',
-      success_url: `https://dev.talentlex.app/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://dev.talentlex.app/canceled`,
+      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/canceled`,
       metadata: {
         userId: userId
       }
