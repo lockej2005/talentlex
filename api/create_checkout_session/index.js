@@ -1,7 +1,15 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+// Ensure these environment variables are set in your Vercel project settings
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -10,7 +18,7 @@ module.exports = async (req, res) => {
 
   const { priceId, userId } = req.body;
 
-  // Get the origin from the request headers
+  // Get the origin from the request headers or use a default
   const origin = req.headers.origin || 'https://talentlex.app';
 
   try {
@@ -21,6 +29,7 @@ module.exports = async (req, res) => {
       .single();
 
     if (error) {
+      console.error('Supabase error:', error);
       throw new Error('Error fetching user');
     }
 
@@ -34,10 +43,14 @@ module.exports = async (req, res) => {
       });
       customerId = customer.id;
 
-      await supabase
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({ stripe_customer_id: customerId })
         .eq('id', userId);
+
+      if (updateError) {
+        console.error('Error updating Supabase:', updateError);
+      }
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -58,7 +71,7 @@ module.exports = async (req, res) => {
 
     res.status(200).json({ url: session.url });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Failed to create checkout session' });
+    console.error('Error creating checkout session:', error);
+    res.status(500).json({ error: 'Failed to create checkout session', details: error.message });
   }
 };
