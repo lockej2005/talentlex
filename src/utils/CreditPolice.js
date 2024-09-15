@@ -58,3 +58,31 @@ export const creditPolice = async (userId, operation) => {
     throw error;
   }
 };
+
+export const subtractCreditsAndUpdateUser = async (userId, credits) => {
+  try {
+    const { data: userData, error: userError } = await supabase
+      .from('profiles')
+      .select('hasPlus')
+      .eq('id', userId)
+      .single();
+
+    if (userError) throw userError;
+
+    if (userData.hasPlus) {
+      return { success: true, message: "No credits deducted for Plus users." };
+    }
+
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ credits: supabase.sql`credits - ${credits}` })
+      .eq('id', userId);
+
+    if (updateError) throw updateError;
+
+    return { success: true, message: `${credits} credits deducted successfully.` };
+  } catch (error) {
+    console.error('Error subtracting credits:', error);
+    return { success: false, error: "Error: Unable to subtract credits. Please try again later." };
+  }
+};
