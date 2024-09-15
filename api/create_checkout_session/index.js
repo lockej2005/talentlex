@@ -46,8 +46,8 @@ module.exports = async (req, res) => {
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/canceled`,
+      success_url: `https://dev.talentlex.app/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `https://dev.talentlex.app/canceled`,
       metadata: {
         userId: userId
       }
