@@ -22,7 +22,7 @@ export const checkCredits = async (userId) => {
       };
     }
 
-    return { hasEnoughCredits: true, hasPlus: false };
+    return { hasEnoughCredits: true, hasPlus: false, currentCredits: userData.credits };
   } catch (error) {
     console.error('Error checking credits:', error);
     return { 
@@ -34,7 +34,7 @@ export const checkCredits = async (userId) => {
 };
 
 export const creditPolice = async (userId, operation) => {
-  const { hasEnoughCredits, hasPlus, error } = await checkCredits(userId);
+  const { hasEnoughCredits, hasPlus, error, currentCredits } = await checkCredits(userId);
   
   if (!hasEnoughCredits && !hasPlus) {
     throw new Error(error);
@@ -44,9 +44,10 @@ export const creditPolice = async (userId, operation) => {
     const result = await operation();
 
     if (!hasPlus) {
+      const newCreditBalance = currentCredits - 10;
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ credits: supabase.sql`credits - 10` })
+        .update({ credits: newCreditBalance })
         .eq('id', userId);
 
       if (updateError) throw updateError;
@@ -63,7 +64,7 @@ export const subtractCreditsAndUpdateUser = async (userId, credits) => {
   try {
     const { data: userData, error: userError } = await supabase
       .from('profiles')
-      .select('hasPlus')
+      .select('credits, hasPlus')
       .eq('id', userId)
       .single();
 
@@ -73,9 +74,14 @@ export const subtractCreditsAndUpdateUser = async (userId, credits) => {
       return { success: true, message: "No credits deducted for Plus users." };
     }
 
+    const newCreditBalance = userData.credits - credits;
+    if (newCreditBalance < 0) {
+      return { success: false, error: "Error: Insufficient credits to complete this operation." };
+    }
+
     const { error: updateError } = await supabase
       .from('profiles')
-      .update({ credits: supabase.sql`credits - ${credits}` })
+      .update({ credits: newCreditBalance })
       .eq('id', userId);
 
     if (updateError) throw updateError;
