@@ -4,32 +4,32 @@ import './Plans.css';
 const Plans = ({ onClose, userId }) => {
   const [selectedPlan, setSelectedPlan] = useState('monthly');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handlePlanChange = (plan) => {
     setSelectedPlan(plan);
   };
 
   const handleCheckout = async () => {
-    let checkoutLink, priceId;
+    let priceId;
 
     switch(selectedPlan) {
       case 'monthly':
-        checkoutLink = 'https://buy.stripe.com/00g28AdFh97h9t6fZ1';
         priceId = 'prod_Qq4Jv5qeR0cTt8';
         break;
       case 'yearly':
-        checkoutLink = 'https://buy.stripe.com/cN25kMgRt97heNq3cg';
         priceId = 'prod_Qq4MR7WD7Qw7lt';
         break;
       case 'test':
-        checkoutLink = 'https://buy.stripe.com/eVafZqcBd1EPeNq6ot';
         priceId = 'price_1Pz9Si05kmxxE8ckGmBvClD9';
         break;
       default:
-        throw new Error('Invalid plan selected');
+        setError('Invalid plan selected');
+        return;
     }
 
     setIsLoading(true);
+    setError(null);
 
     try {
       const response = await fetch('/api/create_checkout_session', {
@@ -39,8 +39,7 @@ const Plans = ({ onClose, userId }) => {
         },
         body: JSON.stringify({
           priceId,
-          userId,
-          checkoutLink
+          userId
         }),
       });
 
@@ -50,10 +49,14 @@ const Plans = ({ onClose, userId }) => {
 
       const session = await response.json();
       
-      window.location.href = session.url;
+      if (session.url) {
+        window.location.href = session.url;
+      } else {
+        throw new Error('No checkout URL received from server');
+      }
     } catch (error) {
       console.error('Error creating checkout session:', error);
-      window.location.href = checkoutLink;
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -92,20 +95,21 @@ const Plans = ({ onClose, userId }) => {
               <span className="plan-savings-plan">Save 17%</span>
             </span>
           </label>
-            <label className={`plan-option-plan ${selectedPlan === 'test' ? 'selected-plan' : ''}`}>
-              <input
-                type="radio"
-                name="plan"
-                value="test"
-                checked={selectedPlan === 'test'}
-                onChange={() => handlePlanChange('test')}
-              />
-              <span className="plan-details-plan">
-                <span className="plan-name-plan">Test Plan</span>
-                <span className="plan-price-plan">Test Price</span>
-              </span>
-            </label>
+          <label className={`plan-option-plan ${selectedPlan === 'test' ? 'selected-plan' : ''}`}>
+            <input
+              type="radio"
+              name="plan"
+              value="test"
+              checked={selectedPlan === 'test'}
+              onChange={() => handlePlanChange('test')}
+            />
+            <span className="plan-details-plan">
+              <span className="plan-name-plan">Test Plan</span>
+              <span className="plan-price-plan">Test Price</span>
+            </span>
+          </label>
         </div>
+        {error && <div className="error-message">{error}</div>}
         <div className="plan-actions-plan">
           <button 
             className="checkout-btn-plan" 
