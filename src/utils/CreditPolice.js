@@ -4,35 +4,57 @@ export const checkCredits = async (userId) => {
   try {
     const { data: userData, error: userError } = await supabase
       .from('profiles')
-      .select('credits')
+      .select('credits, hasPlus')
       .eq('id', userId)
       .single();
 
     if (userError) throw userError;
 
+    if (userData.hasPlus) {
+      return { hasEnoughCredits: true, hasPlus: true };
+    }
+
     if (userData.credits < 10) {
       return { 
         hasEnoughCredits: false, 
+        hasPlus: false,
         error: "Error: Insufficient credits. You need at least 10 credits to perform this operation."
       };
     }
 
-    return { hasEnoughCredits: true };
+    return { hasEnoughCredits: true, hasPlus: false };
   } catch (error) {
     console.error('Error checking credits:', error);
     return { 
       hasEnoughCredits: false, 
+      hasPlus: false,
       error: "Error: Unable to check credit balance. Please try again later."
     };
   }
 };
 
 export const creditPolice = async (userId, operation) => {
-  const { hasEnoughCredits, error } = await checkCredits(userId);
+  const { hasEnoughCredits, hasPlus, error } = await checkCredits(userId);
   
-  if (!hasEnoughCredits) {
+  if (!hasEnoughCredits && !hasPlus) {
     throw new Error(error);
   }
   
-  return operation();
+  try {
+    const result = await operation();
+
+    if (!hasPlus) {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ credits: supabase.sql`credits - 10` })
+        .eq('id', userId);
+
+      if (updateError) throw updateError;
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error in operation or updating credits:', error);
+    throw error;
+  }
 };

@@ -15,10 +15,10 @@ const Plans = ({ onClose, userId }) => {
 
     switch(selectedPlan) {
       case 'monthly':
-        priceId = 'prod_Qq4Jv5qeR0cTt8';
+        priceId = 'price_1PyOAp05kmxxE8ckEjdw0mzG';
         break;
       case 'yearly':
-        priceId = 'prod_Qq4MR7WD7Qw7lt';
+        priceId = 'price_1PyOE605kmxxE8ckattkPDYV';
         break;
       case 'test':
         priceId = 'price_1Pz9Si05kmxxE8ckGmBvClD9';
