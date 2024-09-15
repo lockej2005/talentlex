@@ -69,7 +69,6 @@ export const submitApplication = async (applicationData) => {
       sub_category: userProfile.sub_categories,
       system_prompt,
       model,
-      // Include any other fields that might be required by the backend
     }),
   });
 
@@ -99,6 +98,99 @@ export const createApplicationDraft = async (draftData) => {
   }
 
   return await response.json();
+};
+
+export const calculateAndUpdateScores = async (userId, firmId) => {
+  try {
+    // Fetch firm details including prompts and models
+    const { data: firmData, error: firmError } = await supabase
+      .from('firms')
+      .select('workexp_model, workexp_prompt, opentext_model, opentext_prompt, education_model, education_prompt, id')
+      .eq('id', firmId)
+      .single();
+
+    if (firmError) throw firmError;
+
+    // Fetch open text applications
+    const { data: applicationsData, error: applicationsError } = await supabase
+      .from('applications_vector')
+      .select('question, application_text')
+      .eq('firm_id', firmId)
+      .eq('user_id', userId);
+
+    if (applicationsError) throw applicationsError;
+
+    // Fetch education details
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('education, sub_categories, undergraduate_grades')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) throw profileError;
+
+    // Fetch work experience
+    const { data: workExpData, error: workExpError } = await supabase
+      .from('firm_user_table')
+      .select('work_experience')
+      .eq('user_id', userId)
+      .eq('firm_id', firmId)
+      .single();
+
+    if (workExpError) throw workExpError;
+
+    // Prepare data for backend
+    const openTextContent = applicationsData.map(app => `Question: ${app.question}\nAnswer: ${app.application_text}`).join('\n\n');
+    const educationContent = `Education: ${profileData.education || 'N/A'}\nSub-categories: ${Array.isArray(profileData.sub_categories) ? profileData.sub_categories.join(', ') : (profileData.sub_categories || 'N/A')}\nUndergraduate Grades: ${profileData.undergraduate_grades || 'N/A'}`;
+    const workExpContent = workExpData.work_experience || '[]';
+
+    // Send data to backend for score calculation
+    const response = await fetch('/api/calculate_scores', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        workexp_content: workExpContent,
+        workexp_model: firmData.workexp_model || 'gpt-4o-mini',
+        workexp_prompt: firmData.workexp_prompt || '',
+        opentext_content: openTextContent,
+        opentext_model: firmData.opentext_model || 'gpt-4o-mini',
+        opentext_prompt: firmData.opentext_prompt || '',
+        education_content: educationContent,
+        education_model: firmData.education_model || 'gpt-4o-mini',
+        education_prompt: firmData.education_prompt || ''
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to calculate scores: ${errorText}`);
+    }
+
+    const scoreData = await response.json();
+
+    // Update firm_user_table with the new scores
+    const { error: updateError } = await supabase
+      .from('firm_user_table')
+      .upsert({
+        user_id: userId,
+        firm_id: firmId,
+        opentext_score: scoreData.opentext.score,
+        workexp_score: scoreData.workexp.score,
+        education_score: scoreData.education.score,
+        weighted_score: scoreData.weighted_score
+      }, {
+        onConflict: 'user_id,firm_id'
+      });
+
+    if (updateError) throw updateError;
+
+    return scoreData;
+  } catch (error) {
+    console.error('Error calculating and updating scores:', error);
+    throw error;
+  }
 };
 
 export const handleApplicationSubmit = async (user, applicationText, selectedFirm, selectedQuestion) => {
@@ -140,6 +232,9 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
     if (!success) {
       throw new Error(error);
     }
+
+    // Calculate and update scores
+    await calculateAndUpdateScores(user.id, selectedFirm.id);
 
     return {
       success: true,

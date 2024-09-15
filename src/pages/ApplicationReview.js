@@ -7,6 +7,7 @@ import './ApplicationReview.css';
 import {
   getCurrentUser,
   handleApplicationSubmit,
+  calculateAndUpdateScores
 } from '../utils/ApplicationReviewUtils';
 import { UserInputContext } from '../context/UserInputContext';
 import { supabase } from '../supabaseClient';
@@ -40,7 +41,6 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
     }
 
     try {
-      // First, fetch the firm name
       const { data: firmData, error: firmError } = await supabase
         .from('firms')
         .select('name')
@@ -56,7 +56,6 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
 
       setFirmName(firmData.name);
 
-      // Now, fetch the questions using the firm name
       const { data: questionsData, error: questionsError } = await supabase
         .from('questions')
         .select('*')
@@ -134,7 +133,6 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
 
       if (error) {
         if (error.code === 'PGRST116') {
-          // No matching row found, clear the form and existingRecordId
           setApplicationText('');
           setFeedback('');
           setExistingRecordId(null);
@@ -170,7 +168,6 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
       };
 
       if (existingRecordId) {
-        // Update existing record
         const { error } = await supabase
           .from('applications_vector')
           .update(upsertData)
@@ -178,7 +175,6 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
 
         if (error) throw error;
       } else {
-        // Insert new record
         const { data, error } = await supabase
           .from('applications_vector')
           .insert(upsertData)
@@ -248,11 +244,13 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         setTotalTokens(result.usage.total_tokens);
   
         console.log('Saving review...');
-        // Now that we have the feedback, save the review
         await saveReview(user.id, actualFirmId, selectedQuestion.value, applicationText, newFeedback);
         console.log('Review saved');
         
         updateApplicationData();
+
+        // Calculate and update scores
+        await calculateAndUpdateScores(user.id, actualFirmId);
       } else {
         throw new Error('Unexpected response format from server');
       }

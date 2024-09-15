@@ -19,7 +19,6 @@ const FirmDashboard = () => {
   const [newExperience, setNewExperience] = useState({ title: '', duration: '' });
   const [user, setUser] = useState(null);
   const [scores, setScores] = useState(null);
-  const [isCalculatingScores, setIsCalculatingScores] = useState(false);
   const { id } = useParams();
   const workExperienceRef = useRef(null);
   const scoreDisplayRef = useRef(null);
@@ -130,104 +129,6 @@ const FirmDashboard = () => {
     }
   };
 
-  const calculateScores = async () => {
-    if (!user || !id) return;
-    setIsCalculatingScores(true);
-
-    try {
-      // Fetch firm details including prompts and models
-      const { data: firmData, error: firmError } = await supabase
-        .from('firms')
-        .select('workexp_model, workexp_prompt, opentext_model, opentext_prompt, education_model, education_prompt, id')
-        .eq('id', id)
-        .single();
-
-      if (firmError) throw firmError;
-
-      // Fetch open text applications
-      const { data: applicationsData, error: applicationsError } = await supabase
-        .from('applications_vector')
-        .select('question, application_text')
-        .eq('firm_id', firmData.id)
-        .eq('user_id', user.id);
-
-      if (applicationsError) throw applicationsError;
-
-      // Fetch education details
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('education, sub_categories, undergraduate_grades')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      // Fetch work experience
-      const { data: workExpData, error: workExpError } = await supabase
-        .from('firm_user_table')
-        .select('work_experience')
-        .eq('user_id', user.id)
-        .eq('firm_id', id)
-        .single();
-
-      if (workExpError) throw workExpError;
-
-      // Prepare data for backend
-      const openTextContent = applicationsData.map(app => `Question: ${app.question}\nAnswer: ${app.application_text}`).join('\n\n');
-      const educationContent = `Education: ${profileData.education || 'N/A'}\nSub-categories: ${Array.isArray(profileData.sub_categories) ? profileData.sub_categories.join(', ') : (profileData.sub_categories || 'N/A')}\nUndergraduate Grades: ${profileData.undergraduate_grades || 'N/A'}`;
-      const workExpContent = workExpData.work_experience || '[]';
-
-      // Send data to backend for score calculation
-      const response = await fetch('/api/calculate_scores', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          workexp_content: workExpContent,
-          workexp_model: firmData.workexp_model || 'gpt-4o-mini',
-          workexp_prompt: firmData.workexp_prompt || '',
-          opentext_content: openTextContent,
-          opentext_model: firmData.opentext_model || 'gpt-4o-mini',
-          opentext_prompt: firmData.opentext_prompt || '',
-          education_content: educationContent,
-          education_model: firmData.education_model || 'gpt-4o-mini',
-          education_prompt: firmData.education_prompt || ''
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to calculate scores: ${errorText}`);
-      }
-
-      const scoreData = await response.json();
-      setScores(scoreData);
-
-      // Update firm_user_table with the new scores
-      const { error: updateError } = await supabase
-        .from('firm_user_table')
-        .upsert({
-          user_id: user.id,
-          firm_id: id,
-          opentext_score: scoreData.opentext.score,
-          workexp_score: scoreData.workexp.score,
-          education_score: scoreData.education.score,
-          weighted_score: scoreData.weighted_score
-        }, {
-          onConflict: 'user_id,firm_id'
-        });
-
-      if (updateError) throw updateError;
-
-    } catch (error) {
-      console.error('Error calculating scores:', error);
-      setScores(null);
-    } finally {
-      setIsCalculatingScores(false);
-    }
-  };
-
   const handleSave = async () => {
     if (activeTab === 'generate-draft' && draftData) {
       await handleSaveDraft();
@@ -331,33 +232,23 @@ const FirmDashboard = () => {
                     <div className="score-content">
                       <div className="score-sections">
                         <div className="score-section">
-                          <p className="section-score">{scores.opentext.score}</p>
+                          <p className="section-score">{scores.opentext.score.toFixed(2)}</p>
                           <span className="section-title">Open Text Section</span>
-                          <p className="section-detail">{scores.opentext.justification || 'No justification available'}</p>
                         </div>
                         <div className="score-section">
-                          <p className="section-score">{scores.workexp.score}</p>
+                          <p className="section-score">{scores.workexp.score.toFixed(2)}</p>
                           <span className="section-title">Work Experience Section</span>
-                          <p className="section-detail">{scores.workexp.justification || 'No justification available'}</p>
                         </div>
                         <div className="score-section">
-                          <p className="section-score">{scores.education.score}</p>
+                          <p className="section-score">{scores.education.score.toFixed(2)}</p>
                           <span className="section-title">Education Section</span>
-                          <p className="section-detail">{scores.education.justification || 'No justification available'}</p>
                         </div>
                       </div>
                     </div>
                   </>
                 ) : (
-                  <p>No scores calculated yet. Click the button below to calculate scores.</p>
+                  <p>No scores available yet. Submit an application to calculate scores.</p>
                 )}
-                <button 
-                  className="calculate-scores-button" 
-                  onClick={calculateScores}
-                  disabled={isCalculatingScores}
-                >
-                  {isCalculatingScores ? 'Calculating...' : 'Calculate Scores'}
-                </button>
               </div>
             </div>
             <div className="right-column-firmdash">
