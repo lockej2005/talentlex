@@ -1,0 +1,110 @@
+.plans-overlay-plan {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .plans-content-plan {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 90%;
+  }
+  
+  .plans-content-plan h2 {
+    text-align: center;
+    color: #276D8B;
+    margin-bottom: 20px;
+    font-size: 36px;
+  }
+  
+  .plan-options-plan {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .plan-option-plan {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .plan-option-plan.selected-plan {
+    border-color: #276D8B;
+    background-color: #e6f3f7;
+  }
+  
+  .plan-option-plan input[type="radio"] {
+    display: none;
+  }
+  
+  .plan-details-plan {
+    display: flex;
+    flex-direction: column;
+    margin-left: 10px;
+  }
+  
+  .plan-name-plan {
+    font-weight: bold;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .plan-price-plan {
+    font-size: 16px;
+    color: #666;
+  }
+  
+  .plan-savings-plan {
+    font-size: 14px;
+    color: #4CAF50;
+    font-weight: bold;
+  }
+  
+  .plan-actions-plan {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .checkout-btn-plan, .close-btn-plan {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .checkout-btn-plan {
+    background-color: #276D8B;
+    color: white;
+  }
+  
+  .checkout-btn-plan:hover {
+    background-color: #1c4d62;
+  }
+  
+  .close-btn-plan {
+    background-color: #e0e0e0;
+    color: #333;
+  }
+  
+  .close-btn-plan:hover {
+    background-color: #ccc;
+  }

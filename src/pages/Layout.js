@@ -8,6 +8,9 @@ import { UserInputProvider } from '../context/UserInputContext';
 import Profile from './Profile';
 import FirmDashboard from './FirmDashboard';
 import FirmSelector from './FirmSelector';
+import Plans from './Plans';
+import Success from './Success';
+import ManageSubscription from './ManageSubscription';
 import { Menu } from 'lucide-react';
 import './Layout.css';
 import './Authentication2.css';
@@ -21,6 +24,8 @@ const Layout = () => {
   const [hasPlus, setHasPlus] = useState(false);
   const [selectedFirms, setSelectedFirms] = useState([]);
   const [user, setUser] = useState(null);
+  const [showPlans, setShowPlans] = useState(false);
+  const [showManageSubscription, setShowManageSubscription] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -121,8 +126,19 @@ const Layout = () => {
   };
 
   const handleGetMoreCredits = () => {
-    // Redirect to Stripe Checkout for monthly subscription
-    window.location.href = 'https://buy.stripe.com/eVafZqcBd1EPeNq6ot';
+    if (hasPlus) {
+      setShowManageSubscription(true);
+    } else {
+      setShowPlans(true);
+    }
+  };
+
+  const handleClosePlans = () => {
+    setShowPlans(false);
+  };
+
+  const handleCloseManageSubscription = () => {
+    setShowManageSubscription(false);
   };
 
   return (
@@ -174,9 +190,20 @@ const Layout = () => {
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/ai-usage-policy" element={<AIUsagePolicy />} />
               <Route path="/negotiation-simulator" element={<NegotiationSimulator />} />
+              <Route path="/success" element={<Success />} />
             </Routes>
           </div>
         </div>
+        {showPlans && (
+          <div className="overlay-2">
+            <Plans onClose={handleClosePlans} userId={user?.id} />
+          </div>
+        )}
+        {showManageSubscription && (
+          <div className="overlay">
+            <ManageSubscription onClose={handleCloseManageSubscription} userId={user?.id} />
+          </div>
+        )}
         {showOverlay && (
           <div className="menu-overlay" onClick={closeMenu}></div>
         )}

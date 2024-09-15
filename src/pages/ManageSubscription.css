@@ -1,0 +1,81 @@
+.manage-subscription-container-managesub {
+    background-color: white;
+    border-radius: 10px;
+    padding: 40px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+    margin: 20px auto;
+    font-family: "Inter", sans-serif;
+  }
+  
+  .manage-subscription-container-managesub h2 {
+    color: #276D8B;
+    font-family: "Faustina", serif;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .payment-history-managesub h3 {
+    color: #276D8B;
+    margin-bottom: 15px;
+  }
+  
+  .payment-history-managesub ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .payment-history-managesub li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .payment-history-managesub li:last-child {
+    border-bottom: none;
+  }
+  
+  .subscription-actions-managesub {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .cancel-subscription-btn-managesub, .close-btn-managesub {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .cancel-subscription-btn-managesub {
+    background-color: #d32f2f;
+    color: white;
+  }
+  
+  .cancel-subscription-btn-managesub:hover {
+    background-color: #b71c1c;
+  }
+  
+  .close-btn-managesub {
+    background-color: #276D8B;
+    color: white;
+  }
+  
+  .close-btn-managesub:hover {
+    background-color: #1c4d62;
+  }
+  
+  .loading-managesub, .error-managesub {
+    text-align: center;
+    padding: 20px;
+    font-size: 18px;
+  }
+  
+  .error-managesub {
+    color: #d32f2f;
+  }
