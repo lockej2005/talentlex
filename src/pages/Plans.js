@@ -20,9 +20,6 @@ const Plans = ({ onClose, userId }) => {
       case 'yearly':
         priceId = 'price_1PyOE605kmxxE8ckattkPDYV';
         break;
-      case 'test':
-        priceId = 'price_1Pz9Si05kmxxE8ckGmBvClD9';
-        break;
       default:
         setError('Invalid plan selected');
         return;
@@ -93,19 +90,6 @@ const Plans = ({ onClose, userId }) => {
               <span className="plan-name-plan">Yearly Plan</span>
               <span className="plan-price-plan">£100/year</span>
               <span className="plan-savings-plan">Save 17%</span>
-            </span>
-          </label>
-          <label className={`plan-option-plan ${selectedPlan === 'test' ? 'selected-plan' : ''}`}>
-            <input
-              type="radio"
-              name="plan"
-              value="test"
-              checked={selectedPlan === 'test'}
-              onChange={() => handlePlanChange('test')}
-            />
-            <span className="plan-details-plan">
-              <span className="plan-name-plan">Test Plan</span>
-              <span className="plan-price-plan">Test Price</span>
             </span>
           </label>
         </div>
