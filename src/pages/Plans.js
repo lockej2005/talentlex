@@ -92,7 +92,6 @@ const Plans = ({ onClose, userId }) => {
               <span className="plan-savings-plan">Save 17%</span>
             </span>
           </label>
-          {process.env.NODE_ENV === 'development' && (
             <label className={`plan-option-plan ${selectedPlan === 'test' ? 'selected-plan' : ''}`}>
               <input
                 type="radio"
@@ -106,7 +105,6 @@ const Plans = ({ onClose, userId }) => {
                 <span className="plan-price-plan">Test Price</span>
               </span>
             </label>
-          )}
         </div>
         <div className="plan-actions-plan">
           <button 
