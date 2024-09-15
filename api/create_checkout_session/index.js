@@ -1,4 +1,4 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')("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");
 const { createClient } = require('@supabase/supabase-js');
 
 // Ensure these environment variables are set in your Vercel project settings
