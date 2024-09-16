@@ -113,7 +113,7 @@ const FirmDashboard = () => {
   const fetchScoresAndJustifications = async (userId, firmId) => {
     const { data, error } = await supabase
       .from('firm_user_table')
-      .select('weighted_score, opentext_score, workexp_score, education_score, opentext_justification, workexp_justification, education_justification')
+      .select('weighted_score, opentext, workexp, education')
       .eq('user_id', userId)
       .eq('firm_id', firmId)
       .single();
@@ -128,15 +128,15 @@ const FirmDashboard = () => {
   const updateScoresAndJustifications = (data) => {
     setScores({
       weighted_score: parseFloat(data.weighted_score) || 0,
-      opentext: { score: parseFloat(data.opentext_score) || 0 },
-      workexp: { score: parseFloat(data.workexp_score) || 0 },
-      education: { score: parseFloat(data.education_score) || 0 }
+      opentext: { score: parseFloat(data.opentext?.score) || 0 },
+      workexp: { score: parseFloat(data.workexp?.score) || 0 },
+      education: { score: parseFloat(data.education?.score) || 0 }
     });
 
     setJustifications({
-      opentext: data.opentext_justification || '',
-      workexp: data.workexp_justification || '',
-      education: data.education_justification || ''
+      opentext: data.opentext?.justification || '',
+      workexp: data.workexp?.justification || '',
+      education: data.education?.justification || ''
     });
   };
 
@@ -202,7 +202,6 @@ const FirmDashboard = () => {
     if (!applicationData || !user) return;
   
     try {
-      // First, save the application data
       const { data, error } = await supabase
         .from('applications_vector')
         .upsert({
@@ -216,40 +215,12 @@ const FirmDashboard = () => {
   
       if (error) throw error;
   
-      // Next, get justifications from ChatGPT
-      const justifications = await getJustificationsFromChatGPT(applicationData);
-  
-      // Finally, update Supabase with the justifications
-      const { error: updateError } = await supabase
-        .from('firm_user_table')
-        .upsert({
-          user_id: user.id,
-          firm_id: id,
-          opentext_justification: justifications.opentext,
-          workexp_justification: justifications.workexp,
-          education_justification: justifications.education
-        }, {
-          onConflict: 'user_id,firm_id'
-        });
-  
-      if (updateError) throw updateError;
-  
       alert('Application saved successfully!');
       setShowSaveButton(false);
     } catch (error) {
       console.error('Error saving application:', error);
       alert('Failed to save application. Please try again.');
     }
-  };
-
-  const getJustificationsFromChatGPT = async (applicationData) => {
-    // This is a placeholder function. You need to implement the actual API call to ChatGPT here.
-    // For now, we'll return dummy data.
-    return {
-      opentext: "Strong communication skills demonstrated in open-ended responses.",
-      workexp: "Relevant work experience in the field, showing progression and leadership.",
-      education: "Educational background aligns well with the position requirements."
-    };
   };
 
   const handleDraftChange = useCallback((newDraftData) => {
@@ -390,15 +361,15 @@ const FirmDashboard = () => {
           {showSaveButton && (
             <button className="save-button-firmdash" onClick={handleSave}>
               Save {activeTab === 'generate-draft' ? 'Draft' : 'Application'}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    <div className="dashboard-container-firmdash">
-                      {renderContent()}
-                    </div>
-                  </div>
-                );
-              };
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="dashboard-container-firmdash">
+        {renderContent()}
+      </div>
+    </div>
+  );
+};
 
-          export default FirmDashboard;
+export default FirmDashboard;
