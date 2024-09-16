@@ -170,7 +170,7 @@ export const calculateAndUpdateScores = async (userId, firmId) => {
 
     const scoreData = await response.json();
 
-    // Update firm_user_table with the new scores
+    // Update firm_user_table with the new scores and justifications
     const { error: updateError } = await supabase
       .from('firm_user_table')
       .upsert({
@@ -179,7 +179,10 @@ export const calculateAndUpdateScores = async (userId, firmId) => {
         opentext_score: scoreData.opentext.score,
         workexp_score: scoreData.workexp.score,
         education_score: scoreData.education.score,
-        weighted_score: scoreData.weighted_score
+        weighted_score: scoreData.weighted_score,
+        opentext_justification: scoreData.opentext.justification,
+        workexp_justification: scoreData.workexp.justification,
+        education_justification: scoreData.education.justification
       }, {
         onConflict: 'user_id,firm_id'
       });
@@ -234,7 +237,7 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
     }
 
     // Calculate and update scores
-    await calculateAndUpdateScores(user.id, selectedFirm.id);
+    const scoreData = await calculateAndUpdateScores(user.id, selectedFirm.id);
 
     return {
       success: true,
@@ -242,7 +245,8 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
       cost,
       newBalance,
       usage: data.usage,
-      responseTime
+      responseTime,
+      scoreData
     };
   });
 };
