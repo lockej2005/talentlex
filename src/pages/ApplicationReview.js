@@ -1,337 +1,338 @@
-import React, { useState, useRef, useEffect, useContext, useCallback } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowsLeftRight } from '@fortawesome/free-solid-svg-icons';
-import ReactMarkdown from 'react-markdown';
-import ApplicationInput from './ApplicationInput';
-import './ApplicationReview.css';
-import {
-  getCurrentUser,
-  handleApplicationSubmit,
-  calculateAndUpdateScores
-} from '../utils/ApplicationReviewUtils';
-import { UserInputContext } from '../context/UserInputContext';
 import { supabase } from '../supabaseClient';
+import { subtractCreditsAndUpdateUser } from './CreditManager';
+import { creditPolice } from './CreditPolice';
+import { getProfileContext } from './GetProfileContext';
+import { getReviewSpecs } from './ReviewGetSpecs';
 
-function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
-  const { 
-    applicationText, setApplicationText,
-    selectedQuestion, setSelectedQuestion,
-    feedback, setFeedback
-  } = useContext(UserInputContext);
+export const getCurrentUser = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+};
 
-  const [leftWidth, setLeftWidth] = useState(50);
-  const [isLoading, setIsLoading] = useState(false);
-  const [responseTime, setResponseTime] = useState(null);
-  const containerRef = useRef(null);
-  const dividerRef = useRef(null);
-  const [user, setUser] = useState(null);
-  const [totalTokens, setTotalTokens] = useState(0);
-  const [wordCount, setWordCount] = useState(0);
-  const [questions, setQuestions] = useState([]);
-  const [actualFirmId, setActualFirmId] = useState(null);
-  const [existingRecordId, setExistingRecordId] = useState(null);
-  const [error, setError] = useState(null);
-  const [firmName, setFirmName] = useState(null);
+export const getUserData = async (userId) => {
+  const { data, error } = await supabase
+    .from('user_drafts')
+    .select('application_text, feedback')
+    .eq('user_id', userId)
+    .single();
 
-  const fetchFirmNameAndQuestions = useCallback(async (firmId) => {
-    if (!firmId) {
-      console.error('Firm ID is undefined');
-      setError('Invalid firm ID. Please select a valid firm.');
-      return;
+  if (error) throw error;
+  return data;
+};
+
+export const saveUserData = async (userId, applicationText, feedback) => {
+  const { error } = await supabase
+    .from('user_drafts')
+    .upsert({ 
+      user_id: userId, 
+      application_text: applicationText, 
+      feedback: feedback 
+    });
+
+  if (error) throw error;
+};
+
+export const insertApplication = async (applicationData) => {
+  const { data, error } = await supabase
+    .from('applications')
+    .insert(applicationData);
+
+  if (error) throw error;
+  return data;
+};
+
+export const insertDraftGeneration = async (draftData) => {
+  const { data, error } = await supabase
+    .from('draft_generations')
+    .insert(draftData);
+
+  if (error) throw error;
+  return data;
+};
+
+export const submitApplication = async (applicationData) => {
+  const userProfile = await getProfileContext(applicationData.userId);
+  
+  const { system_prompt, model } = await getReviewSpecs(applicationData.firmName, applicationData.question);
+
+  const response = await fetch('/api/submit_application', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      applicationText: applicationData.applicationText,
+      firm: applicationData.firmName,
+      question: applicationData.question,
+      work_experience: userProfile.work_experience,
+      education: userProfile.education,
+      sub_category: userProfile.sub_categories,
+      system_prompt,
+      model,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Network response was not ok');
+  }
+
+  return await response.json();
+};
+
+export const createApplicationDraft = async (draftData) => {
+  const userProfile = await getProfileContext(draftData.userId);
+
+  const { system_prompt, model } = await getReviewSpecs(draftData.firmName, draftData.question);
+
+  const response = await fetch('/api/create_application', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({...draftData, userProfile, system_prompt, model}),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to generate draft');
+  }
+
+  return await response.json();
+};
+
+export const calculateAndUpdateScores = async (userId, firmId) => {
+  try {
+    // Fetch firm details including prompts and models
+    const { data: firmData, error: firmError } = await supabase
+      .from('firms')
+      .select('workexp_model, workexp_prompt, opentext_model, opentext_prompt, education_model, education_prompt, id')
+      .eq('id', firmId)
+      .single();
+
+    if (firmError) throw firmError;
+
+    // Fetch open text applications
+    const { data: applicationsData, error: applicationsError } = await supabase
+      .from('applications_vector')
+      .select('question, application_text')
+      .eq('firm_id', firmId)
+      .eq('user_id', userId);
+
+    if (applicationsError) throw applicationsError;
+
+    // Fetch education details
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('education, sub_categories, undergraduate_grades')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) throw profileError;
+
+    // Fetch work experience
+    const { data: workExpData, error: workExpError } = await supabase
+      .from('firm_user_table')
+      .select('work_experience')
+      .eq('user_id', userId)
+      .eq('firm_id', firmId)
+      .single();
+
+    if (workExpError) throw workExpError;
+
+    // Prepare data for backend
+    const openTextContent = applicationsData.map(app => `Question: ${app.question}\nAnswer: ${app.application_text}`).join('\n\n');
+    const educationContent = `Education: ${profileData.education || 'N/A'}\nSub-categories: ${Array.isArray(profileData.sub_categories) ? profileData.sub_categories.join(', ') : (profileData.sub_categories || 'N/A')}\nUndergraduate Grades: ${profileData.undergraduate_grades || 'N/A'}`;
+    const workExpContent = workExpData.work_experience || '[]';
+
+    // Send data to backend for score calculation
+    const response = await fetch('/api/calculate_scores', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        workexp_content: workExpContent,
+        workexp_model: firmData.workexp_model || 'gpt-4o-mini',
+        workexp_prompt: firmData.workexp_prompt || '',
+        opentext_content: openTextContent,
+        opentext_model: firmData.opentext_model || 'gpt-4o-mini',
+        opentext_prompt: firmData.opentext_prompt || '',
+        education_content: educationContent,
+        education_model: firmData.education_model || 'gpt-4o-mini',
+        education_prompt: firmData.education_prompt || ''
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to calculate scores: ${errorText}`);
     }
 
-    try {
-      const { data: firmData, error: firmError } = await supabase
-        .from('firms')
-        .select('name')
-        .eq('id', firmId)
-        .single();
+    const scoreData = await response.json();
 
-      if (firmError) throw firmError;
-      if (!firmData) {
-        console.error('No firm found with ID:', firmId);
-        setError(`No firm found with ID: ${firmId}`);
-        return;
-      }
-
-      setFirmName(firmData.name);
-
-      const { data: questionsData, error: questionsError } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('firm', firmData.name)
-        .order('priority', { ascending: true });
-
-      if (questionsError) throw questionsError;
-
-      const formattedQuestions = questionsData.map((q) => ({
-        value: q.question,
-        label: q.question,
-        priority: q.priority
-      }));
-
-      setQuestions(formattedQuestions);
-      if (formattedQuestions.length > 0) {
-        setSelectedQuestion(formattedQuestions[0]);
-      }
-    } catch (error) {
-      console.error('Error fetching firm name and questions:', error);
-      setError('Failed to fetch firm information and questions. Please try again later.');
-    }
-  }, [setSelectedQuestion]);
-
-  const fetchActualFirmId = useCallback(async (firmId) => {
-    setActualFirmId(firmId);
-  }, []);
-
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-      } catch (error) {
-        console.error('Error fetching current user:', error);
-        setError('Failed to fetch user information. Please try logging in again.');
-      }
-    };
-
-    fetchCurrentUser();
-  }, []);
-
-  useEffect(() => {
-    if (selectedFirm && selectedFirm.id) {
-      console.log("Selected Firm:", selectedFirm);
-      fetchFirmNameAndQuestions(selectedFirm.id);
-      fetchActualFirmId(selectedFirm.id);
-    }
-  }, [selectedFirm, fetchFirmNameAndQuestions, fetchActualFirmId]);
-
-  useEffect(() => {
-    if (user && actualFirmId && selectedQuestion) {
-      loadSavedReview(user.id, actualFirmId, selectedQuestion.value);
-    }
-  }, [user, actualFirmId, selectedQuestion]);
-
-  useEffect(() => {
-    const calculateWordCount = (text) => {
-      return text.trim().split(/\s+/).filter(word => word !== '').length;
-    };
-    setWordCount(calculateWordCount(applicationText));
-  }, [applicationText]);
-
-  const loadSavedReview = async (userId, firmId, questionValue) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const { data, error } = await supabase
-        .from('applications_vector')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('firm_id', firmId)
-        .eq('question', questionValue)
-        .single();
-
-      if (error) {
-        if (error.code === 'PGRST116') {
-          setApplicationText('');
-          setFeedback('');
-          setExistingRecordId(null);
-        } else {
-          throw error;
-        }
-      } else if (data) {
-        setApplicationText(data.application_text || '');
-        setFeedback(data.feedback || '');
-        setExistingRecordId(data.id);
-      }
-    } catch (error) {
-      console.error('Error loading saved review:', error.message);
-      setError('Failed to load saved review. Please try again later.');
-      setApplicationText('');
-      setFeedback('');
-      setExistingRecordId(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const saveReview = async (userId, firmId, questionValue, applicationText, newFeedback) => {
-    setError(null);
-    try {
-      let upsertData = {
+    // Update firm_user_table with the new scores and justifications
+    const { error: updateError } = await supabase
+      .from('firm_user_table')
+      .upsert({
         user_id: userId,
         firm_id: firmId,
-        question: questionValue,
-        application_text: applicationText,
-        feedback: newFeedback,
-        timestamp: new Date().toISOString()
-      };
-
-      if (existingRecordId) {
-        const { error } = await supabase
-          .from('applications_vector')
-          .update(upsertData)
-          .eq('id', existingRecordId);
-
-        if (error) throw error;
-      } else {
-        const { data, error } = await supabase
-          .from('applications_vector')
-          .insert(upsertData)
-          .select();
-
-        if (error) throw error;
-        if (data && data[0]) {
-          setExistingRecordId(data[0].id);
-        }
-      }
-
-      console.log('Review saved successfully');
-    } catch (error) {
-      console.error('Error saving review:', error.message);
-      setError('Failed to save review. Please try again later.');
-    }
-  };
-
-  const handleMouseDown = (e) => {
-    e.preventDefault();
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  const handleMouseMove = (e) => {
-    if (containerRef.current) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
-      setLeftWidth(Math.min(Math.max(newLeftWidth, 20), 80));
-    }
-  };
-
-  const handleMouseUp = () => {
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  };
-
-  useEffect(() => {
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, []);
-
-  const handleSubmit = async () => {
-    if (!user) {
-      alert('Please log in to submit your application.');
-      return;
-    }
-  
-    setIsLoading(true);
-    setError(null);
-    try {
-      console.log('Submitting application...');
-      const result = await handleApplicationSubmit(
-        user,
-        applicationText,
-        { id: actualFirmId, name: firmName },
-        selectedQuestion
-      );
-      console.log('Application submitted, result:', result);
-  
-      if (result && result.success) {
-        const newFeedback = `${result.feedback}\n\nCredits used: ${result.usage.total_tokens}. Remaining credits: ${result.newBalance}`;
-        setFeedback(newFeedback);
-        setResponseTime(result.responseTime);
-        setTotalTokens(result.usage.total_tokens);
-  
-        console.log('Saving review...');
-        await saveReview(user.id, actualFirmId, selectedQuestion.value, applicationText, newFeedback);
-        console.log('Review saved');
-        
-        updateApplicationData();
-
-        // Calculate and update scores
-        await calculateAndUpdateScores(user.id, actualFirmId);
-      } else {
-        throw new Error('Unexpected response format from server');
-      }
-    } catch (error) {
-      console.error("Error in handleSubmit:", error);
-      setError(`An error occurred: ${error.message}`);
-      setFeedback("");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateApplicationData = useCallback(() => {
-    if (onApplicationChange && user && actualFirmId && selectedQuestion) {
-      onApplicationChange({
-        user_id: user.id,
-        firm_id: actualFirmId,
-        question: selectedQuestion.value,
-        application_text: applicationText,
-        feedback: feedback,
-        timestamp: new Date().toISOString()
+        opentext_score: scoreData.opentext.score,
+        workexp_score: scoreData.workexp.score,
+        education_score: scoreData.education.score,
+        weighted_score: scoreData.weighted_score,
+        opentext_justification: scoreData.opentext.justification,
+        workexp_justification: scoreData.workexp.justification,
+        education_justification: scoreData.education.justification
+      }, {
+        onConflict: 'user_id,firm_id'
       });
+
+    if (updateError) throw updateError;
+
+    return scoreData;
+  } catch (error) {
+    console.error('Error calculating and updating scores:', error);
+    throw error;
+  }
+};
+
+export const handleApplicationSubmit = async (user, applicationText, selectedFirm, selectedQuestion) => {
+  if (!user) {
+    throw new Error('Please log in to submit your application.');
+  }
+
+  return await creditPolice(user.id, async () => {
+    const startTime = Date.now();
+
+    const userAgent = navigator.userAgent;
+    const screenSize = `${window.screen.width}x${window.screen.height}`;
+
+    const data = await submitApplication({
+      userId: user.id,
+      applicationText,
+      firmId: selectedFirm.id,
+      firmName: selectedFirm.name,
+      question: selectedQuestion.value,
+      email: user.email
+    });
+
+    await insertApplication({
+      firm: selectedFirm.name,
+      question: selectedQuestion.value,
+      application_text: applicationText,
+      feedback: data.feedback,
+      email: user.email,
+      device: userAgent,
+      screen_size: screenSize,
+      timestamp: new Date().toISOString()
+    });
+
+    const endTime = Date.now();
+    const responseTime = (endTime - startTime) / 1000;
+
+    const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, data.usage.total_tokens);
+
+    if (!success) {
+      throw new Error(error);
     }
-  }, [onApplicationChange, user, actualFirmId, selectedQuestion, applicationText, feedback]);
 
-  const handleQuestionChange = useCallback((newQuestion) => {
-    setSelectedQuestion(newQuestion);
-    if (user && actualFirmId) {
-      loadSavedReview(user.id, actualFirmId, newQuestion.value);
+    // Calculate and update scores
+    const scoreData = await calculateAndUpdateScores(user.id, selectedFirm.id);
+
+    return {
+      success: true,
+      feedback: data.feedback,
+      cost,
+      newBalance,
+      usage: data.usage,
+      responseTime,
+      scoreData
+    };
+  });
+};
+
+export const saveDraft = async (userId, title, draft, firm, question) => {
+  const { data, error } = await supabase
+    .from('saved_drafts')
+    .insert({
+      user_id: userId,
+      title: title,
+      draft: draft,
+      firm: firm,
+      question: question
+    });
+
+  if (error) throw error;
+  return data;
+};
+
+export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, additionalInfo, setApplicationText, setTotalTokens, setFeedback) => {
+  if (!user) {
+    throw new Error('Please log in to generate a draft.');
+  }
+
+  return await creditPolice(user.id, async () => {
+    let requiredFields;
+    if (selectedFirm.name === "Jones Day") {
+      requiredFields = ['whyLaw', 'whyJonesDay', 'whyYou', 'relevantExperiences'];
+    } else {
+      requiredFields = ['keyReasons', 'relevantExperience', 'relevantInteraction', 'personalInfo'];
     }
-  }, [user, actualFirmId]);
 
-  return (
-    <div className="comparison-container">
-      <div className="content" ref={containerRef}>
-        <div className="left-column" style={{width: `${leftWidth}%`}}>
-          <ApplicationInput
-            applicationText={applicationText}
-            setApplicationText={setApplicationText}
-            selectedQuestion={selectedQuestion}
-            setSelectedQuestion={setSelectedQuestion}
-            questions={questions}
-            wordCount={wordCount}
-            inputType="simple"
-            onQuestionChange={handleQuestionChange}
-          />
-        </div>
-        <div className="divider" ref={dividerRef} onMouseDown={handleMouseDown}>
-          <div className="divider-line top"></div>
-          <div className="divider-handle">
-            <FontAwesomeIcon icon={faArrowsLeftRight} />
-          </div>
-          <div className="divider-line bottom"></div>
-        </div>
-        <div className="right-column" style={{width: `${100 - leftWidth}%`}}>
-          <div className="button-container">
-            <button className="submit-button2" onClick={handleSubmit} disabled={isLoading || !user}>
-              {isLoading ? 'Sending...' : 'Send for Review'}
-            </button>
-          </div>
-          <div className="title-card">
-            <h3>Your Review for {firmName}</h3>
-            <p className="subtext">
-              {isLoading ? '⏳🙄👀' : 
-               feedback ? `Your review took ${responseTime ? responseTime.toFixed(2) : '...'} seconds to generate` : 
-               'Review will pop up on this side.'}
-            </p>
-          </div>
-          <div className="text-content">
-            {error ? (
-              <p className="error-message">{error}</p>
-            ) : feedback ? (
-              <ReactMarkdown>{feedback}</ReactMarkdown>
-            ) : (
-              <p>{isLoading ? 'Generating your review...' : 'Submit your application to receive feedback.'}</p>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+    const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field]?.trim() !== '');
 
-export default ApplicationReview;
+    if (!areAllFieldsFilled) {
+      throw new Error('Please fill out all the required information fields before generating a draft.');
+    }
+
+    let localTotalTokens = 0;
+
+    const data = await createApplicationDraft({
+      userId: user.id,
+      firmId: selectedFirm.id,
+      firmName: selectedFirm.name,
+      question: selectedQuestion.value,
+      ...additionalInfo
+    });
+
+    localTotalTokens += data.usage.total_tokens;
+    setTotalTokens(localTotalTokens);
+
+    setApplicationText(data.draft);
+
+    const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, localTotalTokens);
+    
+    if (!success) {
+      throw new Error(error);
+    }
+
+    let draftGenerationData;
+    if (selectedFirm.name === "Jones Day") {
+      draftGenerationData = {
+        email: user.email,
+        firm: selectedFirm.name,
+        question: selectedQuestion.value,
+        key_reasons: additionalInfo.whyLaw,
+        relevant_experience: additionalInfo.relevantExperiences,
+        relevant_interaction: additionalInfo.whyJonesDay,
+        personal_info: additionalInfo.whyYou,
+        generated_draft: data.draft
+      };
+    } else {
+      draftGenerationData = {
+        email: user.email,
+        firm: selectedFirm.name,
+        question: selectedQuestion.value,
+        key_reasons: additionalInfo.keyReasons,
+        relevant_experience: additionalInfo.relevantExperience,
+        relevant_interaction: additionalInfo.relevantInteraction,
+        personal_info: additionalInfo.personalInfo,
+        generated_draft: data.draft
+      };
+    }
+
+    await insertDraftGeneration(draftGenerationData);
+
+    return { cost, newBalance };
+  });
+};
