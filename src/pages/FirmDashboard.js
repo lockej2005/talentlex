@@ -202,6 +202,7 @@ const FirmDashboard = () => {
     if (!applicationData || !user) return;
   
     try {
+      // First, save the application data
       const { data, error } = await supabase
         .from('applications_vector')
         .upsert({
@@ -215,12 +216,40 @@ const FirmDashboard = () => {
   
       if (error) throw error;
   
+      // Next, get justifications from ChatGPT
+      const justifications = await getJustificationsFromChatGPT(applicationData);
+  
+      // Finally, update Supabase with the justifications
+      const { error: updateError } = await supabase
+        .from('firm_user_table')
+        .upsert({
+          user_id: user.id,
+          firm_id: id,
+          opentext_justification: justifications.opentext,
+          workexp_justification: justifications.workexp,
+          education_justification: justifications.education
+        }, {
+          onConflict: 'user_id,firm_id'
+        });
+  
+      if (updateError) throw updateError;
+  
       alert('Application saved successfully!');
       setShowSaveButton(false);
     } catch (error) {
       console.error('Error saving application:', error);
       alert('Failed to save application. Please try again.');
     }
+  };
+
+  const getJustificationsFromChatGPT = async (applicationData) => {
+    // This is a placeholder function. You need to implement the actual API call to ChatGPT here.
+    // For now, we'll return dummy data.
+    return {
+      opentext: "Strong communication skills demonstrated in open-ended responses.",
+      workexp: "Relevant work experience in the field, showing progression and leadership.",
+      education: "Educational background aligns well with the position requirements."
+    };
   };
 
   const handleDraftChange = useCallback((newDraftData) => {
@@ -361,15 +390,15 @@ const FirmDashboard = () => {
           {showSaveButton && (
             <button className="save-button-firmdash" onClick={handleSave}>
               Save {activeTab === 'generate-draft' ? 'Draft' : 'Application'}
-            </button>
-          )}
-        </div>
-      </div>
-      <div className="dashboard-container-firmdash">
-        {renderContent()}
-      </div>
-    </div>
-  );
-};
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="dashboard-container-firmdash">
+                      {renderContent()}
+                    </div>
+                  </div>
+                );
+              };
 
-export default FirmDashboard;
+          export default FirmDashboard;
