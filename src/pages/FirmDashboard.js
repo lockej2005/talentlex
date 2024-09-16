@@ -19,7 +19,6 @@ const FirmDashboard = () => {
   const [newExperience, setNewExperience] = useState({ title: '', duration: '' });
   const [user, setUser] = useState(null);
   const [scores, setScores] = useState(null);
-  const [justifications, setJustifications] = useState(null);
   const { id } = useParams();
   const workExperienceRef = useRef(null);
   const scoreDisplayRef = useRef(null);
@@ -39,7 +38,7 @@ const FirmDashboard = () => {
     if (user && id) {
       fetchFirmDetails();
       fetchWorkExperiences(user.id, id);
-      subscribeToScoresAndJustifications(user.id, id);
+      subscribeToScores(user.id, id);
     }
 
     return () => {
@@ -89,7 +88,7 @@ const FirmDashboard = () => {
     }
   };
 
-  const subscribeToScoresAndJustifications = (userId, firmId) => {
+  const subscribeToScores = (userId, firmId) => {
     const channel = supabase
       .channel('firm_user_table_changes')
       .on('postgres_changes', 
@@ -101,42 +100,45 @@ const FirmDashboard = () => {
         }, 
         (payload) => {
           const { new: newData } = payload;
-          updateScoresAndJustifications(newData);
+          updateScores(newData);
         }
       )
       .subscribe();
 
     // Fetch initial data
-    fetchScoresAndJustifications(userId, firmId);
+    fetchScores(userId, firmId);
   };
 
-  const fetchScoresAndJustifications = async (userId, firmId) => {
+  const fetchScores = async (userId, firmId) => {
     const { data, error } = await supabase
       .from('firm_user_table')
-      .select('weighted_score, opentext_score, workexp_score, education_score, opentext_justification, workexp_justification, education_justification')
+      .select('weighted_score, opentext_score, education_score, workexp_score, opentext_justification, education_justification, workexp_justification')
       .eq('user_id', userId)
       .eq('firm_id', firmId)
       .single();
 
     if (error) {
-      console.error('Error fetching scores and justifications:', error);
+      console.error('Error fetching scores:', error);
     } else if (data) {
-      updateScoresAndJustifications(data);
+      updateScores(data);
     }
   };
 
-  const updateScoresAndJustifications = (data) => {
+  const updateScores = (data) => {
     setScores({
       weighted_score: parseFloat(data.weighted_score) || 0,
-      opentext: { score: parseFloat(data.opentext_score) || 0 },
-      workexp: { score: parseFloat(data.workexp_score) || 0 },
-      education: { score: parseFloat(data.education_score) || 0 }
-    });
-
-    setJustifications({
-      opentext: data.opentext_justification || '',
-      workexp: data.workexp_justification || '',
-      education: data.education_justification || ''
+      opentext: { 
+        score: parseFloat(data.opentext_score) || 0,
+        justification: data.opentext_justification || ''
+      },
+      education: { 
+        score: parseFloat(data.education_score) || 0,
+        justification: data.education_justification || ''
+      },
+      workexp: { 
+        score: parseFloat(data.workexp_score) || 0,
+        justification: data.workexp_justification || ''
+      }
     });
   };
 
@@ -202,7 +204,6 @@ const FirmDashboard = () => {
     if (!applicationData || !user) return;
   
     try {
-      // First, save the application data
       const { data, error } = await supabase
         .from('applications_vector')
         .upsert({
@@ -216,40 +217,12 @@ const FirmDashboard = () => {
   
       if (error) throw error;
   
-      // Next, get justifications from ChatGPT
-      const justifications = await getJustificationsFromChatGPT(applicationData);
-  
-      // Finally, update Supabase with the justifications
-      const { error: updateError } = await supabase
-        .from('firm_user_table')
-        .upsert({
-          user_id: user.id,
-          firm_id: id,
-          opentext_justification: justifications.opentext,
-          workexp_justification: justifications.workexp,
-          education_justification: justifications.education
-        }, {
-          onConflict: 'user_id,firm_id'
-        });
-  
-      if (updateError) throw updateError;
-  
       alert('Application saved successfully!');
       setShowSaveButton(false);
     } catch (error) {
       console.error('Error saving application:', error);
       alert('Failed to save application. Please try again.');
     }
-  };
-
-  const getJustificationsFromChatGPT = async (applicationData) => {
-    // This is a placeholder function. You need to implement the actual API call to ChatGPT here.
-    // For now, we'll return dummy data.
-    return {
-      opentext: "Strong communication skills demonstrated in open-ended responses.",
-      workexp: "Relevant work experience in the field, showing progression and leadership.",
-      education: "Educational background aligns well with the position requirements."
-    };
   };
 
   const handleDraftChange = useCallback((newDraftData) => {
@@ -299,17 +272,17 @@ const FirmDashboard = () => {
                         <div className="score-section">
                           <p className="section-score">{scores.opentext.score.toFixed(2)}</p>
                           <span className="section-title">Open Text Section</span>
-                          <p className="section-justification">{justifications?.opentext}</p>
+                          <p className="section-justification">{scores.opentext.justification || 'No justification available'}</p>
                         </div>
                         <div className="score-section">
                           <p className="section-score">{scores.workexp.score.toFixed(2)}</p>
                           <span className="section-title">Work Experience Section</span>
-                          <p className="section-justification">{justifications?.workexp}</p>
+                          <p className="section-justification">{scores.workexp.justification || 'No justification available'}</p>
                         </div>
                         <div className="score-section">
                           <p className="section-score">{scores.education.score.toFixed(2)}</p>
                           <span className="section-title">Education Section</span>
-                          <p className="section-justification">{justifications?.education}</p>
+                          <p className="section-justification">{scores.education.justification || 'No justification available'}</p>
                         </div>
                       </div>
                     </div>
@@ -390,15 +363,15 @@ const FirmDashboard = () => {
           {showSaveButton && (
             <button className="save-button-firmdash" onClick={handleSave}>
               Save {activeTab === 'generate-draft' ? 'Draft' : 'Application'}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    <div className="dashboard-container-firmdash">
-                      {renderContent()}
-                    </div>
-                  </div>
-                );
-              };
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="dashboard-container-firmdash">
+        {renderContent()}
+      </div>
+    </div>
+  );
+};
 
-            export default FirmDashboard;
+export default FirmDashboard;
