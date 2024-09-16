@@ -19,6 +19,7 @@ const FirmDashboard = () => {
   const [newExperience, setNewExperience] = useState({ title: '', duration: '' });
   const [user, setUser] = useState(null);
   const [scores, setScores] = useState(null);
+  const [justifications, setJustifications] = useState(null);
   const { id } = useParams();
   const workExperienceRef = useRef(null);
   const scoreDisplayRef = useRef(null);
@@ -38,8 +39,12 @@ const FirmDashboard = () => {
     if (user && id) {
       fetchFirmDetails();
       fetchWorkExperiences(user.id, id);
-      fetchExistingScores(user.id, id);
+      subscribeToScoresAndJustifications(user.id, id);
     }
+
+    return () => {
+      supabase.removeAllChannels();
+    };
   }, [user, id]);
 
   useEffect(() => {
@@ -84,24 +89,55 @@ const FirmDashboard = () => {
     }
   };
 
-  const fetchExistingScores = async (userId, firmId) => {
+  const subscribeToScoresAndJustifications = (userId, firmId) => {
+    const channel = supabase
+      .channel('firm_user_table_changes')
+      .on('postgres_changes', 
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'firm_user_table', 
+          filter: `user_id=eq.${userId} AND firm_id=eq.${firmId}`
+        }, 
+        (payload) => {
+          const { new: newData } = payload;
+          updateScoresAndJustifications(newData);
+        }
+      )
+      .subscribe();
+
+    // Fetch initial data
+    fetchScoresAndJustifications(userId, firmId);
+  };
+
+  const fetchScoresAndJustifications = async (userId, firmId) => {
     const { data, error } = await supabase
       .from('firm_user_table')
-      .select('weighted_score, opentext_score, workexp_score, education_score')
+      .select('weighted_score, opentext_score, workexp_score, education_score, opentext_justification, workexp_justification, education_justification')
       .eq('user_id', userId)
       .eq('firm_id', firmId)
       .single();
 
     if (error) {
-      console.error('Error fetching existing scores:', error);
+      console.error('Error fetching scores and justifications:', error);
     } else if (data) {
-      setScores({
-        weighted_score: parseFloat(data.weighted_score) || 0,
-        opentext: { score: parseFloat(data.opentext_score) || 0 },
-        workexp: { score: parseFloat(data.workexp_score) || 0 },
-        education: { score: parseFloat(data.education_score) || 0 }
-      });
+      updateScoresAndJustifications(data);
     }
+  };
+
+  const updateScoresAndJustifications = (data) => {
+    setScores({
+      weighted_score: parseFloat(data.weighted_score) || 0,
+      opentext: { score: parseFloat(data.opentext_score) || 0 },
+      workexp: { score: parseFloat(data.workexp_score) || 0 },
+      education: { score: parseFloat(data.education_score) || 0 }
+    });
+
+    setJustifications({
+      opentext: data.opentext_justification || '',
+      workexp: data.workexp_justification || '',
+      education: data.education_justification || ''
+    });
   };
 
   const updateWorkExperiences = async (experiences) => {
@@ -234,14 +270,17 @@ const FirmDashboard = () => {
                         <div className="score-section">
                           <p className="section-score">{scores.opentext.score.toFixed(2)}</p>
                           <span className="section-title">Open Text Section</span>
+                          <p className="section-justification">{justifications?.opentext}</p>
                         </div>
                         <div className="score-section">
                           <p className="section-score">{scores.workexp.score.toFixed(2)}</p>
                           <span className="section-title">Work Experience Section</span>
+                          <p className="section-justification">{justifications?.workexp}</p>
                         </div>
                         <div className="score-section">
                           <p className="section-score">{scores.education.score.toFixed(2)}</p>
                           <span className="section-title">Education Section</span>
+                          <p className="section-justification">{justifications?.education}</p>
                         </div>
                       </div>
                     </div>
