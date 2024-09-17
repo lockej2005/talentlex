@@ -392,7 +392,7 @@ const FirmDashboard = () => {
                     onChange={(e) => setNewExperience({ ...newExperience, title: e.target.value })}
                     rows="2"
                   />
-                  <input
+                  <textarea
                     type="text"
                     placeholder="Description"
                     value={newExperience.duration}

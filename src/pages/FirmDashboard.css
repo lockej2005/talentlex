@@ -126,15 +126,22 @@
 .experience-item {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     border-bottom: 1px #276D8B solid;
+    padding: 10px 0;
   }
   
   .experience-content {
     flex-grow: 1;
+    margin-right: 10px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
   }
   
   .delete-experience-btn {
+    flex-shrink: 0;
     background: none;
     border: none;
     color: #ff6b6b;
@@ -149,18 +156,20 @@
     color: #ff4757;
   }
 
-.experience-title {
+  .experience-title {
     color: white;
     margin-bottom: 5px;
     font-size: 16px;
     line-height: 1.2;
-}
+    max-width: 100%;
+  }
 
-.experience-duration {
+  .experience-duration {
     color: rgba(255, 255, 255, 0.8);
     font-size: 14px;
     line-height: 1.2;
-}
+    max-width: 100%;
+  }
 
 .add-experience {
     display: flex;
@@ -168,6 +177,8 @@
     gap: 10px;
     margin-top: 35px;
 }
+
+
 
 .add-experience textarea,
 .add-experience input {
