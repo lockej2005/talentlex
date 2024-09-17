@@ -9,11 +9,17 @@ def read_prompt(filename):
     with open(os.path.join(os.path.dirname(__file__), filename), 'r', encoding='utf-8') as file:
         return file.read()
 
-# Read only the three specified prompts
+# Read the prompts
 sidley_austin_career_question = read_prompt('sidley_austin_career_question.txt')
 goodwin_why_question = read_prompt('goodwin_why_question.txt')
 jones_day_prompt = read_prompt('jones_day_prompt.txt')
 default_prompt = read_prompt('default_prompt.txt')
+
+# New Ashurst prompts
+ashurst_why_law_and_ashurst = read_prompt('Ashurst_why_law_and_Ashurst_question.txt')
+ashurst_key_skills = read_prompt('Ashurst_key_skills_question.txt')
+ashurst_hobbies_and_interests = read_prompt('Ashurst_hobbies_and_interests_question.txt')
+ashurst_recent_setback = read_prompt('Ashurst_example_of_a_recent_setback_question.txt')
 
 class handler(BaseHTTPRequestHandler):
     def set_CORS_headers(self):
@@ -64,6 +70,18 @@ class handler(BaseHTTPRequestHandler):
             elif firm == "Jones Day":
                 system_prompt = jones_day_prompt
                 base_model = "ft:gpt-4o-2024-08-06:personal:jonesdaydrafter:9zJFj48D"
+            elif firm == "Ashurst":
+                if question == "What has motivated you to pursue a career in commercial law and more specifically, why have you applied to Ashurst? (300 words max)":
+                    system_prompt = ashurst_why_law_and_ashurst
+                elif question == "In 300 words, provide some examples of the key skills that you have gained through your work experience, extracurricular activities, or studies that you think would make you a good trainee at Ashurst. (300 words max)":
+                    system_prompt = ashurst_key_skills
+                elif question == "In 300 words, tell us about your hobbies and interests. (300 words max)":
+                    system_prompt = ashurst_hobbies_and_interests
+                elif question == "Can you provide an example of a recent set back you have had, and how you have overcome this. (300 words max)":
+                    system_prompt = ashurst_recent_setback
+                else:
+                    system_prompt = default_prompt
+                base_model = "gpt-4o-mini"
             else:
                 system_prompt = default_prompt
                 base_model="gpt-4o-mini"   

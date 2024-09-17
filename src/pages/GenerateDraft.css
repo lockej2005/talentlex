@@ -310,7 +310,8 @@
   }
   .upgrade-bar {
     background-color: #b41414;
-    padding: 10px;
+    border-radius: 10px;
+    padding: 20px;
     display: flex;
     color: #fff;
     justify-content: space-between;
