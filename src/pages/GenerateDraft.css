@@ -308,3 +308,30 @@
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
+  .upgrade-bar {
+    background-color: #b41414;
+    padding: 10px;
+    display: flex;
+    color: #fff;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .upgrade-button {
+    background-color: #276D8B;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .upgrade-button:hover {
+    background-color: #1c5a6f;
+  }
+  
+  .submit-button-draft:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }

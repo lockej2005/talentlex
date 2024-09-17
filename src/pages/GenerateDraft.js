@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Editor, EditorState, ContentState, RichUtils, SelectionState } from 'draft-js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowsLeftRight, faBold, faItalic, faUnderline, faListUl, faListOl, faQuoteRight } from '@fortawesome/free-solid-svg-icons';
@@ -7,12 +8,15 @@ import './GenerateDraft.css';
 import { UserInputContext } from '../context/UserInputContext';
 import { getCurrentUser, handleDraftCreation } from '../utils/ApplicationReviewUtils';
 import { supabase } from '../supabaseClient';
+import Plans from './Plans';
 
 const countWords = (text) => {
   return text.trim().split(/\s+/).length;
 };
 
 function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
+  console.log("GenerateDraft component rendered");
+  const navigate = useNavigate();
   const { 
     draftText, setDraftText, 
     additionalInfo, setAdditionalInfo, 
@@ -32,6 +36,8 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
   const [questions, setQuestions] = useState([]);
   const [firmName, setFirmName] = useState(null);
   const [error, setError] = useState(null);
+  const [hasPlus, setHasPlus] = useState(false);
+  const [showPlans, setShowPlans] = useState(false);
 
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
@@ -46,7 +52,6 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     }
 
     try {
-      // First, fetch the firm name
       const { data: firmData, error: firmError } = await supabase
         .from('firms')
         .select('name')
@@ -62,7 +67,6 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
 
       setFirmName(firmData.name);
 
-      // Now, fetch the questions using the firm name
       const { data: questionsData, error: questionsError } = await supabase
         .from('questions')
         .select('*')
@@ -91,6 +95,20 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     const fetchCurrentUser = async () => {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
+      if (currentUser) {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('hasPlus')
+          .eq('id', currentUser.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching user profile:', profileError);
+        } else if (profileData) {
+          console.log("User hasPlus status:", profileData.hasPlus);
+          setHasPlus(profileData.hasPlus || false);
+        }
+      }
     };
 
     fetchCurrentUser();
@@ -216,8 +234,14 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
   }, [user, selectedFirm, selectedQuestion, firmId, additionalInfo, onDraftChange]);
 
   const handleCreateDraft = useCallback(async () => {
+    console.log("handleCreateDraft called, hasPlus:", hasPlus);
     if (!user) {
       alert('Please log in to generate a draft.');
+      return;
+    }
+
+    if (!hasPlus) {
+      console.log("User doesn't have Plus. Cannot generate draft.");
       return;
     }
 
@@ -245,7 +269,6 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
           setWordCount(countWords(newDraftText));
           setIsEdited(true);
           
-          // Save the draft after receiving the response
           await saveDraft(newDraftText);
         },
         setTotalTokens
@@ -259,7 +282,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     } finally {
       setIsLoading(false);
     }
-  }, [user, selectedFirm, selectedQuestion, additionalInfo, setDraftText, setEditorState, saveDraft]);
+  }, [user, selectedFirm, selectedQuestion, additionalInfo, setDraftText, setEditorState, saveDraft, hasPlus]);
 
   const onEditorChange = useCallback((newEditorState) => {
     setEditorState(newEditorState);
@@ -315,8 +338,27 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     resetDraft();
   }, [setSelectedQuestion, resetDraft]);
 
+  const handleUpgrade = useCallback(() => {
+    console.log("handleUpgrade called");
+    setShowPlans(true);
+  }, []);
+
+  const handleClosePlans = useCallback(() => {
+    setShowPlans(false);
+  }, []);
+
+  console.log("Current state - hasPlus:", hasPlus);
+
   return (
     <div className="comparison-container-draft">
+      {!hasPlus && (
+        <div className="upgrade-bar">
+          <span>This is a Plus feature</span>
+          <button className="upgrade-button" onClick={handleUpgrade}>
+            Upgrade to Plus
+          </button>
+        </div>
+      )}
       <div className="content-draft" ref={containerRef}>
         <div className="left-column-draft" style={{ width: `${leftWidth}%` }}>
           <ApplicationInput
@@ -340,18 +382,34 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
         </div>
         <div className="right-column-draft" style={{ width: `${100 - leftWidth}%` }}>
           <div className="button-container-draft">
-            <button className="submit-button-draft" onClick={handleCreateDraft} disabled={isLoading || !user}>
+            <button 
+              className="submit-button-draft" 
+              onClick={handleCreateDraft} 
+              disabled={isLoading || !user || !hasPlus}
+            >
               {isLoading ? 'Generating...' : 'Generate Draft'}
             </button>
           </div>
           <div className="rich-text-editor-draft">
             <div className="editor-toolbar-draft">
-              <button onClick={() => applyInlineStyle('BOLD')}><FontAwesomeIcon icon={faBold} /></button>
-              <button onClick={() => applyInlineStyle('ITALIC')}><FontAwesomeIcon icon={faItalic} /></button>
-              <button onClick={() => applyInlineStyle('UNDERLINE')}><FontAwesomeIcon icon={faUnderline} /></button>
-              <button onClick={() => applyBlockType('unordered-list-item')}><FontAwesomeIcon icon={faListUl} /></button>
-              <button onClick={() => applyBlockType('ordered-list-item')}><FontAwesomeIcon icon={faListOl} /></button>
-              <button onClick={() => applyBlockType('blockquote')}><FontAwesomeIcon icon={faQuoteRight} /></button>
+              <button onClick={() => applyInlineStyle('BOLD')}>
+                <FontAwesomeIcon icon={faBold} />
+              </button>
+              <button onClick={() => applyInlineStyle('ITALIC')}>
+                <FontAwesomeIcon icon={faItalic} />
+              </button>
+              <button onClick={() => applyInlineStyle('UNDERLINE')}>
+                <FontAwesomeIcon icon={faUnderline} />
+              </button>
+              <button onClick={() => applyBlockType('unordered-list-item')}>
+                <FontAwesomeIcon icon={faListUl} />
+              </button>
+              <button onClick={() => applyBlockType('ordered-list-item')}>
+                <FontAwesomeIcon icon={faListOl} />
+              </button>
+              <button onClick={() => applyBlockType('blockquote')}>
+                <FontAwesomeIcon icon={faQuoteRight} />
+              </button>
             </div>
             <div className="editor-container" ref={editorContainerRef} onClick={handleEditorClick}>
               <div className="editor-content-draft">
@@ -368,6 +426,11 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
           </div>
         </div>
       </div>
+      {showPlans && (
+        <div className="overlay-2">
+          <Plans onClose={handleClosePlans} userId={user?.id} />
+        </div>
+      )}
     </div>
   );
 }
