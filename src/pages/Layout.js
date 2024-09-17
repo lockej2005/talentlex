@@ -14,6 +14,7 @@ import ManageSubscription from './ManageSubscription';
 import { Menu } from 'lucide-react';
 import './Layout.css';
 import './Authentication2.css';
+import HowDidYouHearSurvey from './HowDidYouHearSurvey';
 
 const Layout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -183,6 +184,7 @@ const Layout = () => {
   return (
     <UserInputProvider>
       <div className="layout">
+      <HowDidYouHearSurvey />
         <div className={`sidebar ${menuOpen ? 'open' : ''}`}>
           <div className="sidebar-content">
             <div className="logo">TalentLex</div>
