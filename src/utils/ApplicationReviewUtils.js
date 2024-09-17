@@ -85,12 +85,24 @@ export const createApplicationDraft = async (draftData) => {
 
   const { system_prompt, model } = await getReviewSpecs(draftData.firmName, draftData.question);
 
+  // Map the notes to the expected fields
+  const mappedData = {
+    ...draftData,
+    keyReasons: draftData.note_1,
+    relevantExperience: draftData.note_2,
+    relevantInteraction: draftData.note_3,
+    personalInfo: draftData.note_4,
+    userProfile,
+    system_prompt,
+    model
+  };
+
   const response = await fetch('/api/create_application', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({...draftData, userProfile, system_prompt, model}),
+    body: JSON.stringify(mappedData),
   });
 
   if (!response.ok) {
@@ -99,7 +111,6 @@ export const createApplicationDraft = async (draftData) => {
 
   return await response.json();
 };
-
 export const calculateAndUpdateScores = async (userId, firmId) => {
   try {
     // Fetch firm details including prompts and models
