@@ -106,11 +106,13 @@ export const createApplicationDraft = async (draftData) => {
   });
 
   if (!response.ok) {
-    throw new Error('Failed to generate draft');
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to generate draft');
   }
 
   return await response.json();
 };
+
 export const calculateAndUpdateScores = async (userId, firmId) => {
   try {
     // Fetch firm details including prompts and models
@@ -277,27 +279,25 @@ export const saveDraft = async (userId, title, draft, firm, question) => {
   return data;
 };
 
-export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, additionalInfo, setApplicationText, setTotalTokens, setFeedback) => {
+export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, additionalInfo, setApplicationText, setTotalTokens) => {
   if (!user) {
     throw new Error('Please log in to generate a draft.');
   }
 
-  return await creditPolice(user.id, async () => {
-    let requiredFields;
-    if (selectedFirm.name === "Jones Day") {
-      requiredFields = ['whyLaw', 'whyJonesDay', 'whyYou', 'relevantExperiences'];
-    } else {
-      requiredFields = ['keyReasons', 'relevantExperience', 'relevantInteraction', 'personalInfo'];
-    }
+  let requiredFields;
+  if (selectedFirm.name === "Jones Day") {
+    requiredFields = ['whyLaw', 'whyJonesDay', 'whyYou', 'relevantExperiences'];
+  } else {
+    requiredFields = ['note_1', 'note_2', 'note_3', 'note_4'];
+  }
 
-    const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field]?.trim() !== '');
+  const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field]?.trim() !== '');
 
-    if (!areAllFieldsFilled) {
-      throw new Error('Please fill out all the required information fields before generating a draft.');
-    }
+  if (!areAllFieldsFilled) {
+    throw new Error('Please fill out all the required information fields before generating a draft.');
+  }
 
-    let localTotalTokens = 0;
-
+  try {
     const data = await createApplicationDraft({
       userId: user.id,
       firmId: selectedFirm.id,
@@ -306,16 +306,8 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
       ...additionalInfo
     });
 
-    localTotalTokens += data.usage.total_tokens;
-    setTotalTokens(localTotalTokens);
-
     setApplicationText(data.draft);
-
-    const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, localTotalTokens);
-    
-    if (!success) {
-      throw new Error(error);
-    }
+    setTotalTokens(data.usage.total_tokens);
 
     let draftGenerationData;
     if (selectedFirm.name === "Jones Day") {
@@ -334,16 +326,19 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
         email: user.email,
         firm: selectedFirm.name,
         question: selectedQuestion.value,
-        key_reasons: additionalInfo.keyReasons,
-        relevant_experience: additionalInfo.relevantExperience,
-        relevant_interaction: additionalInfo.relevantInteraction,
-        personal_info: additionalInfo.personalInfo,
+        key_reasons: additionalInfo.note_1,
+        relevant_experience: additionalInfo.note_2,
+        relevant_interaction: additionalInfo.note_3,
+        personal_info: additionalInfo.note_4,
         generated_draft: data.draft
       };
     }
 
     await insertDraftGeneration(draftGenerationData);
 
-    return { cost, newBalance };
-  });
+    return { success: true, draft: data.draft, usage: data.usage };
+  } catch (error) {
+    console.error('Error in handleDraftCreation:', error);
+    throw error;
+  }
 };

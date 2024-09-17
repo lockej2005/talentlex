@@ -247,37 +247,31 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
   }, [user, actualFirmId, selectedQuestion, additionalInfo, onDraftChange]);
 
   const handleCreateDraft = useCallback(async () => {
-    console.log("handleCreateDraft called, hasPlus:", hasPlus);
+    console.log("handleCreateDraft called");
     if (!user) {
       alert('Please log in to generate a draft.');
       return;
     }
-
-    if (!hasPlus) {
-      console.log("User doesn't have Plus. Cannot generate draft.");
-      setShowPlans(true);
-      return;
-    }
-
+  
     if (!actualFirmId) {
       alert('No firm selected. Please choose a firm from the dashboard.');
       return;
     }
-
+  
     if (!selectedQuestion) {
       alert('Please select a question before generating a draft.');
       return;
     }
-
+  
     let requiredFields = ['note_1', 'note_2', 'note_3', 'note_4'];
-
+  
     const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field]?.trim() !== '');
-
+  
     if (!areAllFieldsFilled) {
       alert('Please fill out all the required information fields before generating a draft.');
       return;
     }
-
+  
     setIsLoading(true);
     const startTime = Date.now();
     try {
@@ -286,27 +280,27 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
         { id: actualFirmId, name: firmName },
         selectedQuestion,
         additionalInfo,
-        async (newDraftText) => {
-          const contentState = ContentState.createFromText(newDraftText);
-          setEditorState(EditorState.createWithContent(contentState));
-          setDraftText(newDraftText);
-          setWordCount(countWords(newDraftText));
-          setIsEdited(true);
-          
-          await saveDraft(newDraftText);
-        },
+        setDraftText,
         setTotalTokens
       );
       const endTime = Date.now();
       setResponseTime((endTime - startTime) / 1000);
-      alert(`Draft generated and saved successfully. Credits used: ${result.cost}. Remaining credits: ${result.newBalance}`);
+      
+      const contentState = ContentState.createFromText(result.draft);
+      setEditorState(EditorState.createWithContent(contentState));
+      setWordCount(countWords(result.draft));
+      setIsEdited(true);
+      
+      await saveDraft(result.draft);
+      
+      alert('Draft generated and saved successfully.');
     } catch (error) {
       console.error('Error:', error);
       alert("Error: " + error.message);
     } finally {
       setIsLoading(false);
     }
-  }, [user, actualFirmId, firmName, selectedQuestion, additionalInfo, setDraftText, setEditorState, saveDraft, hasPlus]);
+  }, [user, actualFirmId, firmName, selectedQuestion, additionalInfo, setDraftText, setEditorState, saveDraft]);
 
   const onEditorChange = useCallback((newEditorState) => {
     setEditorState(newEditorState);
