@@ -82,14 +82,14 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
       }));
 
       setQuestions(formattedQuestions);
-      if (formattedQuestions.length > 0) {
+      if (formattedQuestions.length > 0 && !selectedQuestion) {
         setSelectedQuestion(formattedQuestions[0]);
       }
     } catch (error) {
       console.error('Error fetching firm name and questions:', error);
       setError('Failed to fetch firm information and questions. Please try again later.');
     }
-  }, [setSelectedQuestion]);
+  }, [setSelectedQuestion, selectedQuestion]);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -115,15 +115,21 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
   }, []);
 
   useEffect(() => {
-    if (selectedFirm && selectedFirm.id) {
+    if (firmId) {
+      console.log("Fetching firm details for ID:", firmId);
+      fetchFirmNameAndQuestions(firmId);
+    } else if (selectedFirm && selectedFirm.id) {
       console.log("Selected Firm:", selectedFirm);
       fetchFirmNameAndQuestions(selectedFirm.id);
+    } else {
+      console.error("No firm ID or selected firm available");
+      setError('No firm selected. Please choose a firm from the dashboard.');
     }
-  }, [selectedFirm, fetchFirmNameAndQuestions]);
+  }, [selectedFirm, firmId, fetchFirmNameAndQuestions]);
 
   useEffect(() => {
     const loadSavedDraft = async () => {
-      if (user && selectedFirm && selectedQuestion) {
+      if (user && firmId && selectedQuestion) {
         setIsLoading(true);
         try {
           const { data: savedDraft, error } = await supabase
@@ -159,7 +165,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     };
 
     loadSavedDraft();
-  }, [user, selectedFirm, selectedQuestion, setDraftText, setAdditionalInfo, firmId]);
+  }, [user, firmId, selectedQuestion, setDraftText, setAdditionalInfo]);
 
   const resetDraft = useCallback(() => {
     setDraftText('');
@@ -242,6 +248,17 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
 
     if (!hasPlus) {
       console.log("User doesn't have Plus. Cannot generate draft.");
+      setShowPlans(true);
+      return;
+    }
+
+    if (!firmId && (!selectedFirm || !selectedFirm.id)) {
+      alert('No firm selected. Please choose a firm from the dashboard.');
+      return;
+    }
+
+    if (!selectedQuestion) {
+      alert('Please select a question before generating a draft.');
       return;
     }
 
@@ -259,7 +276,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     try {
       const result = await handleDraftCreation(
         user,
-        selectedFirm,
+        selectedFirm || { id: firmId, name: firmName },
         selectedQuestion,
         additionalInfo,
         async (newDraftText) => {
@@ -282,7 +299,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     } finally {
       setIsLoading(false);
     }
-  }, [user, selectedFirm, selectedQuestion, additionalInfo, setDraftText, setEditorState, saveDraft, hasPlus]);
+  }, [user, selectedFirm, firmId, firmName, selectedQuestion, additionalInfo, setDraftText, setEditorState, saveDraft, hasPlus]);
 
   const onEditorChange = useCallback((newEditorState) => {
     setEditorState(newEditorState);
@@ -351,6 +368,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
 
   return (
     <div className="comparison-container-draft">
+      {error && <div className="error-message">{error}</div>}
       {!hasPlus && (
         <div className="upgrade-bar">
           <span>This is a Plus feature</span>
@@ -372,7 +390,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
             wordCount={wordCount}
             inputType="expanded"
           />
-        </div>
+</div>
         <div className="divider-draft" ref={dividerRef} onMouseDown={handleMouseDown}>
           <div className="divider-line-draft top"></div>
           <div className="divider-handle-draft">
