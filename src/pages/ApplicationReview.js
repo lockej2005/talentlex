@@ -249,8 +249,7 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         
         updateApplicationData();
 
-        // Calculate and update scores
-        await calculateAndUpdateScores(user.id, actualFirmId);
+        // Removed the separate call to calculateAndUpdateScores here
       } else {
         throw new Error('Unexpected response format from server');
       }
