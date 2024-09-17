@@ -26,30 +26,37 @@ const Layout = () => {
   const [user, setUser] = useState(null);
   const [showPlans, setShowPlans] = useState(false);
   const [showManageSubscription, setShowManageSubscription] = useState(false);
+  const [subscriptionError, setSubscriptionError] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user);
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('name, society, credits, hasPlus')
-          .eq('id', user.id)
-          .single();
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setUser(user);
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('name, society, credits, hasPlus')
+            .eq('id', user.id)
+            .single();
 
-        if (profileError) {
-          console.error('Error fetching user profile:', profileError);
-        } else if (profileData) {
-          setUserName(profileData.name || 'User');
-          setUserCredits(profileData.credits || 0);
-          setSocietyName(profileData.society || '');
-          setHasPlus(profileData.hasPlus || false);
+          if (profileError) {
+            console.error('Error fetching user profile:', profileError);
+            setSubscriptionError('Failed to fetch user profile. Please try refreshing the page.');
+          } else if (profileData) {
+            setUserName(profileData.name || 'User');
+            setUserCredits(profileData.credits || 0);
+            setSocietyName(profileData.society || '');
+            setHasPlus(profileData.hasPlus || false);
+          }
+
+          await fetchSelectedFirms(user.id);
         }
-
-        fetchSelectedFirms(user.id);
+      } catch (error) {
+        console.error('Error in fetchUserProfile:', error);
+        setSubscriptionError('An error occurred while loading user data. Please try again later.');
       }
     };
 
@@ -57,47 +64,79 @@ const Layout = () => {
   }, []);
 
   const fetchSelectedFirms = async (userId) => {
-    const { data, error } = await supabase
-      .from('firm_user_table')
-      .select(`
-        firm_id,
-        firms (
-          id,
-          name
-        )
-      `)
-      .eq('user_id', userId);
+    try {
+      const { data, error } = await supabase
+        .from('firm_user_table')
+        .select(`
+          firm_id,
+          firms (
+            id,
+            name
+          )
+        `)
+        .eq('user_id', userId);
 
-    if (error) {
-      console.error('Error fetching selected firms:', error);
-    } else {
-      setSelectedFirms(data.map(item => item.firms));
+      if (error) {
+        console.error('Error fetching selected firms:', error);
+        setSubscriptionError('Failed to fetch selected firms. Please try refreshing the page.');
+      } else {
+        setSelectedFirms(data.map(item => item.firms));
+      }
+    } catch (error) {
+      console.error('Error in fetchSelectedFirms:', error);
+      setSubscriptionError('An error occurred while loading firm data. Please try again later.');
     }
   };
 
   useEffect(() => {
-    const profileSubscription = supabase
-      .channel('public:profiles')
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user?.id}` }, payload => {
-        const updatedCredits = payload.new.credits;
-        const updatedHasPlus = payload.new.hasPlus;
-        setUserCredits(updatedCredits);
-        setHasPlus(updatedHasPlus);
-      })
-      .subscribe();
+    let profileSubscription;
+    let firmUserSubscription;
 
-    const firmUserSubscription = supabase
-      .channel('public:firm_user_table')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'firm_user_table', filter: `user_id=eq.${user?.id}` }, () => {
-        if (user) {
-          fetchSelectedFirms(user.id);
+    const setupSubscriptions = async () => {
+      if (user) {
+        try {
+          profileSubscription = supabase
+            .channel('public:profiles')
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` }, payload => {
+              const updatedCredits = payload.new.credits;
+              const updatedHasPlus = payload.new.hasPlus;
+              setUserCredits(updatedCredits);
+              setHasPlus(updatedHasPlus);
+            })
+            .subscribe((status) => {
+              if (status === 'SUBSCRIBED') {
+                console.log('Subscribed to profile changes');
+              } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+                console.error('Profile subscription error:', status);
+                setSubscriptionError('Lost connection to profile updates. Please refresh the page.');
+              }
+            });
+
+          firmUserSubscription = supabase
+            .channel('public:firm_user_table')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'firm_user_table', filter: `user_id=eq.${user.id}` }, () => {
+              fetchSelectedFirms(user.id);
+            })
+            .subscribe((status) => {
+              if (status === 'SUBSCRIBED') {
+                console.log('Subscribed to firm user table changes');
+              } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+                console.error('Firm user table subscription error:', status);
+                setSubscriptionError('Lost connection to firm updates. Please refresh the page.');
+              }
+            });
+        } catch (error) {
+          console.error('Error setting up subscriptions:', error);
+          setSubscriptionError('Failed to set up real-time updates. Please refresh the page.');
         }
-      })
-      .subscribe();
+      }
+    };
+
+    setupSubscriptions();
 
     return () => {
-      profileSubscription.unsubscribe();
-      firmUserSubscription.unsubscribe();
+      if (profileSubscription) profileSubscription.unsubscribe();
+      if (firmUserSubscription) firmUserSubscription.unsubscribe();
     };
   }, [user]);
 
@@ -183,6 +222,11 @@ const Layout = () => {
             <Menu size={24} />
           </button>
           <div className="content-area">
+            {subscriptionError && (
+              <div className="error-banner">
+                {subscriptionError}
+              </div>
+            )}
             <Routes>
               <Route path="/" element={<Profile />} />
               <Route path="/firm/:id/*" element={<FirmDashboard key={location.pathname} />} />

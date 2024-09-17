@@ -22,12 +22,24 @@ const FirmDashboard = () => {
   const { id } = useParams();
   const workExperienceRef = useRef(null);
   const scoreDisplayRef = useRef(null);
+  const [realtimeError, setRealtimeError] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user);
+      try {
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser();
+        if (error) throw error;
+        if (user) {
+          setUser(user);
+        } else {
+          setRealtimeError('User not found. Please log in.');
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+        setRealtimeError('Failed to authenticate user. Please try logging in again.');
       }
     };
 
@@ -35,14 +47,28 @@ const FirmDashboard = () => {
   }, []);
 
   useEffect(() => {
-    if (user && id) {
-      fetchFirmDetails();
-      fetchWorkExperiences(user.id, id);
-      subscribeToScores(user.id, id);
-    }
+    let scoreChannel;
+
+    const setupRealtimeSubscription = async () => {
+      if (user && id) {
+        try {
+          await fetchFirmDetails();
+          await fetchWorkExperiences(user.id, id);
+          scoreChannel = subscribeToScores(user.id, id);
+        } catch (error) {
+          console.error('Error setting up realtime subscription:', error);
+          setRealtimeError('Failed to set up real-time updates. Please refresh the page.');
+        }
+      }
+    };
+
+    setupRealtimeSubscription();
 
     return () => {
-      supabase.removeAllChannels();
+      if (scoreChannel) {
+        console.log('Unsubscribing from score channel');
+        supabase.removeChannel(scoreChannel);
+      }
     };
   }, [user, id]);
 
@@ -51,119 +77,161 @@ const FirmDashboard = () => {
   }, [activeTab]);
 
   const fetchFirmDetails = async () => {
-    const { data, error } = await supabase
-      .from('firms')
-      .select('*')
-      .eq('id', id)
-      .single();
+    try {
+      const { data, error } = await supabase.from('firms').select('*').eq('id', id).single();
 
-    if (error) {
-      console.error('Error fetching firm details:', error);
-    } else {
+      if (error) throw error;
+
       setFirmDetails(data);
-      const firm = firms.find(f => f.value === data.name);
+      const firm = firms.find((f) => f.value === data.name);
       setSelectedFirm({ ...firm, id: data.id } || null);
+    } catch (error) {
+      console.error('Error fetching firm details:', error);
+      setRealtimeError('Failed to fetch firm details. Please try refreshing the page.');
     }
   };
 
   const fetchWorkExperiences = async (userId, firmId) => {
-    const { data, error } = await supabase
-      .from('firm_user_table')
-      .select('work_experience')
-      .eq('user_id', userId)
-      .eq('firm_id', firmId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('firm_user_table')
+        .select('work_experience')
+        .eq('user_id', userId)
+        .eq('firm_id', firmId)
+        .single();
 
-    if (error) {
+      if (error) throw error;
+
+      if (data && data.work_experience) {
+        const parsedExperiences = JSON.parse(data.work_experience);
+        setWorkExperiences(
+          parsedExperiences.map((exp) => ({
+            title: exp.title,
+            duration: exp.time,
+          }))
+        );
+      } else {
+        setWorkExperiences([]);
+      }
+    } catch (error) {
       console.error('Error fetching work experiences:', error);
-      setWorkExperiences([]);
-    } else if (data && data.work_experience) {
-      const parsedExperiences = JSON.parse(data.work_experience);
-      setWorkExperiences(parsedExperiences.map(exp => ({
-        title: exp.title,
-        duration: exp.time
-      })));
-    } else {
-      setWorkExperiences([]);
+      setRealtimeError('Failed to fetch work experiences. Please try refreshing the page.');
     }
   };
 
   const subscribeToScores = (userId, firmId) => {
+    console.log('Attempting to subscribe to scores...');
     const channel = supabase
-      .channel('firm_user_table_changes')
-      .on('postgres_changes', 
-        { 
-          event: 'UPDATE', 
-          schema: 'public', 
-          table: 'firm_user_table', 
-          filter: `user_id=eq.${userId} AND firm_id=eq.${firmId}`
-        }, 
+      .channel(`firm_user_table_changes_${userId}_${firmId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'firm_user_table',
+          match: { user_id: userId, firm_id: firmId },
+        },
         (payload) => {
+          console.log('Received score update:', payload);
           const { new: newData } = payload;
           updateScores(newData);
         }
       )
       .subscribe();
 
+    // Handle channel status updates
+    channel.on('status', ({ status }) => {
+      console.log('Score subscription status:', status);
+      if (status === 'SUBSCRIBED') {
+        console.log('Successfully subscribed to real-time score updates');
+        setRealtimeError(null);
+      } else if (status === 'CLOSED') {
+        console.error('WebSocket connection closed');
+        setRealtimeError('Real-time connection lost. Please refresh the page.');
+      } else if (status === 'CHANNEL_ERROR') {
+        console.error('Channel error for score updates');
+        setRealtimeError('Error connecting to real-time score updates. Please try again later.');
+      }
+    });
+
+    console.log('Subscribed to score channel:', channel);
+
     // Fetch initial data
     fetchScores(userId, firmId);
+
+    return channel;
   };
 
   const fetchScores = async (userId, firmId) => {
-    const { data, error } = await supabase
-      .from('firm_user_table')
-      .select('weighted_score, opentext_score, education_score, workexp_score, opentext_justification, education_justification, workexp_justification')
-      .eq('user_id', userId)
-      .eq('firm_id', firmId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('firm_user_table')
+        .select(
+          'weighted_score, opentext_score, education_score, workexp_score, opentext_justification, education_justification, workexp_justification'
+        )
+        .eq('user_id', userId)
+        .eq('firm_id', firmId)
+        .single();
 
-    if (error) {
+      if (error) throw error;
+
+      if (data) {
+        console.log('Fetched initial scores:', data);
+        updateScores(data);
+      }
+    } catch (error) {
       console.error('Error fetching scores:', error);
-    } else if (data) {
-      updateScores(data);
+      setRealtimeError('Failed to fetch scores. Please try refreshing the page.');
     }
   };
 
   const updateScores = (data) => {
+    console.log('Updating scores with:', data);
     setScores({
       weighted_score: parseFloat(data.weighted_score) || 0,
-      opentext: { 
+      opentext: {
         score: parseFloat(data.opentext_score) || 0,
-        justification: data.opentext_justification || ''
+        justification: data.opentext_justification || '',
       },
-      education: { 
+      education: {
         score: parseFloat(data.education_score) || 0,
-        justification: data.education_justification || ''
+        justification: data.education_justification || '',
       },
-      workexp: { 
+      workexp: {
         score: parseFloat(data.workexp_score) || 0,
-        justification: data.workexp_justification || ''
-      }
+        justification: data.workexp_justification || '',
+      },
     });
   };
 
   const updateWorkExperiences = async (experiences) => {
     if (!user) return;
 
-    const formattedExperiences = experiences.map(exp => ({
+    const formattedExperiences = experiences.map((exp) => ({
       title: exp.title,
-      time: exp.duration
+      time: exp.duration,
     }));
-    
-    const { error } = await supabase
-      .from('firm_user_table')
-      .upsert({
-        user_id: user.id,
-        firm_id: id,
-        work_experience: JSON.stringify(formattedExperiences)
-      }, {
-        onConflict: 'user_id,firm_id'
-      });
 
-    if (error) {
-      console.error('Error updating work experiences:', error);
-    } else {
+    try {
+      const { error } = await supabase
+        .from('firm_user_table')
+        .upsert(
+          {
+            user_id: user.id,
+            firm_id: id,
+            work_experience: JSON.stringify(formattedExperiences),
+          },
+          {
+            onConflict: 'user_id,firm_id',
+          }
+        );
+
+      if (error) throw error;
+
       fetchWorkExperiences(user.id, id);
+    } catch (error) {
+      console.error('Error updating work experiences:', error);
+      setRealtimeError('Failed to update work experiences. Please try again.');
     }
   };
 
@@ -179,16 +247,18 @@ const FirmDashboard = () => {
     if (!draftData || !user) return;
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('drafts_generations_vector')
-        .upsert({
-          ...draftData,
-          user_id: user.id,
-          firm_id: id
-        }, {
-          onConflict: 'user_id,firm_id,question'
-        })
-        .select();
+        .upsert(
+          {
+            ...draftData,
+            user_id: user.id,
+            firm_id: id,
+          },
+          {
+            onConflict: 'user_id,firm_id,question',
+          }
+        );
 
       if (error) throw error;
 
@@ -202,21 +272,23 @@ const FirmDashboard = () => {
 
   const handleSaveApplication = async () => {
     if (!applicationData || !user) return;
-  
+
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('applications_vector')
-        .upsert({
-          ...applicationData,
-          user_id: user.id,
-          firm_id: id
-        }, {
-          onConflict: 'user_id,firm_id,question'
-        })
-        .select();
-  
+        .upsert(
+          {
+            ...applicationData,
+            user_id: user.id,
+            firm_id: id,
+          },
+          {
+            onConflict: 'user_id,firm_id,question',
+          }
+        );
+
       if (error) throw error;
-  
+
       alert('Application saved successfully!');
       setShowSaveButton(false);
     } catch (error) {
@@ -272,17 +344,23 @@ const FirmDashboard = () => {
                         <div className="score-section">
                           <p className="section-score">{scores.opentext.score.toFixed(2)}</p>
                           <span className="section-title">Open Text Section</span>
-                          <p className="section-justification">{scores.opentext.justification || 'No justification available'}</p>
+                          <p className="section-justification">
+                            {scores.opentext.justification || 'No justification available'}
+                          </p>
                         </div>
                         <div className="score-section">
                           <p className="section-score">{scores.workexp.score.toFixed(2)}</p>
                           <span className="section-title">Work Experience Section</span>
-                          <p className="section-justification">{scores.workexp.justification || 'No justification available'}</p>
+                          <p className="section-justification">
+                            {scores.workexp.justification || 'No justification available'}
+                          </p>
                         </div>
                         <div className="score-section">
                           <p className="section-score">{scores.education.score.toFixed(2)}</p>
                           <span className="section-title">Education Section</span>
-                          <p className="section-justification">{scores.education.justification || 'No justification available'}</p>
+                          <p className="section-justification">
+                            {scores.education.justification || 'No justification available'}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -308,17 +386,17 @@ const FirmDashboard = () => {
                   </div>
                 ))}
                 <div className="add-experience">
-                  <textarea 
-                    placeholder="Job Title and Company" 
+                  <textarea
+                    placeholder="Job Title and Company"
                     value={newExperience.title}
-                    onChange={(e) => setNewExperience({...newExperience, title: e.target.value})}
+                    onChange={(e) => setNewExperience({ ...newExperience, title: e.target.value })}
                     rows="2"
                   />
-                  <input 
-                    type="text" 
-                    placeholder="Description" 
+                  <input
+                    type="text"
+                    placeholder="Description"
                     value={newExperience.duration}
-                    onChange={(e) => setNewExperience({...newExperience, duration: e.target.value})}
+                    onChange={(e) => setNewExperience({ ...newExperience, duration: e.target.value })}
                   />
                   <button onClick={handleAddExperience}>+</button>
                 </div>
@@ -329,7 +407,9 @@ const FirmDashboard = () => {
       case 'generate-draft':
         return <GenerateDraft firmId={id} selectedFirm={selectedFirm} onDraftChange={handleDraftChange} />;
       case 'application-review':
-        return <ApplicationReview firmId={id} selectedFirm={selectedFirm} onApplicationChange={handleApplicationChange} />;
+        return (
+          <ApplicationReview firmId={id} selectedFirm={selectedFirm} onApplicationChange={handleApplicationChange} />
+        );
       default:
         return null;
     }
@@ -337,6 +417,7 @@ const FirmDashboard = () => {
 
   return (
     <div className="firm-dashboard-firmdash">
+      {realtimeError && <div className="error-banner">{realtimeError}</div>}
       <div className="toolbar-firmdash">
         <div className="firm-name-firmdash">{firmDetails?.name}</div>
         <div className="tab-toggle-firmdash">
@@ -367,9 +448,7 @@ const FirmDashboard = () => {
           )}
         </div>
       </div>
-      <div className="dashboard-container-firmdash">
-        {renderContent()}
-      </div>
+      <div className="dashboard-container-firmdash">{renderContent()}</div>
     </div>
   );
 };
