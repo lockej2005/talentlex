@@ -37,40 +37,27 @@ class handler(BaseHTTPRequestHandler):
         post_data = self.rfile.read(content_length)
         data = json.loads(post_data.decode('utf-8'))
 
-        firm = data.get('firm')
+        print("Received data:", json.dumps(data, indent=2))  # Log received data
+
+        firmName = data.get('firmName')
         question = data.get('question')
 
-        if firm == "Jones Day":
-            why_law = data.get('whyLaw')
-            why_jones_day = data.get('whyJonesDay')
-            why_you = data.get('whyYou')
-            relevant_experiences = data.get('relevantExperiences')
-        else:
-            key_reasons = data.get('keyReasons')
-            relevant_experience = data.get('relevantExperience')
-            relevant_interaction = data.get('relevantInteraction')
-            personal_info = data.get('personalInfo')
-
-        if not firm or not question:
-            self.send_response(400)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            response = json.dumps({"error": "Missing required data"})
-            self.wfile.write(response.encode('utf-8'))
+        if not firmName or not question:
+            self.send_error_response(400, f"Missing required data. firmName: {firmName}, question: {question}")
             return
 
         try:
             # Select the appropriate prompt based on firm and question
-            if firm == "Sidley Austin" and question == "Why does a career in commercial law and specifically Sidley Austin interest you? (250 words max)":
+            if firmName == "Sidley Austin" and question == "Why does a career in commercial law and specifically Sidley Austin interest you? (250 words max)":
                 system_prompt = sidley_austin_career_question
                 base_model="gpt-4o-mini"   
-            elif firm == "Goodwin" and question == "Why are you applying to Goodwin? (100 words)":
+            elif firmName == "Goodwin" and question == "Why are you applying to Goodwin? (100 words)":
                 system_prompt = goodwin_why_question
                 base_model = "ft:gpt-4o-mini-2024-07-18:personal:appdrafterdataset:9vG3pVmA"
-            elif firm == "Jones Day":
+            elif firmName == "Jones Day":
                 system_prompt = jones_day_prompt
                 base_model = "ft:gpt-4o-2024-08-06:personal:jonesdaydrafter:9zJFj48D"
-            elif firm == "Ashurst":
+            elif firmName == "Ashurst":
                 if question == "What has motivated you to pursue a career in commercial law and more specifically, why have you applied to Ashurst? (300 words max)":
                     system_prompt = ashurst_why_law_and_ashurst
                 elif question == "In 300 words, provide some examples of the key skills that you have gained through your work experience, extracurricular activities, or studies that you think would make you a good trainee at Ashurst. (300 words max)":
@@ -86,34 +73,38 @@ class handler(BaseHTTPRequestHandler):
                 system_prompt = default_prompt
                 base_model="gpt-4o-mini"   
 
-            model = base_model
+            model = data.get('model', base_model)
 
-            if firm == "Jones Day":
+            if firmName == "Jones Day":
                 prompt = f"""
                 Generate a draft application for Jones Day addressing the following question:
                 "{question}"
 
                 Include the following information in your response:
-                - Why law: {why_law}
-                - Why Jones Day: {why_jones_day}
-                - Why you: {why_you}
-                - Relevant experiences: {relevant_experiences}
+                - Why law: {data.get('whyLaw')}
+                - Why Jones Day: {data.get('whyJonesDay')}
+                - Why you: {data.get('whyYou')}
+                - Relevant experiences: {data.get('relevantExperiences')}
 
                 Please create a well-structured, professional application that incorporates all the provided information seamlessly.
                 """
             else:
                 prompt = f"""
-                Generate a draft application for {firm} addressing the following question:
+                Generate a draft application for {firmName} addressing the following question:
                 "{question}"
 
                 Include the following information in your response:
-                - Key reason(s) for applying: {key_reasons}
-                - Relevant experience: {relevant_experience}
-                - Relevant interaction with the firm: {relevant_interaction}
-                - Additional personal information: {personal_info}
+                - Key reason(s) for applying: {data.get('keyReasons')}
+                - Relevant experience: {data.get('relevantExperience')}
+                - Relevant interaction with the firm: {data.get('relevantInteraction')}
+                - Additional personal information: {data.get('personalInfo')}
 
                 Please create a well-structured, professional application that incorporates all the provided information seamlessly.
                 """
+
+            print(f"Using model: {model}")
+            print(f"System prompt: {system_prompt}")
+            print(f"User prompt: {prompt}")
 
             completion = client.chat.completions.create(
                 model=model,
@@ -142,9 +133,13 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(response.encode('utf-8'))
 
         except Exception as e:
-            self.send_response(500)
-            self.set_CORS_headers()
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            response = json.dumps({"error": str(e)})
-            self.wfile.write(response.encode('utf-8'))
+            print(f"Error occurred: {str(e)}")
+            self.send_error_response(500, f"Internal server error: {str(e)}")
+
+    def send_error_response(self, status_code, message):
+        self.send_response(status_code)
+        self.set_CORS_headers()
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        response = json.dumps({"error": message})
+        self.wfile.write(response.encode('utf-8'))
