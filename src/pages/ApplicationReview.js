@@ -167,6 +167,14 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         timestamp: new Date().toISOString()
       };
 
+      // First, insert into applications_vector_history
+      const { error: historyError } = await supabase
+        .from('applications_vector_history')
+        .insert(upsertData);
+
+      if (historyError) throw historyError;
+
+      // Then, update or insert into applications_vector
       if (existingRecordId) {
         const { error } = await supabase
           .from('applications_vector')
@@ -248,8 +256,6 @@ function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
         console.log('Review saved');
         
         updateApplicationData();
-
-        // Removed the separate call to calculateAndUpdateScores here
       } else {
         throw new Error('Unexpected response format from server');
       }
