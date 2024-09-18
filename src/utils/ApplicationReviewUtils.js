@@ -243,14 +243,15 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
     const endTime = Date.now();
     const responseTime = (endTime - startTime) / 1000;
 
+    // Calculate and update scores
+    const scoreData = await calculateAndUpdateScores(user.id, selectedFirm.id);
+
+    // Subtract credits only once, after all operations are complete
     const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, data.usage.total_tokens);
 
     if (!success) {
       throw new Error(error);
     }
-
-    // Calculate and update scores
-    const scoreData = await calculateAndUpdateScores(user.id, selectedFirm.id);
 
     return {
       success: true,

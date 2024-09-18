@@ -42,20 +42,9 @@ export const creditPolice = async (userId, operation) => {
   
   try {
     const result = await operation();
-
-    if (!hasPlus) {
-      const newCreditBalance = currentCredits - 10;
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ credits: newCreditBalance })
-        .eq('id', userId);
-
-      if (updateError) throw updateError;
-    }
-
     return result;
   } catch (error) {
-    console.error('Error in operation or updating credits:', error);
+    console.error('Error in operation:', error);
     throw error;
   }
 };
