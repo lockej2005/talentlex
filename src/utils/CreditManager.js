@@ -57,7 +57,7 @@ export const subtractCreditsAndUpdateUser = async (userId, totalTokens) => {
     return { 
       success: false, 
       error: error.message === 'Insufficient credits' 
-        ? "Error: Insufficient credits to complete this operation." 
+        ? "Error: Insufficient credits to complete this operation. Please UPGRADE TO RENEW CREDITS" 
         : "Error: Unable to process credits. Please try again later."
     };
   }
