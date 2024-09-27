@@ -2,7 +2,6 @@ import { supabase } from '../supabaseClient';
 import { subtractCreditsAndUpdateUser } from './CreditManager';
 import { creditPolice } from './CreditPolice';
 import { getProfileContext } from './GetProfileContext';
-import { getReviewSpecs } from './ReviewGetSpecs';
 
 export const getCurrentUser = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -50,10 +49,35 @@ export const insertDraftGeneration = async (draftData) => {
   return data;
 };
 
+export const getDraftSpecs = async (firmName, question) => {
+  // First, try to get the prompt and model for the specific question
+  let { data, error } = await supabase
+    .from('questions')
+    .select('draft_system_prompt, draft_model')
+    .eq('question_text', question)
+    .single();
+
+  if (error || !data) {
+    // If no question-specific prompt is found, fall back to the firm-level prompt
+    ({ data, error } = await supabase
+      .from('firms')
+      .select('draft_system_prompt, draft_model')
+      .eq('name', firmName)
+      .single());
+
+    if (error) throw error;
+  }
+
+  return {
+    system_prompt: data.draft_system_prompt,
+    model: data.draft_model
+  };
+};
+
 export const submitApplication = async (applicationData) => {
   const userProfile = await getProfileContext(applicationData.userId);
   
-  const { system_prompt, model } = await getReviewSpecs(applicationData.firmName, applicationData.question);
+  const { system_prompt, model } = await getDraftSpecs(applicationData.firmName, applicationData.question);
 
   const response = await fetch('/api/submit_application', {
     method: 'POST',
@@ -83,7 +107,7 @@ export const submitApplication = async (applicationData) => {
 export const createApplicationDraft = async (draftData) => {
   const userProfile = await getProfileContext(draftData.userId);
 
-  const { system_prompt, model } = await getReviewSpecs(draftData.firmName, draftData.question);
+  const { system_prompt, model } = await getDraftSpecs(draftData.firmName, draftData.question);
 
   // Map the notes to the expected fields
   const mappedData = {
