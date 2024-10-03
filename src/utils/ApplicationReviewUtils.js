@@ -74,10 +74,35 @@ export const getDraftSpecs = async (firmName, question) => {
   };
 };
 
+export const getReviewSpecs = async (firmName, question) => {
+  // First, try to get the prompt and model for the specific question
+  let { data, error } = await supabase
+    .from('questions')
+    .select('review_system_prompt, review_model')
+    .eq('question', question)
+    .single();
+
+  if (error || !data) {
+    // If no question-specific prompt is found, fall back to the firm-level prompt
+    ({ data, error } = await supabase
+      .from('firms')
+      .select('review_system_prompt, review_model')
+      .eq('name', firmName)
+      .single());
+
+    if (error) throw error;
+  }
+
+  return {
+    system_prompt: data.review_system_prompt,
+    model: data.review_model
+  };
+};
+
 export const submitApplication = async (applicationData) => {
   const userProfile = await getProfileContext(applicationData.userId);
-  
-  const { system_prompt, model } = await getDraftSpecs(applicationData.firmName, applicationData.question);
+   
+  const { system_prompt, model } = await getReviewSpecs(applicationData.firmName, applicationData.question);
 
   const response = await fetch('/api/submit_application', {
     method: 'POST',
