@@ -54,7 +54,7 @@ export const getDraftSpecs = async (firmName, question) => {
   let { data, error } = await supabase
     .from('questions')
     .select('draft_system_prompt, draft_model')
-    .eq('question_text', question)
+    .eq('question', question)
     .single();
 
   if (error || !data) {
@@ -79,7 +79,7 @@ export const getReviewSpecs = async (firmName, question) => {
   let { data, error } = await supabase
     .from('questions')
     .select('review_system_prompt, review_model')
-    .eq('question_text', question)
+    .eq('question', question)
     .single();
 
   if (error || !data) {
