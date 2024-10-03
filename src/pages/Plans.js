@@ -63,7 +63,7 @@ const Plans = ({ onClose, userId }) => {
     <div className="plans-overlay-plan">
       <div className="plans-content-plan">
         <h2>Choose Your Plan</h2>
-        <h3>Upgrade to a plan and get Infinite credits</h3>
+        <h3>Upgrade to a plan and get Infinite credits and Draft Generation</h3>
         <div className="plan-options-plan">
           <label className={`plan-option-plan ${selectedPlan === 'monthly' ? 'selected-plan' : ''}`}>
             <input
