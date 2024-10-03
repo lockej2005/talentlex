@@ -15,10 +15,10 @@ const Plans = ({ onClose, userId }) => {
 
     switch(selectedPlan) {
       case 'monthly':
-        priceId = 'price_1PyOAp05kmxxE8ckEjdw0mzG';
+        priceId = 'price_1Q5v6H05kmxxE8ckRj5uBzNf';
         break;
-      case 'yearly':
-        priceId = 'price_1PyOE605kmxxE8ckattkPDYV';
+      case 'quarterly':
+        priceId = 'price_1Q5uiY05kmxxE8ckKQVvbtAt';
         break;
       default:
         setError('Invalid plan selected');
@@ -75,21 +75,21 @@ const Plans = ({ onClose, userId }) => {
             />
             <span className="plan-details-plan">
               <span className="plan-name-plan">Monthly Plan</span>
-              <span className="plan-price-plan">£10/month</span>
+              <span className="plan-price-plan">£15/month</span>
             </span>
           </label>
-          <label className={`plan-option-plan ${selectedPlan === 'yearly' ? 'selected-plan' : ''}`}>
+          <label className={`plan-option-plan ${selectedPlan === 'quarterly' ? 'selected-plan' : ''}`}>
             <input
               type="radio"
               name="plan"
-              value="yearly"
-              checked={selectedPlan === 'yearly'}
-              onChange={() => handlePlanChange('yearly')}
+              value="quarterly"
+              checked={selectedPlan === 'quarterly'}
+              onChange={() => handlePlanChange('quarterly')}
             />
             <span className="plan-details-plan">
-              <span className="plan-name-plan">Yearly Plan</span>
-              <span className="plan-price-plan">£100/year</span>
-              <span className="plan-savings-plan">Save 17%</span>
+              <span className="plan-name-plan">Quarterly Plan</span>
+              <span className="plan-price-plan">£30/quarter</span>
+              <span className="plan-savings-plan">Save £15/quarter</span>
             </span>
           </label>
         </div>
