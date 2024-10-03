@@ -11,6 +11,7 @@ import FirmSelector from './FirmSelector';
 import Plans from './Plans';
 import Success from './Success';
 import ManageSubscription from './ManageSubscription';
+import Activity from './Activity';
 import { Menu } from 'lucide-react';
 import './Layout.css';
 import './Authentication2.css';
@@ -28,6 +29,7 @@ const Layout = () => {
   const [showPlans, setShowPlans] = useState(false);
   const [showManageSubscription, setShowManageSubscription] = useState(false);
   const [subscriptionError, setSubscriptionError] = useState(null);
+  const [selectedFirm, setSelectedFirm] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -82,64 +84,15 @@ const Layout = () => {
         setSubscriptionError('Failed to fetch selected firms. Please try refreshing the page.');
       } else {
         setSelectedFirms(data.map(item => item.firms));
+        if (data.length > 0 && !selectedFirm) {
+          setSelectedFirm(data[0].firms.id);
+        }
       }
     } catch (error) {
       console.error('Error in fetchSelectedFirms:', error);
       setSubscriptionError('An error occurred while loading firm data. Please try again later.');
     }
   };
-
-  useEffect(() => {
-    let profileSubscription;
-    let firmUserSubscription;
-
-    const setupSubscriptions = async () => {
-      if (user) {
-        try {
-          profileSubscription = supabase
-            .channel('public:profiles')
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` }, payload => {
-              const updatedCredits = payload.new.credits;
-              const updatedHasPlus = payload.new.hasPlus;
-              setUserCredits(updatedCredits);
-              setHasPlus(updatedHasPlus);
-            })
-            .subscribe((status) => {
-              if (status === 'SUBSCRIBED') {
-                console.log('Subscribed to profile changes');
-              } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-                console.error('Profile subscription error:', status);
-                setSubscriptionError('Lost connection to profile updates. Please refresh the page.');
-              }
-            });
-
-          firmUserSubscription = supabase
-            .channel('public:firm_user_table')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'firm_user_table', filter: `user_id=eq.${user.id}` }, () => {
-              fetchSelectedFirms(user.id);
-            })
-            .subscribe((status) => {
-              if (status === 'SUBSCRIBED') {
-                console.log('Subscribed to firm user table changes');
-              } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-                console.error('Firm user table subscription error:', status);
-                setSubscriptionError('Lost connection to firm updates. Please refresh the page.');
-              }
-            });
-        } catch (error) {
-          console.error('Error setting up subscriptions:', error);
-          setSubscriptionError('Failed to set up real-time updates. Please refresh the page.');
-        }
-      }
-    };
-
-    setupSubscriptions();
-
-    return () => {
-      if (profileSubscription) profileSubscription.unsubscribe();
-      if (firmUserSubscription) firmUserSubscription.unsubscribe();
-    };
-  }, [user]);
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -181,10 +134,14 @@ const Layout = () => {
     setShowManageSubscription(false);
   };
 
+  const handleFirmChange = (firmId) => {
+    setSelectedFirm(firmId);
+  };
+
   return (
     <UserInputProvider>
       <div className="layout">
-      <HowDidYouHearSurvey />
+        <HowDidYouHearSurvey />
         <div className={`sidebar ${menuOpen ? 'open' : ''}`}>
           <div className="sidebar-content">
             <div className="logo">TalentLex</div>
@@ -194,6 +151,9 @@ const Layout = () => {
                 <div className='seperator'></div>
                 <li className={location.pathname === "/" ? "active" : ""}>
                   <Link to="/">Profile</Link>
+                </li>
+                <li className={location.pathname === "/activity" ? "active" : ""}>
+                  <Link to="/activity">Activity</Link>
                 </li>
                 <li className="section-title">Firms</li>
                 <div className='seperator'></div>
@@ -231,6 +191,7 @@ const Layout = () => {
             )}
             <Routes>
               <Route path="/" element={<Profile />} />
+              <Route path="/activity" element={<Activity userId={user?.id} selectedFirm={selectedFirm} onFirmChange={handleFirmChange} />} />
               <Route path="/firm/:id/*" element={<FirmDashboard key={location.pathname} />} />
               <Route path="/firm-selector" element={<FirmSelector />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
