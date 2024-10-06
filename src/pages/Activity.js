@@ -13,11 +13,25 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
   const [firms, setFirms] = useState([]);
   const [hoveredApp, setHoveredApp] = useState(null);
 
+  console.log('Component rendered. Current state:', { 
+    applicationsCount: applications.length, 
+    usersCount: users.length,
+    hoveredApp, 
+    selectedFirm,
+    openDate,
+    deadlineDate,
+    userSubmitDate,
+    loading,
+    maxScore
+  });
+
   useEffect(() => {
+    console.log('Fetching firms...');
     fetchFirms();
   }, []);
 
   useEffect(() => {
+    console.log('selectedFirm or userId changed:', { selectedFirm, userId });
     if (selectedFirm && userId) {
       fetchData();
     } else {
@@ -35,6 +49,7 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
         .order('name', { ascending: true });
 
       if (error) throw error;
+      console.log('Firms fetched:', data);
       setFirms(data);
     } catch (error) {
       console.error('Error fetching firms:', error);
@@ -42,6 +57,7 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
   };
 
   const fetchData = async () => {
+    console.log('Fetching data...');
     setLoading(true);
     try {
       await Promise.all([
@@ -67,17 +83,8 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
 
       if (error) throw error;
 
-      const userIds = data.map(app => app.user_id);
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, name')
-        .in('id', userIds);
-
-      if (profilesError) throw profilesError;
-
-      const userMap = Object.fromEntries(profiles.map(profile => [profile.id, profile.name]));
-
-      const processedData = processApplicationData(data, userMap);
+      const processedData = processApplicationData(data);
+      console.log('Processed application data:', processedData);
       setApplications(processedData);
     } catch (error) {
       console.error('Error fetching application data:', error);
@@ -93,22 +100,13 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
 
       if (error) throw error;
 
-      const userIds = data.map(item => item.user_id);
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, name')
-        .in('id', userIds);
-
-      if (profilesError) throw profilesError;
-
-      const userMap = Object.fromEntries(profiles.map(profile => [profile.id, profile.name]));
-
-      const userList = data.map(item => ({
+      const userList = data.map((item, index) => ({
         id: item.user_id,
-        name: userMap[item.user_id] || 'Unknown',
+        name: `Applicant ${index + 1}`,
         status: item.submission_status
       }));
 
+      console.log('Fetched user list:', userList);
       setUsers(userList);
     } catch (error) {
       console.error('Error fetching user list:', error);
@@ -125,6 +123,7 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
 
       if (error) throw error;
 
+      console.log('Fetched firm dates:', data);
       setOpenDate(new Date(data.open_date));
       setDeadlineDate(new Date(data.deadline_date));
     } catch (error) {
@@ -144,6 +143,7 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
       if (error) throw error;
 
       if (data && data.submit_time) {
+        console.log('Fetched user submit date:', data.submit_time);
         setUserSubmitDate(new Date(data.submit_time));
       }
     } catch (error) {
@@ -151,9 +151,9 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
     }
   };
 
-  const processApplicationData = (data, userMap) => {
+  const processApplicationData = (data) => {
     let maxScore = 0;
-    const processed = data.map(app => {
+    const processed = data.map((app, index) => {
       const score = parseFloat(app.weighted_score) || 0;
       if (score > maxScore) maxScore = score;
       return {
@@ -161,15 +161,19 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
         date: new Date(app.submit_time),
         status: app.submission_status,
         score: score,
-        name: userMap[app.user_id] || 'Unknown'
+        name: `Applicant ${index + 1}`
       };
     });
+    console.log('Max score:', maxScore);
     setMaxScore(maxScore);
     return processed;
   };
 
   const renderTimeline = () => {
-    if (!openDate || !deadlineDate) return null;
+    if (!openDate || !deadlineDate) {
+      console.log('Timeline not rendered: missing dates', { openDate, deadlineDate });
+      return null;
+    }
 
     const timelineStart = new Date(openDate);
     timelineStart.setMonth(timelineStart.getMonth() - 1);
@@ -199,12 +203,21 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
       currentDate.setMonth(currentDate.getMonth() + 1);
     }
 
+    console.log('Rendering timeline with:', { 
+      applicationCount: applications.length, 
+      timelineStart, 
+      timelineEnd, 
+      totalDays, 
+      pixelsPerDay 
+    });
+
     return (
       <div className="timeline-container-skew">
         <div className="application-dots-skew">
           {applications.map((app, index) => {
             const left = getPositionPercentage(app.date);
             const bottom = getScorePosition(app.score);
+            console.log(`Rendering dot for app ${index}:`, { left, bottom, status: app.status });
             return (
               <div
                 key={index}
@@ -213,8 +226,14 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
                   left: `${left}%`,
                   bottom: `${bottom}%`
                 }}
-                onMouseEnter={() => setHoveredApp(app)}
-                onMouseLeave={() => setHoveredApp(null)}
+                onMouseEnter={() => {
+                  console.log('Mouse entered dot:', app);
+                  setHoveredApp(app);
+                }}
+                onMouseLeave={() => {
+                  console.log('Mouse left dot:', app);
+                  setHoveredApp(null);
+                }}
               ></div>
             );
           })}
@@ -260,66 +279,72 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
 
   const handleFirmChange = (event) => {
     const newFirmId = event.target.value;
+    console.log('Firm changed:', newFirmId);
     onFirmChange(newFirmId);
   };
 
-  return (
-    <div className="activity-container-skew">
-      <div className="bg-wrapper">
-        <div className="firm-selector-skew">
-          <select value={selectedFirm} onChange={handleFirmChange}>
-            <option value="">Select Firm</option>
-            {firms.map((firm) => (
-              <option key={firm.id} value={firm.id}>{firm.name}</option>
-            ))}
-          </select>
-        </div>
-        <div className="main-content-skew">
-          <div className="user-list-panel-skew">
-            <h3>Applicants</h3>
-            <div className="user-list-skew">
-              {users.length > 0 ? (
-                users.map(user => (
-                  <div key={user.id} className="user-item-skew">
-                    <span>{user.name}</span>
-                    <span className={`status-skew ${user.status.toLowerCase()}`}>{user.status}</span>
+  try {
+    return (
+      <div className="activity-container-skew">
+        <div className="bg-wrapper">
+          <div className="firm-selector-skew">
+            <select value={selectedFirm} onChange={handleFirmChange}>
+              <option value="">Select Firm</option>
+              {firms.map((firm) => (
+                <option key={firm.id} value={firm.id}>{firm.name}</option>
+              ))}
+            </select>
+          </div>
+          <div className="main-content-skew">
+            <div className="user-list-panel-skew">
+              <h3>Applicants</h3>
+              <div className="user-list-skew">
+                {users.length > 0 ? (
+                  users.map(user => (
+                    <div key={user.id} className="user-item-skew">
+                      <span>{user.name}</span>
+                      <span className={`status-skew ${user.status.toLowerCase()}`}>{user.status}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="user-item-skew">
+                    <span>No applicants yet</span>
                   </div>
-                ))
-              ) : (
-                <div className="user-item-skew">
-                  <span>No applicants yet</span>
-                </div>
-              )}
+                )}
+              </div>
+            </div>
+            <div className="skew-graph-panel-skew">
+              <h3>Application Activity</h3>
+              {renderTimeline()}
             </div>
           </div>
-          <div className="skew-graph-panel-skew">
-            <h3>Application Activity</h3>
-            {renderTimeline()}
-          </div>
-        </div>
-        <div className="bottom-panel-skew">
-          <div className="legend-skew">
-            <div className="legend-item-skew">
-              <span className="legend-color-skew accepted"></span>
-              <span>Accepted</span>
-            </div>
-            <div className="legend-item-skew">
-              <span className="legend-color-skew rejected"></span>
-              <span>Rejected</span>
-            </div>
-            <div className="legend-item-skew">
-              <span className="legend-color-skew pending"></span>
-              <span>Pending</span>
-            </div>
-            <div className="legend-item-skew">
-              <span className="legend-color-skew submitted"></span>
-              <span>Submitted</span>
+          <div className="bottom-panel-skew">
+            <div className="legend-skew">
+              <div className="legend-item-skew">
+                <span className="legend-color-skew accepted"></span>
+                <span>Accepted</span>
+              </div>
+              <div className="legend-item-skew">
+                <span className="legend-color-skew rejected"></span>
+                <span>Rejected</span>
+              </div>
+              <div className="legend-item-skew">
+                <span className="legend-color-skew pending"></span>
+                <span>Pending</span>
+              </div>
+              <div className="legend-item-skew">
+                <span className="legend-color-skew submitted"></span>
+                <span>Submitted</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error('Error rendering Activity component:', error);
+    return <div>An error occurred while rendering the activity view.</div>;
+  }
 };
 
 export default Activity;
