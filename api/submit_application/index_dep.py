@@ -41,7 +41,7 @@ class handler(BaseHTTPRequestHandler):
             Application decision:
             This application was rejected.
 
-            Open-Text Question:
+            Open-Text Answer:
             {application_text}
 
             Work Experience:
