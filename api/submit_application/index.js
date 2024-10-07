@@ -1,10 +1,9 @@
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
@@ -26,12 +25,21 @@ async function getFirmContext(firmId) {
 async function processSystemPrompt(systemPrompt, firmId) {
   const functionRegex = /\{&([^&]+)&\}/g;
   
-  return systemPrompt.replace(functionRegex, async (match, functionName) => {
-    if (functionName === "firm_context_function") {
-      return await getFirmContext(firmId);
-    }
-    return match;  // Return the original string if no match
-  });
+  const replacements = await Promise.all(
+    Array.from(systemPrompt.matchAll(functionRegex)).map(async ([full, functionName]) => {
+      if (functionName === "firm_context") {
+        return [full, await getFirmContext(firmId)];
+      }
+      return [full, full];  // Return the original string if no match
+    })
+  );
+
+  let processedPrompt = systemPrompt;
+  for (const [original, replacement] of replacements) {
+    processedPrompt = processedPrompt.replace(original, replacement);
+  }
+
+  return processedPrompt;
 }
 
 export default async function handler(req, res) {
@@ -77,7 +85,7 @@ export default async function handler(req, res) {
       This applicant studied at ${education} for a ${sub_category}.
       `;
 
-      const completion = await openai.createChatCompletion({
+      const completion = await openai.chat.completions.create({
         model: model,
         messages: [
           { role: "system", content: processedSystemPrompt },
@@ -85,12 +93,12 @@ export default async function handler(req, res) {
         ]
       });
 
-      const aiFeedback = completion.data.choices[0].message.content;
+      const aiFeedback = completion.choices[0].message.content;
 
       const usage = {
-        prompt_tokens: completion.data.usage.prompt_tokens,
-        completion_tokens: completion.data.usage.completion_tokens,
-        total_tokens: completion.data.usage.total_tokens
+        prompt_tokens: completion.usage.prompt_tokens,
+        completion_tokens: completion.usage.completion_tokens,
+        total_tokens: completion.usage.total_tokens
       };
 
       res.status(200).json({
