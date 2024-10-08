@@ -1,76 +1,31 @@
-import OpenAI from 'openai';
-import { createClient } from '@supabase/supabase-js';
+const { OpenAI } = require('openai');
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+module.exports = async (req, res) => {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
-async function getFirmContext(firmId) {
-  const { data, error } = await supabase
-    .from('firms')
-    .select('description')
-    .eq('id', firmId)
-    .single();
-
-  if (error) {
-    console.error('Error fetching firm context:', error);
-    return "No firm context available.";
-  }
-
-  return data.description || "No firm context available.";
-}
-
-async function processSystemPrompt(systemPrompt, firmId) {
-  const functionRegex = /\{&([^&]+)&\}/g;
-  
-  const replacements = await Promise.all(
-    Array.from(systemPrompt.matchAll(functionRegex)).map(async ([full, functionName]) => {
-      if (functionName === "firm_context") {
-        return [full, await getFirmContext(firmId)];
-      }
-      return [full, full];  // Return the original string if no match
-    })
-  );
-
-  let processedPrompt = systemPrompt;
-  for (const [original, replacement] of replacements) {
-    processedPrompt = processedPrompt.replace(original, replacement);
-  }
-
-  return processedPrompt;
-}
-
-export default async function handler(req, res) {
+  // Handle OPTIONS request
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
 
+  // Handle POST request
   if (req.method === 'POST') {
-    const {
-      applicationText,
-      firm,
-      firmId,
-      question,
-      work_experience = '',
-      education = '',
-      sub_category = '',
-      system_prompt,
-      model
-    } = req.body;
+    const { applicationText, firm, question, work_experience = '', education = '', sub_category = '', system_prompt, model } = req.body;
 
-    if (!applicationText || !firm || !firmId || !question || !system_prompt || !model) {
+    if (!applicationText || !firm || !question || !system_prompt || !model) {
       res.status(400).json({ error: "Missing required data" });
       return;
     }
 
     try {
-      // Process the system prompt
-      const processedSystemPrompt = await processSystemPrompt(system_prompt, firmId);
-
-      const userPrompt = `Firm: ${firm}
+      const user_prompt = `Firm: ${firm}
       Question: ${question}
       Application decision:
       This application was rejected.
@@ -85,15 +40,15 @@ export default async function handler(req, res) {
       This applicant studied at ${education} for a ${sub_category}.
       `;
 
-      const completion = await openai.chat.completions.create({
+      const completion = await client.chat.completions.create({
         model: model,
         messages: [
-          { role: "system", content: processedSystemPrompt },
-          { role: "user", content: userPrompt }
+          { role: "system", content: system_prompt },
+          { role: "user", content: user_prompt }
         ]
       });
 
-      const aiFeedback = completion.choices[0].message.content;
+      const ai_feedback = completion.choices[0].message.content;
 
       const usage = {
         prompt_tokens: completion.usage.prompt_tokens,
@@ -103,19 +58,17 @@ export default async function handler(req, res) {
 
       res.status(200).json({
         success: true,
-        feedback: aiFeedback,
+        feedback: ai_feedback,
         usage: usage,
         model: model,
-        system_prompt: processedSystemPrompt,
-        user_prompt: userPrompt
+        system_prompt: system_prompt,
+        user_prompt: user_prompt
       });
-
     } catch (error) {
-      console.error('Error:', error);
       res.status(500).json({ error: error.message });
     }
   } else {
-    res.setHeader('Allow', ['POST']);
+    res.setHeader('Allow', ['POST', 'OPTIONS']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-}
+};
