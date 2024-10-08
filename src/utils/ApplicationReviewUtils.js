@@ -80,31 +80,55 @@ export const getDraftSpecs = async (firmName, question) => {
 };
 
 export const getReviewSpecs = async (firmName, question) => {
+  console.log(`[getReviewSpecs] Starting to get review specs for firm: ${firmName}, question: ${question}`);
+  
+  // First, try to get the prompt and model for the specific question
   let { data, error } = await supabase
     .from('questions')
     .select('review_system_prompt, review_model')
     .eq('question', question)
     .single();
 
-  if (error || !data) {
-    ({ data, error } = await supabase
+  if (error) {
+    console.error(`[getReviewSpecs] Error fetching question-specific data:`, error);
+  }
+
+  let reviewSystemPrompt = data?.review_system_prompt;
+  let reviewModel = data?.review_model;
+
+  // If either the prompt or model is null/empty at the question level, fetch from firm level
+  if (!reviewSystemPrompt || !reviewModel) {
+    console.log(`[getReviewSpecs] Question-level data incomplete. Fetching firm-level data.`);
+    const { data: firmData, error: firmError } = await supabase
       .from('firms')
       .select('review_system_prompt, review_model')
       .eq('name', firmName)
-      .single());
+      .single();
 
-    if (error) throw error;
+    if (firmError) {
+      console.error(`[getReviewSpecs] Error fetching firm-level data:`, firmError);
+      throw firmError;
+    }
+
+    // Use firm-level data if question-level data is missing
+    reviewSystemPrompt = reviewSystemPrompt || firmData.review_system_prompt;
+    reviewModel = reviewModel || firmData.review_model;
   }
 
-  console.log(`[getReviewSpecs] Initial review system prompt:`, data.review_system_prompt);
+  if (!reviewSystemPrompt || !reviewModel) {
+    console.error(`[getReviewSpecs] Unable to find complete review specs for firm: ${firmName}, question: ${question}`);
+    throw new Error('Incomplete review specifications');
+  }
 
-  const updatedPrompt = await insertFirmContext(data.review_system_prompt, firmName);
+  console.log(`[getReviewSpecs] Initial review system prompt:`, reviewSystemPrompt);
+
+  const updatedPrompt = await insertFirmContext(reviewSystemPrompt, firmName);
 
   console.log(`[getReviewSpecs] Updated review system prompt:`, updatedPrompt);
 
   return {
     system_prompt: updatedPrompt,
-    model: data.review_model
+    model: reviewModel
   };
 };
 
