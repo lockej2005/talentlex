@@ -1,77 +1,138 @@
-const stripe = require('stripe')("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");
-const { createClient } = require('@supabase/supabase-js');
+import OpenAI from 'openai';
+import { createClient } from '@supabase/supabase-js';
 
-// Ensure these environment variables are set in your Vercel project settings
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+// Check for required environment variables
+const requiredEnvVars = ['OPENAI_API_KEY', 'SUPABASE_URL', 'SUPABASE_KEY'];
+const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
-if (!supabaseUrl || !supabaseKey) {
-  console.error('Missing Supabase environment variables');
+if (missingEnvVars.length > 0) {
+  console.error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
-module.exports = async (req, res) => {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
+let supabase;
+try {
+  supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+} catch (error) {
+  console.error('Failed to initialize Supabase client:', error);
+  process.exit(1);
+}
 
-  const { priceId, userId } = req.body;
-
-  // Get the origin from the request headers or use a default
-  const origin = req.headers.origin || 'https://talentlex.app';
-
+async function getFirmContext(firmId) {
   try {
-    const { data: user, error } = await supabase
-      .from('profiles')
-      .select('stripe_customer_id')
-      .eq('id', userId)
+    const { data, error } = await supabase
+      .from('firms')
+      .select('description')
+      .eq('id', firmId)
       .single();
 
-    if (error) {
-      console.error('Supabase error:', error);
-      throw new Error('Error fetching user');
-    }
+    if (error) throw error;
 
-    let customerId = user.stripe_customer_id;
-
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        metadata: {
-          supabase_user_id: userId,
-        },
-      });
-      customerId = customer.id;
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ stripe_customer_id: customerId })
-        .eq('id', userId);
-
-      if (updateError) {
-        console.error('Error updating Supabase:', updateError);
-      }
-    }
-
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/canceled`,
-      metadata: {
-        userId: userId
-      }
-    });
-
-    res.status(200).json({ url: session.url });
+    return data.description || "No firm context available.";
   } catch (error) {
-    console.error('Error creating checkout session:', error);
-    res.status(500).json({ error: 'Failed to create checkout session', details: error.message });
+    console.error('Error fetching firm context:', error);
+    return "Error fetching firm context.";
   }
-};
+}
+
+async function processSystemPrompt(systemPrompt, firmId) {
+  const functionRegex = /\{&([^&]+)&\}/g;
+  
+  const replacements = await Promise.all(
+    Array.from(systemPrompt.matchAll(functionRegex)).map(async ([full, functionName]) => {
+      if (functionName === "firm_context") {
+        return [full, await getFirmContext(firmId)];
+      }
+      return [full, full];  // Return the original string if no match
+    })
+  );
+
+  let processedPrompt = systemPrompt;
+  for (const [original, replacement] of replacements) {
+    processedPrompt = processedPrompt.replace(original, replacement);
+  }
+
+  return processedPrompt;
+}
+
+export default async function handler(req, res) {
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
+  if (req.method === 'POST') {
+    const {
+      applicationText,
+      firm,
+      firmId,
+      question,
+      work_experience = '',
+      education = '',
+      sub_category = '',
+      system_prompt,
+      model
+    } = req.body;
+
+    if (!applicationText || !firm || !firmId || !question || !system_prompt || !model) {
+      res.status(400).json({ error: "Missing required data" });
+      return;
+    }
+
+    try {
+      // Process the system prompt
+      const processedSystemPrompt = await processSystemPrompt(system_prompt, firmId);
+
+      const userPrompt = `Firm: ${firm}
+      Question: ${question}
+      Application decision:
+      This application was rejected.
+
+      Open-Text Answer:
+      ${applicationText}
+
+      Work Experience:
+      ${work_experience}
+
+      Education:
+      This applicant studied at ${education} for a ${sub_category}.
+      `;
+
+      const completion = await openai.chat.completions.create({
+        model: model,
+        messages: [
+          { role: "system", content: processedSystemPrompt },
+          { role: "user", content: userPrompt }
+        ]
+      });
+
+      const aiFeedback = completion.choices[0].message.content;
+
+      const usage = {
+        prompt_tokens: completion.usage.prompt_tokens,
+        completion_tokens: completion.usage.completion_tokens,
+        total_tokens: completion.usage.total_tokens
+      };
+
+      res.status(200).json({
+        success: true,
+        feedback: aiFeedback,
+        usage: usage,
+        model: model,
+        system_prompt: processedSystemPrompt,
+        user_prompt: userPrompt
+      });
+
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ error: error.message });
+    }
+  } else {
+    res.setHeader('Allow', ['POST']);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+}
