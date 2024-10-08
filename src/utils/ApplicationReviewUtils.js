@@ -2,6 +2,7 @@ import { supabase } from '../supabaseClient';
 import { subtractCreditsAndUpdateUser } from './CreditManager';
 import { creditPolice } from './CreditPolice';
 import { getProfileContext } from './GetProfileContext';
+import { insertFirmContext } from './PromptFunctions';
 
 export const getCurrentUser = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -68,8 +69,10 @@ export const getDraftSpecs = async (firmName, question) => {
     if (error) throw error;
   }
 
+  const updatedPrompt = await insertFirmContext(data.draft_system_prompt, firmName);
+
   return {
-    system_prompt: data.draft_system_prompt,
+    system_prompt: updatedPrompt,
     model: data.draft_model
   };
 };
@@ -93,15 +96,18 @@ export const getReviewSpecs = async (firmName, question) => {
     if (error) throw error;
   }
 
+  const updatedPrompt = await insertFirmContext(data.review_system_prompt, firmName);
+
   return {
-    system_prompt: data.review_system_prompt,
+    system_prompt: updatedPrompt,
     model: data.review_model
   };
 };
 
 export const submitApplication = async (applicationData) => {
+  console.log("activated")
   const userProfile = await getProfileContext(applicationData.userId);
-   
+  console.log("submitApplication activated - "+ userProfile)
   const { system_prompt, model } = await getReviewSpecs(applicationData.firmName, applicationData.question);
 
   const response = await fetch('/api/submit_application', {
