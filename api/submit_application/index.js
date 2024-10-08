@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
+//why no work?
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY);
 
 async function getFirmContext(firmId) {
