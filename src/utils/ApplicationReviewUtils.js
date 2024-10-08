@@ -2,25 +2,33 @@ import { supabase } from '../supabaseClient';
 import { subtractCreditsAndUpdateUser } from './CreditManager';
 import { creditPolice } from './CreditPolice';
 import { getProfileContext } from './GetProfileContext';
-import { insertFirmContext } from './PromptFunctions';
+import { insertFirmContext, logPromptDetails } from './PromptFunctions';
 
 export const getCurrentUser = async () => {
+  console.log('[getCurrentUser] Fetching current user');
   const { data: { user } } = await supabase.auth.getUser();
+  console.log('[getCurrentUser] User fetched:', user ? user.id : 'No user found');
   return user;
 };
 
 export const getUserData = async (userId) => {
+  console.log(`[getUserData] Fetching data for user: ${userId}`);
   const { data, error } = await supabase
     .from('user_drafts')
     .select('application_text, feedback')
     .eq('user_id', userId)
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.error(`[getUserData] Error fetching user data:`, error);
+    throw error;
+  }
+  console.log(`[getUserData] Data fetched successfully for user: ${userId}`);
   return data;
 };
 
 export const saveUserData = async (userId, applicationText, feedback) => {
+  console.log(`[saveUserData] Saving data for user: ${userId}`);
   const { error } = await supabase
     .from('user_drafts')
     .upsert({ 
@@ -29,29 +37,43 @@ export const saveUserData = async (userId, applicationText, feedback) => {
       feedback: feedback 
     });
 
-  if (error) throw error;
+  if (error) {
+    console.error(`[saveUserData] Error saving user data:`, error);
+    throw error;
+  }
+  console.log(`[saveUserData] Data saved successfully for user: ${userId}`);
 };
 
 export const insertApplication = async (applicationData) => {
+  console.log(`[insertApplication] Inserting application for user: ${applicationData.email}`);
   const { data, error } = await supabase
     .from('applications')
     .insert(applicationData);
 
-  if (error) throw error;
+  if (error) {
+    console.error(`[insertApplication] Error inserting application:`, error);
+    throw error;
+  }
+  console.log(`[insertApplication] Application inserted successfully for user: ${applicationData.email}`);
   return data;
 };
 
 export const insertDraftGeneration = async (draftData) => {
+  console.log(`[insertDraftGeneration] Inserting draft generation for user: ${draftData.email}`);
   const { data, error } = await supabase
     .from('draft_generations')
     .insert(draftData);
 
-  if (error) throw error;
+  if (error) {
+    console.error(`[insertDraftGeneration] Error inserting draft generation:`, error);
+    throw error;
+  }
+  console.log(`[insertDraftGeneration] Draft generation inserted successfully for user: ${draftData.email}`);
   return data;
 };
 
 export const getDraftSpecs = async (firmName, question) => {
-  // First, try to get the prompt and model for the specific question
+  console.log(`[getDraftSpecs] Getting draft specs for firm: ${firmName}, question: ${question}`);
   let { data, error } = await supabase
     .from('questions')
     .select('draft_system_prompt, draft_model')
@@ -59,17 +81,26 @@ export const getDraftSpecs = async (firmName, question) => {
     .single();
 
   if (error || !data) {
-    // If no question-specific prompt is found, fall back to the firm-level prompt
+    console.log(`[getDraftSpecs] No question-specific prompt found. Falling back to firm-level prompt.`);
     ({ data, error } = await supabase
       .from('firms')
       .select('draft_system_prompt, draft_model')
       .eq('name', firmName)
       .single());
 
-    if (error) throw error;
+    if (error) {
+      console.error(`[getDraftSpecs] Error fetching firm-level prompt:`, error);
+      throw error;
+    }
   }
 
+  console.log(`[getDraftSpecs] Retrieved system prompt before context insertion:`);
+  logPromptDetails(data.draft_system_prompt);
+
   const updatedPrompt = await insertFirmContext(data.draft_system_prompt, firmName);
+
+  console.log(`[getDraftSpecs] Updated system prompt after context insertion:`);
+  logPromptDetails(updatedPrompt);
 
   return {
     system_prompt: updatedPrompt,
@@ -78,7 +109,7 @@ export const getDraftSpecs = async (firmName, question) => {
 };
 
 export const getReviewSpecs = async (firmName, question) => {
-  // First, try to get the prompt and model for the specific question
+  console.log(`[getReviewSpecs] Getting review specs for firm: ${firmName}, question: ${question}`);
   let { data, error } = await supabase
     .from('questions')
     .select('review_system_prompt, review_model')
@@ -86,17 +117,26 @@ export const getReviewSpecs = async (firmName, question) => {
     .single();
 
   if (error || !data) {
-    // If no question-specific prompt is found, fall back to the firm-level prompt
+    console.log(`[getReviewSpecs] No question-specific prompt found. Falling back to firm-level prompt.`);
     ({ data, error } = await supabase
       .from('firms')
       .select('review_system_prompt, review_model')
       .eq('name', firmName)
       .single());
 
-    if (error) throw error;
+    if (error) {
+      console.error(`[getReviewSpecs] Error fetching firm-level prompt:`, error);
+      throw error;
+    }
   }
 
+  console.log(`[getReviewSpecs] Retrieved system prompt before context insertion:`);
+  logPromptDetails(data.review_system_prompt);
+
   const updatedPrompt = await insertFirmContext(data.review_system_prompt, firmName);
+
+  console.log(`[getReviewSpecs] Updated system prompt after context insertion:`);
+  logPromptDetails(updatedPrompt);
 
   return {
     system_prompt: updatedPrompt,
@@ -105,10 +145,14 @@ export const getReviewSpecs = async (firmName, question) => {
 };
 
 export const submitApplication = async (applicationData) => {
-  console.log("activated")
+  console.log(`[submitApplication] Starting application submission for user: ${applicationData.userId}, firm: ${applicationData.firmName}`);
   const userProfile = await getProfileContext(applicationData.userId);
-  console.log("submitApplication activated - "+ userProfile)
+  console.log(`[submitApplication] Retrieved user profile:`, userProfile);
+  
   const { system_prompt, model } = await getReviewSpecs(applicationData.firmName, applicationData.question);
+  
+  console.log(`[submitApplication] Final system prompt before API call:`);
+  logPromptDetails(system_prompt);
 
   const response = await fetch('/api/submit_application', {
     method: 'POST',
@@ -129,16 +173,24 @@ export const submitApplication = async (applicationData) => {
 
   if (!response.ok) {
     const errorData = await response.json();
+    console.error(`[submitApplication] API call failed:`, errorData);
     throw new Error(errorData.message || 'Network response was not ok');
   }
 
-  return await response.json();
+  const result = await response.json();
+  console.log(`[submitApplication] Application submitted successfully. Response:`, result);
+  return result;
 };
 
 export const createApplicationDraft = async (draftData) => {
+  console.log(`[createApplicationDraft] Starting draft creation for user: ${draftData.userId}, firm: ${draftData.firmName}`);
   const userProfile = await getProfileContext(draftData.userId);
+  console.log(`[createApplicationDraft] Retrieved user profile:`, userProfile);
 
   const { system_prompt, model } = await getDraftSpecs(draftData.firmName, draftData.question);
+
+  console.log(`[createApplicationDraft] Final system prompt before API call:`);
+  logPromptDetails(system_prompt);
 
   // Map the notes to the expected fields
   const mappedData = {
@@ -162,13 +214,17 @@ export const createApplicationDraft = async (draftData) => {
 
   if (!response.ok) {
     const errorData = await response.json();
+    console.error(`[createApplicationDraft] API call failed:`, errorData);
     throw new Error(errorData.message || 'Failed to generate draft');
   }
 
-  return await response.json();
+  const result = await response.json();
+  console.log(`[createApplicationDraft] Draft created successfully. Response:`, result);
+  return result;
 };
 
 export const calculateAndUpdateScores = async (userId, firmId) => {
+  console.log(`[calculateAndUpdateScores] Starting score calculation for user: ${userId}, firm: ${firmId}`);
   try {
     // Fetch firm details including prompts and models
     const { data: firmData, error: firmError } = await supabase
@@ -212,6 +268,7 @@ export const calculateAndUpdateScores = async (userId, firmId) => {
     const educationContent = `Education: ${profileData.education || 'N/A'}\nSub-categories: ${Array.isArray(profileData.sub_categories) ? profileData.sub_categories.join(', ') : (profileData.sub_categories || 'N/A')}\nUndergraduate Grades: ${profileData.undergraduate_grades || 'N/A'}`;
     const workExpContent = workExpData.work_experience || '[]';
 
+    console.log(`[calculateAndUpdateScores] Sending data to backend for score calculation`);
     // Send data to backend for score calculation
     const response = await fetch('/api/calculate_scores', {
       method: 'POST',
@@ -233,11 +290,14 @@ export const calculateAndUpdateScores = async (userId, firmId) => {
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error(`[calculateAndUpdateScores] Failed to calculate scores:`, errorText);
       throw new Error(`Failed to calculate scores: ${errorText}`);
     }
 
     const scoreData = await response.json();
+    console.log(`[calculateAndUpdateScores] Scores calculated successfully:`, scoreData);
 
+    console.log(`[calculateAndUpdateScores] Updating firm_user_table with new scores`);
     // Update firm_user_table with the new scores and justifications
     const { error: updateError } = await supabase
       .from('firm_user_table')
@@ -255,8 +315,12 @@ export const calculateAndUpdateScores = async (userId, firmId) => {
         onConflict: 'user_id,firm_id'
       });
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      console.error(`[calculateAndUpdateScores] Error updating firm_user_table:`, updateError);
+      throw updateError;
+    }
 
+    console.log(`[calculateAndUpdateScores] Scores updated successfully`);
     return scoreData;
   } catch (error) {
     console.error('Error calculating and updating scores:', error);
@@ -265,6 +329,8 @@ export const calculateAndUpdateScores = async (userId, firmId) => {
 };
 
 export const handleApplicationSubmit = async (user, applicationText, selectedFirm, selectedQuestion) => {
+  console.log(`[handleApplicationSubmit] Starting application submission process for user: ${user.id}`);
+  
   if (!user) {
     throw new Error('Please log in to submit your application.');
   }
@@ -275,6 +341,7 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
     const userAgent = navigator.userAgent;
     const screenSize = `${window.screen.width}x${window.screen.height}`;
 
+    console.log(`[handleApplicationSubmit] Submitting application`);
     const data = await submitApplication({
       userId: user.id,
       applicationText,
@@ -284,6 +351,7 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
       email: user.email
     });
 
+    console.log(`[handleApplicationSubmit] Inserting application data`);
     await insertApplication({
       firm: selectedFirm.name,
       question: selectedQuestion.value,
@@ -298,15 +366,20 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
     const endTime = Date.now();
     const responseTime = (endTime - startTime) / 1000;
 
+    console.log(`[handleApplicationSubmit] Calculating and updating scores`);
     // Calculate and update scores
     const scoreData = await calculateAndUpdateScores(user.id, selectedFirm.id);
 
+    console.log(`[handleApplicationSubmit] Subtracting credits and updating user`);
     // Subtract credits only once, after all operations are complete
     const { success, cost, newBalance, error } = await subtractCreditsAndUpdateUser(user.id, data.usage.total_tokens);
 
     if (!success) {
+      console.error(`[handleApplicationSubmit] Error subtracting credits:`, error);
       throw new Error(error);
     }
+
+    console.log(`[handleApplicationSubmit] Application submission process completed. Total time: ${responseTime}s`);
 
     return {
       success: true,
@@ -321,6 +394,7 @@ export const handleApplicationSubmit = async (user, applicationText, selectedFir
 };
 
 export const saveDraft = async (userId, title, draft, firm, question) => {
+  console.log(`[saveDraft] Saving draft for user: ${userId}, firm: ${firm}`);
   const { data, error } = await supabase
     .from('saved_drafts')
     .insert({
@@ -331,11 +405,17 @@ export const saveDraft = async (userId, title, draft, firm, question) => {
       question: question
     });
 
-  if (error) throw error;
+  if (error) {
+    console.error(`[saveDraft] Error saving draft:`, error);
+    throw error;
+  }
+  console.log(`[saveDraft] Draft saved successfully for user: ${userId}`);
   return data;
 };
 
 export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, additionalInfo, setApplicationText, setTotalTokens) => {
+  console.log(`[handleDraftCreation] Starting draft creation for user: ${user.id}, firm: ${selectedFirm.name}`);
+  
   if (!user) {
     throw new Error('Please log in to generate a draft.');
   }
@@ -350,10 +430,12 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
   const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field]?.trim() !== '');
 
   if (!areAllFieldsFilled) {
+    console.error(`[handleDraftCreation] Not all required fields are filled`);
     throw new Error('Please fill out all the required information fields before generating a draft.');
   }
 
   try {
+    console.log(`[handleDraftCreation] Creating application draft`);
     const data = await createApplicationDraft({
       userId: user.id,
       firmId: selectedFirm.id,
@@ -390,8 +472,10 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
       };
     }
 
+    console.log(`[handleDraftCreation] Inserting draft generation data`);
     await insertDraftGeneration(draftGenerationData);
 
+    console.log(`[handleDraftCreation] Draft creation completed successfully`);
     return { success: true, draft: data.draft, usage: data.usage };
   } catch (error) {
     console.error('Error in handleDraftCreation:', error);
