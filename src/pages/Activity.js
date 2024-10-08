@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
+import { AlertTriangle, Copy, Check } from 'lucide-react';
 import './Activity.css';
 
 const Activity = ({ userId, selectedFirm, onFirmChange }) => {
@@ -12,6 +13,7 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
   const [maxScore, setMaxScore] = useState(0);
   const [firms, setFirms] = useState([]);
   const [hoveredApp, setHoveredApp] = useState(null);
+  const [copySuccess, setCopySuccess] = useState(false);
 
   console.log('Component rendered. Current state:', { 
     applicationsCount: applications.length, 
@@ -283,8 +285,32 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
     onFirmChange(newFirmId);
   };
 
-  try {
-    return (
+  const copyReferralLink = () => {
+    const referralLink = "https://talentlex.app/"; // Replace with actual referral link
+    navigator.clipboard.writeText(referralLink).then(() => {
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000); // Reset after 2 seconds
+    });
+  };
+
+  return (
+    <div>
+      <div className="custom-warning-banner">
+        <AlertTriangle size={16} className="warning-icon" />
+        <span className="warning-text">
+          Refer a friend using {" "}
+          <button className="warning-link" onClick={copyReferralLink}>
+            this link
+            {copySuccess ? (
+              <Check size={16} className="copy-icon" />
+            ) : (
+              <Copy size={16} className="copy-icon" />
+            )}
+          </button>
+          {copySuccess && <span className="copied-text">Copied!</span>}
+          {" "}to contribute to this feature and help other applicants
+        </span>
+      </div>
       <div className="activity-container-skew">
         <div className="bg-wrapper">
           <div className="firm-selector-skew">
@@ -340,11 +366,8 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
           </div>
         </div>
       </div>
-    );
-  } catch (error) {
-    console.error('Error rendering Activity component:', error);
-    return <div>An error occurred while rendering the activity view.</div>;
-  }
+    </div>
+  );
 };
 
 export default Activity;

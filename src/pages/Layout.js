@@ -153,7 +153,12 @@ const Layout = () => {
                   <Link to="/">Profile</Link>
                 </li>
                 <li className={location.pathname === "/activity" ? "active" : ""}>
-                  <Link to="/activity">Activity</Link>
+                  <Link to="/activity">
+                  <div className='label-row'>
+                    Activity
+                    <span className="new-tag">New !</span>
+                  </div>
+                  </Link>
                 </li>
                 <li className="section-title">Firms</li>
                 <div className='seperator'></div>
@@ -163,7 +168,7 @@ const Layout = () => {
                   </li>
                 ))}
                 <li className="add-new" onClick={handleAddNewFirm}>
-                  Add New +
+                  Add New Firm +
                 </li>
               </ul>
             </nav>

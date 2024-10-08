@@ -1,32 +1,32 @@
 import { supabase } from '../supabaseClient';
 
-export const getFirmDescription = async (firmName) => {
-  console.log(`[getFirmDescription] Starting to fetch description for firm: ${firmName}`);
+export const getFirmContext = async (firmName) => {
+  console.log(`[getFirmContext] Starting to fetch context for firm: ${firmName}`);
 
   const startTime = Date.now();
   const { data, error } = await supabase
     .from('firms')
-    .select('description')
+    .select('firm_context')
     .eq('name', firmName)
     .single();
 
   const endTime = Date.now();
-  console.log(`[getFirmDescription] Supabase query execution time: ${endTime - startTime}ms`);
+  console.log(`[getFirmContext] Supabase query execution time: ${endTime - startTime}ms`);
 
   if (error) {
-    console.error(`[getFirmDescription] Error fetching firm description for ${firmName}:`, error);
+    console.error(`[getFirmContext] Error fetching firm context for ${firmName}:`, error);
     return '';
   }
 
   if (!data) {
-    console.warn(`[getFirmDescription] No data returned for firm: ${firmName}`);
+    console.warn(`[getFirmContext] No data returned for firm: ${firmName}`);
     return '';
   }
 
-  console.log(`[getFirmDescription] Successfully fetched description for firm: ${firmName}`);
-  console.log(`[getFirmDescription] Description length: ${data.description ? data.description.length : 0} characters`);
+  console.log(`[getFirmContext] Successfully fetched context for firm: ${firmName}`);
+  console.log(`[getFirmContext] Context length: ${data.firm_context ? data.firm_context.length : 0} characters`);
 
-  return data.description || '';
+  return data.firm_context || '';
 };
 
 export const insertFirmContext = async (prompt, firmName) => {
@@ -37,13 +37,13 @@ export const insertFirmContext = async (prompt, firmName) => {
     console.log(`[insertFirmContext] Found placeholder in prompt for firm: ${firmName}`);
     
     const startTime = Date.now();
-    const firmDescription = await getFirmDescription(firmName);
+    const firmContext = await getFirmContext(firmName);
     const endTime = Date.now();
     
-    console.log(`[insertFirmContext] Time taken to fetch firm description: ${endTime - startTime}ms`);
-    console.log(`[insertFirmContext] Firm description length: ${firmDescription.length} characters`);
+    console.log(`[insertFirmContext] Time taken to fetch firm context: ${endTime - startTime}ms`);
+    console.log(`[insertFirmContext] Firm context length: ${firmContext.length} characters`);
 
-    const updatedPrompt = prompt.replace('{&firm_context_function&}', firmDescription);
+    const updatedPrompt = prompt.replace('{&firm_context_function&}', firmContext);
     console.log(`[insertFirmContext] Updated prompt length: ${updatedPrompt.length} characters`);
     
     console.log(`[insertFirmContext] Context insertion complete for firm: ${firmName}`);
@@ -54,7 +54,6 @@ export const insertFirmContext = async (prompt, firmName) => {
   return prompt;
 };
 
-// Add a new function for logging purposes
 export const logPromptDetails = (prompt) => {
   console.log(`[logPromptDetails] Prompt details:`);
   console.log(`  - Total length: ${prompt.length} characters`);

@@ -18,7 +18,7 @@ const Plans = ({ onClose, userId }) => {
         priceId = 'price_1Q5v6H05kmxxE8ckRj5uBzNf';
         break;
       case 'quarterly':
-        priceId = 'price_1Q5uiY05kmxxE8ckKQVvbtAt';
+        priceId = 'price_1Q7ldD05kmxxE8ckBibJNRvO';
         break;
       default:
         setError('Invalid plan selected');
@@ -88,8 +88,8 @@ const Plans = ({ onClose, userId }) => {
             />
             <span className="plan-details-plan">
               <span className="plan-name-plan">Quarterly Plan</span>
-              <span className="plan-price-plan">£30/quarter</span>
-              <span className="plan-savings-plan">Save £15/quarter</span>
+              <span className="plan-price-plan">£35/quarter</span>
+              <span className="plan-savings-plan">Save £10/quarter</span>
             </span>
           </label>
         </div>

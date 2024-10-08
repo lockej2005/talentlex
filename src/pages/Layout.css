@@ -509,3 +509,18 @@ a:hover {
   max-height: 90vh;
   overflow-y: auto;
 }
+.label-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+.new-tag {
+  background-color: #ff4757;
+  color: white;
+  font-size: 0.7em;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  vertical-align: top;
+}
