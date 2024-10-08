@@ -308,7 +308,7 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
             )}
           </button>
           {copySuccess && <span className="copied-text">Copied!</span>}
-          {" "}to contribute to this feature and help other applicants
+          {" "} to see if they've heard back!
         </span>
       </div>
       <div className="activity-container-skew">
