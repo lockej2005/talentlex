@@ -2,7 +2,7 @@ import { supabase } from '../supabaseClient';
 import { subtractCreditsAndUpdateUser } from './CreditManager';
 import { creditPolice } from './CreditPolice';
 import { getProfileContext } from './GetProfileContext';
-import { insertFirmContext } from './PromptFunctions';
+import { insertFirmContext, insertTopExamples, logPromptDetails } from './PromptFunctions';
 
 export const getCurrentUser = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -132,13 +132,29 @@ export const getReviewSpecs = async (firmName, question) => {
   };
 };
 
-export const submitApplication = async (applicationData) => {
-  console.log("activated")
-  const userProfile = await getProfileContext(applicationData.userId);
-  console.log("submitApplication activated - "+ userProfile)
-  const { system_prompt, model } = await getReviewSpecs(applicationData.firmName, applicationData.question);
+export const prepareReviewPrompt = async (systemPrompt, firmName, applicationText) => {
+  console.log(`[prepareReviewPrompt] Starting prompt preparation for firm: ${firmName}`);
+  
+  let updatedPrompt = await insertFirmContext(systemPrompt, firmName);
+  console.log(`[prepareReviewPrompt] Prompt after inserting firm context:`);
+  logPromptDetails(updatedPrompt);
 
-  console.log(`[submitApplication] Final system prompt:`, system_prompt);
+  updatedPrompt = await insertTopExamples(updatedPrompt, applicationText);
+  console.log(`[prepareReviewPrompt] Prompt after inserting top examples:`);
+  logPromptDetails(updatedPrompt);
+
+  return updatedPrompt;
+};
+
+export const submitApplication = async (applicationData) => {
+  console.log(`[submitApplication] Starting application submission for firm: ${applicationData.firmName}`);
+
+  const { system_prompt, model } = await getReviewSpecs(applicationData.firmName, applicationData.question);
+  console.log(`[submitApplication] Retrieved review specs. Model: ${model}`);
+
+  const preparedPrompt = await prepareReviewPrompt(system_prompt, applicationData.firmName, applicationData.applicationText);
+  console.log(`[submitApplication] Prepared review prompt:`);
+  logPromptDetails(preparedPrompt);
 
   const response = await fetch('/api/submit_application', {
     method: 'POST',
@@ -146,23 +162,21 @@ export const submitApplication = async (applicationData) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      applicationText: applicationData.applicationText,
-      firm: applicationData.firmName,
-      question: applicationData.question,
-      work_experience: userProfile.work_experience,
-      education: userProfile.education,
-      sub_category: userProfile.sub_categories,
-      system_prompt,
+      ...applicationData,
+      system_prompt: preparedPrompt,
       model,
     }),
   });
 
   if (!response.ok) {
+    console.error(`[submitApplication] Error submitting application:`, response.statusText);
     const errorData = await response.json();
     throw new Error(errorData.message || 'Network response was not ok');
   }
 
-  return await response.json();
+  const result = await response.json();
+  console.log(`[submitApplication] Application submitted successfully. Usage:`, result.usage);
+  return result;
 };
 
 export const createApplicationDraft = async (draftData) => {
