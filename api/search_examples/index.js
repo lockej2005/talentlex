@@ -24,12 +24,15 @@ export default async function handler(req, res) {
 
     const [{ embedding }] = embeddingResponse.data;
 
-    // Fetch all examples from applications_vector
+    // Fetch all examples from examples_vector
     const { data: examples, error } = await supabase
-      .from('applications_vector')
-      .select('id, user_id, firm_id, question, application_text, vector');
+      .from('examples_vector')
+      .select('id, application_text, vector');
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching examples:', error);
+      throw error;
+    }
 
     // Process results locally
     const results = examples.map(example => {
@@ -37,9 +40,6 @@ export default async function handler(req, res) {
       const similarity = dotProduct(embedding, exampleEmbedding);
       return {
         id: example.id,
-        user_id: example.user_id,
-        firm_id: example.firm_id,
-        question: example.question,
         application_text: example.application_text,
         similarity
       };
