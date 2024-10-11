@@ -1,16 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { OpenAI } from 'openai';
 
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -24,7 +16,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'user_application is required' });
     }
 
-    // Get embedding for the user's application
+    // Get embedding for the user application
     const embeddingResponse = await openai.embeddings.create({
       model: "text-embedding-3-small",
       input: user_application,
@@ -32,25 +24,39 @@ export default async function handler(req, res) {
 
     const [{ embedding }] = embeddingResponse.data;
 
-    // Perform vector similarity search
+    // Fetch all examples from applications_vector
     const { data: examples, error } = await supabase
-      .from('example_vectors')
-      .select('id, application_text, vector')
-      .order('vector <-> $1', { ascending: true })
-      .limit(10)
-      .values([embedding]);
+      .from('applications_vector')
+      .select('id, user_id, firm_id, question, application_text, vector');
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
-    // Extract application_text from similar examples
-    const topExamples = examples.map(example => example.application_text);
+    // Process results locally
+    const results = examples.map(example => {
+      const exampleEmbedding = JSON.parse(example.vector);
+      const similarity = dotProduct(embedding, exampleEmbedding);
+      return {
+        id: example.id,
+        user_id: example.user_id,
+        firm_id: example.firm_id,
+        question: example.question,
+        application_text: example.application_text,
+        similarity
+      };
+    });
 
-    return res.status(200).json({ similar_examples: topExamples });
+    // Sort results by similarity (highest first) and take top 10
+    results.sort((a, b) => b.similarity - a.similarity);
+    const topResults = results.slice(0, 10);
+
+    return res.status(200).json(topResults);
 
   } catch (error) {
     console.error('Error:', error);
     return res.status(500).json({ error: 'An error occurred while processing your request' });
   }
+}
+
+function dotProduct(vecA, vecB) {
+  return vecA.reduce((sum, val, i) => sum + val * vecB[i], 0);
 }

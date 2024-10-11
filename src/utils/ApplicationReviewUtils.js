@@ -82,7 +82,6 @@ export const getDraftSpecs = async (firmName, question) => {
 export const getReviewSpecs = async (firmName, question) => {
   console.log(`[getReviewSpecs] Starting to get review specs for firm: ${firmName}, question: ${question}`);
   
-  // First, try to get the prompt and model for the specific question
   let { data, error } = await supabase
     .from('questions')
     .select('review_system_prompt, review_model')
@@ -96,7 +95,6 @@ export const getReviewSpecs = async (firmName, question) => {
   let reviewSystemPrompt = data?.review_system_prompt;
   let reviewModel = data?.review_model;
 
-  // If either the prompt or model is null/empty at the question level, fetch from firm level
   if (!reviewSystemPrompt || !reviewModel) {
     console.log(`[getReviewSpecs] Question-level data incomplete. Fetching firm-level data.`);
     const { data: firmData, error: firmError } = await supabase
@@ -110,7 +108,6 @@ export const getReviewSpecs = async (firmName, question) => {
       throw firmError;
     }
 
-    // Use firm-level data if question-level data is missing
     reviewSystemPrompt = reviewSystemPrompt || firmData.review_system_prompt;
     reviewModel = reviewModel || firmData.review_model;
   }
@@ -120,14 +117,10 @@ export const getReviewSpecs = async (firmName, question) => {
     throw new Error('Incomplete review specifications');
   }
 
-  console.log(`[getReviewSpecs] Initial review system prompt:`, reviewSystemPrompt);
-
-  const updatedPrompt = await insertFirmContext(reviewSystemPrompt, firmName);
-
-  console.log(`[getReviewSpecs] Updated review system prompt:`, updatedPrompt);
+  console.log(`[getReviewSpecs] Retrieved review specs. Prompt length: ${reviewSystemPrompt.length}, Model: ${reviewModel}`);
 
   return {
-    system_prompt: updatedPrompt,
+    system_prompt: reviewSystemPrompt,
     model: reviewModel
   };
 };
@@ -139,8 +132,26 @@ export const prepareReviewPrompt = async (systemPrompt, firmName, applicationTex
   console.log(`[prepareReviewPrompt] Prompt after inserting firm context:`);
   logPromptDetails(updatedPrompt);
 
-  updatedPrompt = await insertTopExamples(updatedPrompt, applicationText);
-  console.log(`[prepareReviewPrompt] Prompt after inserting top examples:`);
+  if (updatedPrompt.includes('{&top_examples_retrieval&}')) {
+    const response = await fetch('/api/search_examples', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_application: applicationText }),
+    });
+
+    if (!response.ok) {
+      console.error(`[prepareReviewPrompt] Error fetching similar examples:`, response.statusText);
+      throw new Error('Failed to fetch similar examples');
+    }
+
+    const similarExamples = await response.json();
+    const examplesText = similarExamples
+      .map(example => `Question: ${example.question}\nAnswer: ${example.application_text}`)
+      .join('\n\n');
+    updatedPrompt = updatedPrompt.replace('{&top_examples_retrieval&}', examplesText);
+  }
+
+  console.log(`[prepareReviewPrompt] Final prepared prompt:`);
   logPromptDetails(updatedPrompt);
 
   return updatedPrompt;
@@ -148,11 +159,19 @@ export const prepareReviewPrompt = async (systemPrompt, firmName, applicationTex
 
 export const submitApplication = async (applicationData) => {
   console.log(`[submitApplication] Starting application submission for firm: ${applicationData.firmName}`);
+  
+  const userProfile = await getProfileContext(applicationData.userId);
+  console.log(`[submitApplication] Retrieved user profile for user ID: ${applicationData.userId}`);
 
   const { system_prompt, model } = await getReviewSpecs(applicationData.firmName, applicationData.question);
   console.log(`[submitApplication] Retrieved review specs. Model: ${model}`);
 
-  const preparedPrompt = await prepareReviewPrompt(system_prompt, applicationData.firmName, applicationData.applicationText);
+  let preparedPrompt = await insertFirmContext(system_prompt, applicationData.firmName);
+  console.log(`[submitApplication] Inserted firm context into prompt`);
+
+  preparedPrompt = await insertTopExamples(preparedPrompt, applicationData.applicationText);
+  console.log(`[submitApplication] Inserted top examples into prompt`);
+
   console.log(`[submitApplication] Prepared review prompt:`);
   logPromptDetails(preparedPrompt);
 
@@ -162,7 +181,12 @@ export const submitApplication = async (applicationData) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      ...applicationData,
+      applicationText: applicationData.applicationText,
+      firm: applicationData.firmName,
+      question: applicationData.question,
+      work_experience: userProfile.work_experience,
+      education: userProfile.education,
+      sub_category: userProfile.sub_categories,
       system_prompt: preparedPrompt,
       model,
     }),
@@ -176,6 +200,7 @@ export const submitApplication = async (applicationData) => {
 
   const result = await response.json();
   console.log(`[submitApplication] Application submitted successfully. Usage:`, result.usage);
+
   return result;
 };
 
