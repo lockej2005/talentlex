@@ -49,24 +49,41 @@ export const insertTopExamples = async (prompt, applicationText) => {
 
   if (prompt.includes('{&top_examples_retrieval&}')) {
     console.log(`[insertTopExamples] Found placeholder in prompt`);
-    const response = await fetch('/api/search_examples', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ user_application: applicationText }),
-    });
+    try {
+      const response = await fetch('/api/search_examples', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_application: applicationText }),
+      });
 
-    if (!response.ok) {
-      console.error(`[insertTopExamples] Error fetching top examples:`, response.statusText);
-      throw new Error('Failed to fetch top examples');
+      if (!response.ok) {
+        console.error(`[insertTopExamples] Error fetching top examples:`, response.statusText);
+        throw new Error('Failed to fetch top examples');
+      }
+
+      const similarExamples = await response.json();
+      console.log(`[insertTopExamples] Received similar examples:`, JSON.stringify(similarExamples, null, 2));
+
+      if (!Array.isArray(similarExamples) || similarExamples.length === 0) {
+        console.warn(`[insertTopExamples] No similar examples found or invalid response`);
+        return prompt.replace('{&top_examples_retrieval&}', '');
+      }
+
+      const examplesText = similarExamples
+        .map(example => `Example (similarity: ${example.similarity.toFixed(4)}):\n${example.application_text}`)
+        .join('\n\n');
+
+      console.log(`[insertTopExamples] Processed examples text:`, examplesText);
+
+      const updatedPrompt = prompt.replace('{&top_examples_retrieval&}', examplesText);
+      console.log(`[insertTopExamples] Updated prompt length: ${updatedPrompt.length}`);
+      return updatedPrompt;
+    } catch (error) {
+      console.error(`[insertTopExamples] Error processing top examples:`, error);
+      return prompt.replace('{&top_examples_retrieval&}', '');
     }
-
-    const { similar_examples } = await response.json();
-    const examplesText = similar_examples.join('\n\n');
-    const updatedPrompt = prompt.replace('{&top_examples_retrieval&}', examplesText);
-    console.log(`[insertTopExamples] Updated prompt length: ${updatedPrompt.length}`);
-    return updatedPrompt;
   }
 
   console.log(`[insertTopExamples] No placeholder found in prompt`);
