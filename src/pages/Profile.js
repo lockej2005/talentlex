@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { supabase } from '../supabaseClient'; // Adjust the import path as needed
 import './Profile.css';
+import WelcomeMessage from './WelcomeMessage'; // Import the WelcomeMessage component
 
 const Profile = () => {
   const [userId, setUserId] = useState(null);
@@ -170,6 +171,7 @@ const Profile = () => {
 
   return (
     <div className="profile-container">
+      <WelcomeMessage /> {/* WelcomeMessage placed above the profile content */}
       <div className="main-content-profile">
         <div className="user-context-profile">
           <div className="profile-header">

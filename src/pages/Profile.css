@@ -1,12 +1,14 @@
 .profile-container {
     display: flex;
-    height: 100%;
+    flex-direction: column; /* Change to column layout */
+    min-height: 100vh;
     padding: 20px;
     gap: 20px;
+    background-color: #E4E4E4;
 }
 
 .main-content-profile {
-    flex: 2;
+    flex: 1;
     display: flex;
     flex-direction: column;
 }
@@ -19,6 +21,8 @@
     display: flex;
     flex-direction: column;
 }
+
+/* Rest of the CSS remains unchanged */
 
 .linkedin-scraper-profile {
     flex: 1;
@@ -204,8 +208,8 @@
 }
 
 .subcategories-input {
-    min-height: 60px; /* Adjust this value to fit two lines of text */
-    resize: vertical; /* Allows user to resize vertically if needed */
+    min-height: 60px;
+    resize: vertical;
 }
 
 .year-header-profile {
@@ -214,18 +218,18 @@
     align-items: center;
     padding: 0.75rem 1rem;
     cursor: pointer;
-  }
-  
-  .year-name {
+}
+
+.year-name {
     font-weight: bold;
-  }
-  
-  .year-controls {
+}
+
+.year-controls {
     display: flex;
     align-items: center;
-  }
-  
-  .delete-year-btn {
+}
+
+.delete-year-btn {
     background: none;
     border: none;
     color: #ff6b6b;
@@ -235,25 +239,25 @@
     align-items: center;
     justify-content: center;
     margin-right: 10px;
-  }
-  
-  .delete-year-btn:hover {
+}
+
+.delete-year-btn:hover {
     color: #ff4757;
-  }
-  
-  .expand-icon {
+}
+
+.expand-icon {
     display: inline-flex;
     align-items: center;
-  }
+}
 
-  .profile-header {
+.profile-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-  }
-  
-  .save-profile-btn {
+}
+
+.save-profile-btn {
     background-color: #4CAF50;
     color: white;
     border: none;
@@ -262,18 +266,18 @@
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
-  }
-  
-  .save-profile-btn:hover {
+}
+
+.save-profile-btn:hover {
     background-color: #45a049;
-  }
-  
-  .save-profile-btn.saving {
+}
+
+.save-profile-btn.saving {
     background-color: #cccccc;
     cursor: not-allowed;
-  }
-  
-  .save-profile-btn:disabled {
+}
+
+.save-profile-btn:disabled {
     opacity: 0.7;
     cursor: not-allowed;
-  }
+}

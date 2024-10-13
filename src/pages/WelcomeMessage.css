@@ -1,0 +1,82 @@
+.welcome-message {
+    margin: 30px;
+    background-color: #e6f3ff;
+    border: 1px solid #b3d7ff;
+    color: #004085;
+    padding: 20px 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    display: flex;
+    align-items: flex-start;
+    font-size: 16px;
+    font-family: "Inter", sans-serif;
+  }
+  
+  .welcome-message .welcome-icon {
+    margin-right: 15px;
+    color: #004085;
+    flex-shrink: 0;
+  }
+  
+  .welcome-message .welcome-content {
+    flex-grow: 1;
+  }
+  
+  .welcome-message h1 {
+    color: #004085;
+    font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-family: "Faustina", serif;
+    font-weight: 700;
+  }
+  
+  .welcome-message p {
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  
+  .welcome-message ul {
+    list-style-type: none;
+    padding-left: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .welcome-message ul li {
+    margin-bottom: 5px;
+    position: relative;
+  }
+  
+  .welcome-message ul li::before {
+    content: "•";
+    color: #004085;
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+    position: absolute;
+    left: 0;
+  }
+  
+  @media (max-width: 768px) {
+    .welcome-message {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 15px;
+    }
+  
+    .welcome-message .welcome-icon {
+      margin-right: 0;
+      margin-bottom: 10px;
+    }
+  
+    .welcome-message ul {
+      padding-left: 0;
+    }
+  
+    .welcome-message ul li::before {
+      position: static;
+      margin-right: 5px;
+    }
+  }
