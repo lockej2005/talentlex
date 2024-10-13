@@ -90,6 +90,28 @@ const HowDidYouHearSurvey = () => {
               />
               <label htmlFor="wordofmouth">Word of mouth</label>
             </div>
+            <div className={`option ${selectedOption === 'Legal Cheek event' ? 'selected' : ''}`}>
+              <input
+                type="radio"
+                id="legalcheekevent"
+                name="referral"
+                value="Legal Cheek event"
+                checked={selectedOption === 'Legal Cheek event'}
+                onChange={handleOptionChange}
+              />
+              <label htmlFor="legalcheekevent">Legal Cheek event</label>
+            </div>
+            <div className={`option ${selectedOption === 'QR code Poster' ? 'selected' : ''}`}>
+              <input
+                type="radio"
+                id="qrcodepost"
+                name="referral"
+                value="QR code Poster"
+                checked={selectedOption === 'QR code Poster'}
+                onChange={handleOptionChange}
+              />
+              <label htmlFor="qrcodepost">QR code Poster</label>
+            </div>
             <div className={`option ${selectedOption === 'Other' ? 'selected' : ''}`}>
               <input
                 type="radio"
