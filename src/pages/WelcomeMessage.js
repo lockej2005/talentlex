@@ -26,6 +26,9 @@ const WelcomeMessage = () => {
         <p>
           If you need help making a first draft for your application, you can use your "Draft Application feature". Once you press Send for Review on your Application Review tab a score will automatically be given to you for likelihood of acceptance.
         </p>
+        <p>
+          To calculate your most accurate score, also fill out your Work Experience in in the Firm Dashboard of each specific firm (they must be done for every individual firm) and fill out your profile here. Your written application, work experience and profile determines your firm score. 
+        </p>
       </div>
     </div>
   );
