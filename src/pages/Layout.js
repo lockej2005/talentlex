@@ -154,22 +154,33 @@ const Layout = () => {
                 </li>
                 <li className={location.pathname === "/activity" ? "active" : ""}>
                   <Link to="/activity">
-                  <div className='label-row'>
-                    Activity
-                    <span className="new-tag">New !</span>
-                  </div>
+                    <div className='label-row'>
+                      Activity
+                      <span className="new-tag">New !</span>
+                    </div>
                   </Link>
                 </li>
                 <li className="section-title">Firms</li>
                 <div className='seperator'></div>
-                {selectedFirms.map(firm => (
-                  <li key={firm.id} className={location.pathname === `/firm/${firm.id}` ? "active" : ""}>
-                    <Link to={`/firm/${firm.id}`}>{firm.name}</Link>
-                  </li>
-                ))}
-                <li className="add-new" onClick={handleAddNewFirm}>
-                  Add New Firm +
-                </li>
+                {selectedFirms.length > 0 ? (
+                  <>
+                    {selectedFirms.map(firm => (
+                      <li key={firm.id} className={location.pathname === `/firm/${firm.id}` ? "active" : ""}>
+                        <Link to={`/firm/${firm.id}`}>{firm.name}</Link>
+                      </li>
+                    ))}
+                    <li className="add-new" onClick={handleAddNewFirm}>
+                      Add New Firm +
+                    </li>
+                  </>
+                ) : (
+                  <>
+                    <li className="no-firms-prompt">Get started by adding a firm ⬇️</li>
+                    <li className="add-new" onClick={handleAddNewFirm}>
+                      Add New Firm +
+                    </li>
+                  </>
+                )}
               </ul>
             </nav>
           </div>
