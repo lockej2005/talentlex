@@ -417,6 +417,16 @@
   min-height: 200px;
   padding: 10px;
   margin-bottom: 10px;
+  overflow-y: auto;
+}
+
+.import-editor .DraftEditor-root {
+  height: 100%;
+  min-height: 180px;
+}
+
+.import-editor .public-DraftEditorPlaceholder-root {
+  color: #999;
 }
 
 .apply-import {

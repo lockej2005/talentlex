@@ -248,61 +248,55 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     }
   }, [user, actualFirmId, selectedQuestion, additionalInfo, onDraftChange]);
 
-  const handleCreateDraft = useCallback(async () => {
-    console.log("handleCreateDraft called");
-    if (!user) {
-      alert('Please log in to generate a draft.');
-      return;
-    }
-  
-    if (!actualFirmId) {
-      alert('No firm selected. Please choose a firm from the dashboard.');
-      return;
-    }
-  
-    if (!selectedQuestion) {
-      alert('Please select a question before generating a draft.');
-      return;
-    }
-  
-    let requiredFields = ['note_1', 'note_2', 'note_3', 'note_4'];
-  
-    const areAllFieldsFilled = requiredFields.every((field) => additionalInfo[field]?.trim() !== '');
-  
-    if (!areAllFieldsFilled) {
-      alert('Please fill out all the required information fields before generating a draft.');
-      return;
-    }
-  
+  const handleGenerateDraft = async () => {
     setIsLoading(true);
-    const startTime = Date.now();
+    setError(null);
+
     try {
-      const result = await handleDraftCreation(
-        user,
-        { id: actualFirmId, name: firmName },
-        selectedQuestion,
-        additionalInfo,
-        setDraftText,
-        setTotalTokens
-      );
-      const endTime = Date.now();
-      setResponseTime((endTime - startTime) / 1000);
+      const response = await fetch('/api/generate-draft', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firmId,
+          additionalInfo,
+          // ... any other data you're sending
+        }),
+      });
+
+      // Log the full response for debugging
+      console.log('Full response:', response);
+
+      // Check if the response is okay
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Check the content type of the response
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const errorText = await response.text();
+        console.error('Unexpected content type:', contentType);
+        console.error('Response text:', errorText);
+        throw new Error("Oops! We haven't received a valid response from the server.");
+      }
+
+      const data = await response.json();
       
-      const contentState = ContentState.createFromText(result.draft);
-      setEditorState(EditorState.createWithContent(contentState));
-      setWordCount(countWords(result.draft));
-      setIsEdited(true);
-      
-      await saveDraft(result.draft);
-      
-      alert('Draft generated and saved successfully.');
+      // Process your data here
+      setDraftText(data.generatedDraft);
+      // ... other state updates
+
     } catch (error) {
-      console.error('Error:', error);
-      alert("Error: " + error.message);
+      console.error('Error generating draft:', error);
+      setError('An error occurred while generating the draft. Please try again.');
     } finally {
       setIsLoading(false);
     }
-  }, [user, actualFirmId, firmName, selectedQuestion, additionalInfo, setDraftText, setEditorState, saveDraft]);
+  };
 
   const onEditorChange = useCallback((newEditorState) => {
     setEditorState(newEditorState);
@@ -423,11 +417,12 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
                 <button className="close-import-editor" onClick={handleCloseImportEditor}>
                   <FontAwesomeIcon icon={faTimes} />
                 </button>
-                <h3>Paste your previous application here:</h3>
+                <h3>Paste or type your previous application here:</h3>
                 <div className="import-editor">
                   <Editor
                     editorState={importEditorState}
                     onChange={handleImportEditorChange}
+                    placeholder="Start typing or paste your previous application here..."
                   />
                 </div>
                 <button className="apply-import" onClick={handleApplyImport}>
@@ -460,7 +455,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
           <div className="button-container-draft">
             <button 
               className="submit-button-draft" 
-              onClick={handleCreateDraft} 
+              onClick={handleGenerateDraft} 
               disabled={isLoading || !user || !hasPlus}
             >
               {isLoading ? 'Generating...' : 'Generate Draft'}
