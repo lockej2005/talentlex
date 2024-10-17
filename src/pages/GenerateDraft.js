@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useContext, useCallback } from 'rea
 import { useNavigate } from 'react-router-dom';
 import { Editor, EditorState, ContentState, RichUtils, SelectionState } from 'draft-js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowsLeftRight, faBold, faItalic, faUnderline, faListUl, faListOl, faQuoteRight } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsLeftRight, faBold, faItalic, faUnderline, faListUl, faListOl, faQuoteRight, faFileImport, faTimes } from '@fortawesome/free-solid-svg-icons';
 import ApplicationInput from './ApplicationInput';
 import './GenerateDraft.css';
 import { UserInputContext } from '../context/UserInputContext';
@@ -39,6 +39,8 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
   const [hasPlus, setHasPlus] = useState(false);
   const [showPlans, setShowPlans] = useState(false);
   const [actualFirmId, setActualFirmId] = useState(null);
+  const [showImportEditor, setShowImportEditor] = useState(false);
+  const [importEditorState, setImportEditorState] = useState(EditorState.createEmpty());
 
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
@@ -365,6 +367,28 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     setShowPlans(false);
   }, []);
 
+  const handleImportPreviousApplication = useCallback(() => {
+    setShowImportEditor(true);
+  }, []);
+
+  const handleCloseImportEditor = useCallback(() => {
+    setShowImportEditor(false);
+    setImportEditorState(EditorState.createEmpty());
+  }, []);
+
+  const handleImportEditorChange = useCallback((newEditorState) => {
+    setImportEditorState(newEditorState);
+  }, []);
+
+  const handleApplyImport = useCallback(() => {
+    const importedText = importEditorState.getCurrentContent().getPlainText();
+    setAdditionalInfo(prevInfo => ({
+      ...prevInfo,
+      note_1: importedText
+    }));
+    handleCloseImportEditor();
+  }, [importEditorState, setAdditionalInfo]);
+
   console.log("Current state - hasPlus:", hasPlus);
 
   return (
@@ -380,6 +404,39 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
       )}
       <div className="content-draft" ref={containerRef}>
       <div className="left-column-draft" style={{ width: `${leftWidth}%` }}>
+          <div className="firm-selection-container">
+            <select
+              value={selectedFirm}
+              onChange={(e) => {/* Your existing onChange handler */}}
+            >
+              {/* Your firm options */}
+            </select>
+            
+            <button className="import-button" onClick={handleImportPreviousApplication}>
+              <FontAwesomeIcon icon={faFileImport} /> Import Previous Application
+            </button>
+          </div>
+          
+          {showImportEditor && (
+            <div className="import-editor-overlay">
+              <div className="import-editor-container">
+                <button className="close-import-editor" onClick={handleCloseImportEditor}>
+                  <FontAwesomeIcon icon={faTimes} />
+                </button>
+                <h3>Paste your previous application here:</h3>
+                <div className="import-editor">
+                  <Editor
+                    editorState={importEditorState}
+                    onChange={handleImportEditorChange}
+                  />
+                </div>
+                <button className="apply-import" onClick={handleApplyImport}>
+                  Apply Import
+                </button>
+              </div>
+            </div>
+          )}
+          
           <ApplicationInput
             applicationText={draftText}
             setApplicationText={setDraftText}

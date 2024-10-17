@@ -336,3 +336,99 @@
     background-color: #cccccc;
     cursor: not-allowed;
   }
+
+.firm-selection-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.import-button {
+  background-color: #276D8B;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.import-button:hover {
+  background-color: #1c5a6f;
+}
+
+.import-button svg {
+  margin-right: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .firm-selection-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .import-button {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}
+
+.import-editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.import-editor-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-import-editor {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.import-editor {
+  border: 1px solid #ccc;
+  min-height: 200px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.apply-import {
+  background-color: #276D8B;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.apply-import:hover {
+  background-color: #1c5a6f;
+}
