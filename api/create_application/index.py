@@ -27,6 +27,7 @@ class handler(BaseHTTPRequestHandler):
         question = data.get('question')
         system_prompt = data.get('system_prompt')
         model = data.get('model')
+        importedDraft = data.get('importedDraft', '')  # Get the imported draft, default to empty string
 
         if not all([firmName, question, system_prompt, model]):
             self.send_error_response(400, f"Missing required data. firmName: {firmName}, question: {question}, system_prompt: {system_prompt}, model: {model}")
@@ -45,6 +46,9 @@ class handler(BaseHTTPRequestHandler):
                 - Relevant experiences: {data.get('relevantExperiences')}
 
                 Please create a well-structured, professional application that incorporates all the provided information seamlessly.
+
+                If applicable, use the following imported draft as a reference or starting point:
+                {importedDraft}
                 """
             else:
                 prompt = f"""
@@ -58,6 +62,9 @@ class handler(BaseHTTPRequestHandler):
                 - Additional personal information: {data.get('personalInfo')}
 
                 Please create a well-structured, professional application that incorporates all the provided information seamlessly.
+
+                If applicable, use the following imported draft as a reference or starting point:
+                {importedDraft}
                 """
 
             print(f"Using model: {model}")
