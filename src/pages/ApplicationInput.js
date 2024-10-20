@@ -9,10 +9,11 @@ function ApplicationInput({
   setSelectedQuestion,
   questions,
   wordCount,
+  additionalInfo,
+  onAdditionalInfoChange,
   inputType,
   onQuestionChange,
-  additionalInfo,
-  onAdditionalInfoChange
+  onImportDraftClick,
 }) {
   const customStyles = {
     control: (provided) => ({
@@ -87,7 +88,17 @@ function ApplicationInput({
   const renderExpandedInput = () => (
     <div className="application-container">
       <div className="title-card expanded">
-        <h3>Additional Information</h3>
+        <div className="additional-info-row">
+          <h3>Additional Information</h3>
+          <button 
+              className="import-draft-btn" 
+              onClick={() => {
+                onImportDraftClick(); // Ensure this function is called
+              }}
+            >
+            Import Draft ↑
+          </button>
+        </div>
         <p>Please provide the following details to help generate your draft.</p>
         {dropdownSection}
         <div className="additional-fields">

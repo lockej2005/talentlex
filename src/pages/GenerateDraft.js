@@ -39,6 +39,25 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
   const [hasPlus, setHasPlus] = useState(false);
   const [showPlans, setShowPlans] = useState(false);
   const [actualFirmId, setActualFirmId] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [importedDraft, setImportedDraft] = useState('');
+
+
+  const openPopup = () => {
+    setIsPopupOpen(true);
+  };
+
+  const closePopup = () => {
+    setIsPopupOpen(false);
+  };
+
+  const handleImportDraft = () => {
+    setDraftText(importedDraft);
+    setEditorState(EditorState.createWithContent(ContentState.createFromText(importedDraft)));
+    setWordCount(countWords(importedDraft));
+    setIsEdited(true);
+    closePopup();
+  };
 
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
@@ -281,7 +300,8 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
         selectedQuestion,
         additionalInfo,
         setDraftText,
-        setTotalTokens
+        setTotalTokens,
+        draftText // Pass the current draftText, which may be the imported draft
       );
       const endTime = Date.now();
       setResponseTime((endTime - startTime) / 1000);
@@ -300,7 +320,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     } finally {
       setIsLoading(false);
     }
-  }, [user, actualFirmId, firmName, selectedQuestion, additionalInfo, setDraftText, setEditorState, saveDraft]);
+  }, [user, actualFirmId, firmName, selectedQuestion, additionalInfo, setDraftText, setEditorState, saveDraft, draftText]);
 
   const onEditorChange = useCallback((newEditorState) => {
     setEditorState(newEditorState);
@@ -369,6 +389,21 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
 
   return (
     <div className="comparison-container-draft">
+      {isPopupOpen && (
+        <div className="popup-draft" onClick={(e) => e.target.className === 'popup-draft' && closePopup()}>
+          <div className="popup-content-draft">
+            <span className="close-btn-draft" onClick={closePopup}>&times;</span>
+            <h2>Import your previous draft</h2>
+            <textarea
+              className="import-draft-textarea"
+              value={importedDraft}
+              onChange={(e) => setImportedDraft(e.target.value)}
+              placeholder="Paste your previous draft here..."
+            />
+            <button className="import-draft-btn" onClick={handleImportDraft}>Done</button>
+          </div>
+        </div>
+      )}
       {error && <div className="error-message">{error}</div>}
       {!hasPlus && (
         <div className="upgrade-bar">
@@ -378,6 +413,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
           </button>
         </div>
       )}
+
       <div className="content-draft" ref={containerRef}>
       <div className="left-column-draft" style={{ width: `${leftWidth}%` }}>
           <ApplicationInput
@@ -390,6 +426,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
             onAdditionalInfoChange={handleAdditionalInfoChange}
             wordCount={wordCount}
             inputType="expanded"
+            onImportDraftClick={openPopup}
           />
         </div>
         <div className="divider-draft" ref={dividerRef} onMouseDown={handleMouseDown}>

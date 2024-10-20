@@ -219,7 +219,8 @@ export const createApplicationDraft = async (draftData) => {
     personalInfo: draftData.note_4,
     userProfile,
     system_prompt,
-    model
+    model,
+    importedDraft: draftData.importedDraft // Add this line
   };
 
   const response = await fetch('/api/create_application', {
@@ -400,7 +401,7 @@ export const saveDraft = async (userId, title, draft, firm, question) => {
   return data;
 };
 
-export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, additionalInfo, setApplicationText, setTotalTokens) => {
+export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, additionalInfo, setApplicationText, setTotalTokens, importedDraft = '') => {
   if (!user) {
     throw new Error('Please log in to generate a draft.');
   }
@@ -424,7 +425,8 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
       firmId: selectedFirm.id,
       firmName: selectedFirm.name,
       question: selectedQuestion.value,
-      ...additionalInfo
+      ...additionalInfo,
+      importedDraft // optional, if user has previous draft
     });
 
     setApplicationText(data.draft);
@@ -440,7 +442,8 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
         relevant_experience: additionalInfo.relevantExperiences,
         relevant_interaction: additionalInfo.whyJonesDay,
         personal_info: additionalInfo.whyYou,
-        generated_draft: data.draft
+        generated_draft: data.draft,
+        imported_draft: importedDraft
       };
     } else {
       draftGenerationData = {
@@ -451,10 +454,11 @@ export const handleDraftCreation = async (user, selectedFirm, selectedQuestion, 
         relevant_experience: additionalInfo.note_2,
         relevant_interaction: additionalInfo.note_3,
         personal_info: additionalInfo.note_4,
-        generated_draft: data.draft
+        generated_draft: data.draft,
+        imported_draft: importedDraft
       };
     }
-
+    
     await insertDraftGeneration(draftGenerationData);
 
     return { success: true, draft: data.draft, usage: data.usage };
