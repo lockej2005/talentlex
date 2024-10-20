@@ -47,7 +47,7 @@ class handler(BaseHTTPRequestHandler):
 
                 Please create a well-structured, professional application that incorporates all the provided information seamlessly.
 
-                If applicable, use the following imported draft as a reference or starting point:
+                If applicable, use the following imported draft that the user made as a reference or starting point:
                 {importedDraft}
                 """
             else:
@@ -63,7 +63,7 @@ class handler(BaseHTTPRequestHandler):
 
                 Please create a well-structured, professional application that incorporates all the provided information seamlessly.
 
-                If applicable, use the following imported draft as a reference or starting point:
+                If applicable, use the following imported draft that the user made as a reference or starting point:
                 {importedDraft}
                 """
 
