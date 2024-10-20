@@ -93,7 +93,8 @@ class handler(BaseHTTPRequestHandler):
                     "prompt_tokens": usage.prompt_tokens,
                     "completion_tokens": usage.completion_tokens,
                     "total_tokens": usage.total_tokens
-                }
+                },
+                "user_prompt": prompt  # Include the user prompt in the response
             })
             self.wfile.write(response.encode('utf-8'))
 
