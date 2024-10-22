@@ -11,7 +11,7 @@ import {
 } from '../utils/ApplicationReviewUtils';
 import { UserInputContext } from '../context/UserInputContext';
 import { supabase } from '../supabaseClient';
-
+// sample comment
 function ApplicationReview({ firmId, selectedFirm, onApplicationChange }) {
   const { 
     applicationText, setApplicationText,
