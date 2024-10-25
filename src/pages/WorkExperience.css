@@ -1,0 +1,330 @@
+.work-experience-workexp {
+    background-color: #1B4A5D;
+    padding: 24px;
+    border-radius: 8px;
+    color: white;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.work-experience-workexp * {
+    box-sizing: border-box;
+}
+
+.work-experience-workexp h3 {
+    color: white;
+    font-size: 24px;
+    font-weight: normal;
+    margin-bottom: 30px;
+}
+
+.experience-item-workexp {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 16px 0;
+    position: relative;
+}
+
+.experience-content-workexp {
+    margin-right: 32px;
+}
+
+.experience-title-workexp {
+    color: white;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.experience-duration-workexp {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+}
+
+.delete-experience-btn-workexp {
+    position: absolute;
+    top: 16px;
+    right: 0;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+}
+
+.add-experience-workexp {
+    margin-top: 24px;
+    width: 100%;
+    padding-bottom: 60px;
+    position: relative;
+}
+
+/* Duration inputs (From/To) */
+.experience-duration-inputs-workexp {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.date-input-group-workexp {
+    flex: 1;
+}
+
+.date-input-group-workexp label {
+    display: block;
+    color: white;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.date-input-group-workexp input {
+    width: 100%;
+    height: 36px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: white;
+    color: #333;
+    font-size: 14px;
+}
+
+.date-input-group-workexp input[type="date"] {
+    background-color: white;
+    color: #333;
+}
+
+.date-input-group-workexp input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
+/* Regular input groups */
+.input-group-workexp {
+    margin-bottom: 24px;
+    width: 100%;
+}
+
+.input-group-workexp label {
+    display: block;
+    color: white;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.input-group-workexp input,
+.input-group-workexp select {
+    width: calc(100% - 2px);
+    height: 36px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: white;
+    color: #333;
+    font-size: 14px;
+}
+
+.input-group-workexp select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    padding-right: 32px;
+}
+
+.input-group-workexp select option {
+    background-color: white;
+    color: #333;
+}
+
+.input-group-workexp textarea {
+    width: calc(100% - 2px);
+    min-height: 120px;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: white;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: vertical;
+    margin: 0;
+}
+
+.input-group-workexp input::placeholder,
+.input-group-workexp textarea::placeholder,
+.input-group-workexp select::placeholder {
+    color: rgba(51, 51, 51, 0.6);
+}
+
+/* Radio buttons */
+.radio-group-workexp {
+    margin: 24px 0;
+    width: 100%;
+}
+
+.radio-options-workexp {
+    display: flex;
+    gap: 24px;
+    margin-top: 8px;
+}
+
+.radio-options-workexp label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: white;
+    font-size: 14px;
+}
+
+.radio-options-workexp input[type="radio"] {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid white;
+    border-radius: 50%;
+    margin: 0;
+    cursor: pointer;
+    position: relative;
+}
+
+.radio-options-workexp input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+/* Word count */
+.word-count-workexp {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    text-align: right;
+    margin-top: 4px;
+}
+
+/* Add button */
+.add-button-workexp {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #2D7DA3;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.add-button-workexp:hover {
+    background-color: #246686;
+}
+
+/* Focus states */
+.input-group-workexp input:focus,
+.input-group-workexp select:focus,
+.input-group-workexp textarea:focus,
+.date-input-group-workexp input:focus {
+    outline: none;
+    border: 1px solid #2D7DA3;
+}
+
+@media (max-width: 768px) {
+    .experience-duration-inputs-workexp {
+        flex-direction: column;
+    }
+
+    .add-button-workexp {
+        position: static;
+        width: 100%;
+        margin-top: 16px;
+    }
+
+    .add-experience-workexp {
+        padding-bottom: 0;
+    }
+
+    .work-experience-workexp {
+        padding: 16px;
+    }
+
+    .input-group-workexp input,
+    .input-group-workexp select,
+    .input-group-workexp textarea,
+    .date-input-group-workexp input {
+        width: 100%;
+    }
+
+    .radio-options-workexp {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+.error-message-workexp {
+    color: #ff4757;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+}
+
+.input-group-workexp input.error,
+.input-group-workexp textarea.error,
+.date-input-group-workexp input.error {
+    border: 1px solid #ff4757;
+}
+
+.work-experience-header-workexp {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.work-experience-header-workexp h3 {
+    margin: 0;
+}
+
+.sync-button-workexp {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #2D7DA3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.sync-button-workexp:hover {
+    background-color: #246686;
+}
+
+.sync-button-workexp:disabled {
+    background-color: #1B4A5D;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.sync-button-workexp svg {
+    transition: transform 0.5s ease;
+}
+
+.sync-button-workexp.syncing svg {
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
