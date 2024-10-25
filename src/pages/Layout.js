@@ -12,6 +12,7 @@ import Plans from './Plans';
 import Success from './Success';
 import ManageSubscription from './ManageSubscription';
 import Activity from './Activity';
+import WorkExperience from './WorkExperience';
 import { Menu } from 'lucide-react';
 import './Layout.css';
 import './Authentication2.css';
@@ -152,6 +153,9 @@ const Layout = () => {
                 <li className={location.pathname === "/" ? "active" : ""}>
                   <Link to="/">Profile</Link>
                 </li>
+                <li className={location.pathname === "/work-experience" ? "active" : ""}>
+                  <Link to="/work-experience">Work Experience</Link>
+                </li>
                 <li className={location.pathname === "/activity" ? "active" : ""}>
                   <Link to="/activity">
                     <div className='label-row'>
@@ -207,6 +211,7 @@ const Layout = () => {
             )}
             <Routes>
               <Route path="/" element={<Profile />} />
+              <Route path="/work-experience" element={<WorkExperience />} />
               <Route path="/activity" element={<Activity userId={user?.id} selectedFirm={selectedFirm} onFirmChange={handleFirmChange} />} />
               <Route path="/firm/:id/*" element={<FirmDashboard key={location.pathname} />} />
               <Route path="/firm-selector" element={<FirmSelector />} />
