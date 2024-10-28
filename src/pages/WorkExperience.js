@@ -294,8 +294,13 @@ const WorkExperience = () => {  // Removed unused props
   };
 
   if (isLoading) {
-    return <div className="loading-message-workexp">Loading...</div>;
+    return (
+      <div className="spinner-container">
+        <div className="loading-spinner"></div>
+      </div>
+    );
   }
+  
 
   const content = (
     <div className="work-experience-workexp">
