@@ -27,7 +27,7 @@ const Plans = ({ onClose, userId }) => {
 
     setIsLoading(true);
     setError(null);
-
+    // test commit to supabase_key
     try {
       const response = await fetch('/api/create_checkout_session', {
         method: 'POST',
