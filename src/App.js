@@ -1,5 +1,3 @@
-// App.js
-
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
@@ -17,6 +15,7 @@ import Videos from './pages/Videos';
 import SpeakToFounders from './pages/SpeakToFounders';
 import DueDiligence from './pages/DueDiligence';
 import Profile from './pages/Profile';
+import WorkExperience from './pages/WorkExperience';
 import useUserActivity from './hooks/useUserActivity';
 
 const PrivateRoute = ({ children }) => {
@@ -44,7 +43,6 @@ const PrivateRoute = ({ children }) => {
 };
 
 function App() {
-  // Use the useUserActivity hook to track user activity
   useUserActivity();
 
   return (
@@ -63,6 +61,7 @@ function App() {
             }
           >
             <Route index element={<Profile />} />
+            <Route path="work-experience" element={<WorkExperience />} />
             <Route path="application-review" element={<ApplicationReview />} />
             <Route path="generate-draft" element={<GenerateDraft />} />
             <Route path="generate-draft/:id" element={<GenerateDraft />} />

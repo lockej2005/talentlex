@@ -4,8 +4,8 @@ import { supabase } from '../supabaseClient';
 import GenerateDraft from './GenerateDraft';
 import ApplicationReview from './ApplicationReview';
 import ScoreWarnings from './ScoreWarnings';
+import WorkExperience from './WorkExperience';
 import { firms } from '../data/ApplicationReviewData';
-import { Trash2 } from 'lucide-react';
 import './FirmDashboard.css';
 
 const FirmDashboard = () => {
@@ -16,7 +16,6 @@ const FirmDashboard = () => {
   const [applicationData, setApplicationData] = useState(null);
   const [selectedFirm, setSelectedFirm] = useState(null);
   const [workExperiences, setWorkExperiences] = useState([]);
-  const [newExperience, setNewExperience] = useState({ title: '', duration: '' });
   const [user, setUser] = useState(null);
   const [scores, setScores] = useState(null);
   const { id } = useParams();
@@ -119,6 +118,36 @@ const FirmDashboard = () => {
     }
   };
 
+  const updateWorkExperiences = async (experiences) => {
+    if (!user) return;
+
+    const formattedExperiences = experiences.map((exp) => ({
+      title: exp.title,
+      time: exp.duration,
+    }));
+
+    try {
+      const { error } = await supabase
+        .from('firm_user_table')
+        .upsert(
+          {
+            user_id: user.id,
+            firm_id: id,
+            work_experience: JSON.stringify(formattedExperiences),
+          },
+          {
+            onConflict: 'user_id,firm_id',
+          }
+        );
+
+      if (error) throw error;
+      setWorkExperiences(experiences);
+    } catch (error) {
+      console.error('Error updating work experiences:', error);
+      setRealtimeError('Failed to update work experiences. Please try again.');
+    }
+  };
+
   const subscribeToScores = (userId, firmId) => {
     console.log('Attempting to subscribe to scores...');
     const channel = supabase
@@ -139,7 +168,6 @@ const FirmDashboard = () => {
       )
       .subscribe();
 
-    // Handle channel status updates
     channel.on('status', ({ status }) => {
       console.log('Score subscription status:', status);
       if (status === 'SUBSCRIBED') {
@@ -155,10 +183,7 @@ const FirmDashboard = () => {
     });
 
     console.log('Subscribed to score channel:', channel);
-
-    // Fetch initial data
     fetchScores(userId, firmId);
-
     return channel;
   };
 
@@ -202,37 +227,6 @@ const FirmDashboard = () => {
         justification: data.workexp_justification || '',
       },
     });
-  };
-
-  const updateWorkExperiences = async (experiences) => {
-    if (!user) return;
-
-    const formattedExperiences = experiences.map((exp) => ({
-      title: exp.title,
-      time: exp.duration,
-    }));
-
-    try {
-      const { error } = await supabase
-        .from('firm_user_table')
-        .upsert(
-          {
-            user_id: user.id,
-            firm_id: id,
-            work_experience: JSON.stringify(formattedExperiences),
-          },
-          {
-            onConflict: 'user_id,firm_id',
-          }
-        );
-
-      if (error) throw error;
-
-      fetchWorkExperiences(user.id, id);
-    } catch (error) {
-      console.error('Error updating work experiences:', error);
-      setRealtimeError('Failed to update work experiences. Please try again.');
-    }
   };
 
   const handleSave = async () => {
@@ -307,21 +301,6 @@ const FirmDashboard = () => {
     setShowSaveButton(true);
   }, []);
 
-  const handleAddExperience = () => {
-    if (newExperience.title && newExperience.duration) {
-      const updatedExperiences = [...workExperiences, newExperience];
-      setWorkExperiences(updatedExperiences);
-      updateWorkExperiences(updatedExperiences);
-      setNewExperience({ title: '', duration: '' });
-    }
-  };
-
-  const handleDeleteExperience = (index) => {
-    const updatedExperiences = workExperiences.filter((_, i) => i !== index);
-    setWorkExperiences(updatedExperiences);
-    updateWorkExperiences(updatedExperiences);
-  };
-
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -332,6 +311,8 @@ const FirmDashboard = () => {
                 <h2>{firmDetails?.name}</h2>
                 <p>{firmDetails?.description}</p>
               </div>
+              <ScoreWarnings userId={user?.id} firmId={id} />
+
               <div className="score-display" ref={scoreDisplayRef}>
                 {scores ? (
                   <>
@@ -371,35 +352,11 @@ const FirmDashboard = () => {
               </div>
             </div>
             <div className="right-column-firmdash">
-              <ScoreWarnings userId={user?.id} firmId={id} />
-              <div className="work-experience-firmdash" ref={workExperienceRef}>
-                <h3>Work Experience</h3>
-                {workExperiences.map((exp, index) => (
-                  <div key={index} className="experience-item">
-                    <div className="experience-content">
-                      <h4 className="experience-title">{exp.title}</h4>
-                      <p className="experience-duration">{exp.duration}</p>
-                    </div>
-                    <button className="delete-experience-btn" onClick={() => handleDeleteExperience(index)}>
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ))}
-                <div className="add-experience">
-                  <textarea
-                    placeholder="Job Title and Company"
-                    value={newExperience.title}
-                    onChange={(e) => setNewExperience({ ...newExperience, title: e.target.value })}
-                    rows="2"
-                  />
-                  <textarea
-                    type="text"
-                    placeholder="Description"
-                    value={newExperience.duration}
-                    onChange={(e) => setNewExperience({ ...newExperience, duration: e.target.value })}
-                  />
-                  <button onClick={handleAddExperience}>+</button>
-                </div>
+              <div ref={workExperienceRef}>
+                <WorkExperience 
+                  workExperiences={workExperiences} 
+                  onUpdateExperiences={updateWorkExperiences}
+                />
               </div>
             </div>
           </div>
