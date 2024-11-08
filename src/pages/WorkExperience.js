@@ -453,7 +453,6 @@ const WorkExperience = () => {  // Removed unused props
           <textarea
             value={newExperience.details}
             onChange={(e) => handleChange('details', e.target.value)}
-            maxLength={1000}
             rows={4}
             className={errors.details ? 'error' : ''}
           />
