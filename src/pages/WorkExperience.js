@@ -167,8 +167,8 @@ const WorkExperience = () => {  // Removed unused props
       errors.to = 'End date is required';
     }
 
-    if (experience.details && experience.details.length > 250) {
-      errors.details = 'Details must be less than 250 words';
+    if (experience.details && experience.details.length > 1000) {
+      errors.details = 'Details must be less than 1000 characters';
     }
 
     return errors;
@@ -288,11 +288,6 @@ const WorkExperience = () => {  // Removed unused props
     }
   };
 
-  const handleWordCount = (text) => {
-    if (!text) return 0;
-    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
-  };
-
   if (isLoading) {
     return (
       <div className="spinner-container">
@@ -364,7 +359,7 @@ const WorkExperience = () => {  // Removed unused props
         <div className="date-input-group-workexp">
             <label>From</label>
             <input
-            type="month"  // Changed from "date" to "month"
+            type="month"
             value={newExperience.from}
             onChange={(e) => handleChange('from', e.target.value)}
             className={errors.from ? 'error' : ''}
@@ -374,7 +369,7 @@ const WorkExperience = () => {  // Removed unused props
         <div className="date-input-group-workexp">
             <label>To</label>
             <input
-            type="month"  // Changed from "date" to "month"
+            type="month"
             value={newExperience.to}
             onChange={(e) => handleChange('to', e.target.value)}
             className={errors.to ? 'error' : ''}
@@ -462,9 +457,6 @@ const WorkExperience = () => {  // Removed unused props
             rows={4}
             className={errors.details ? 'error' : ''}
           />
-          <div className="word-count-workexp">
-            Word Count (Max 250 words): {handleWordCount(newExperience.details)}
-          </div>
           {errors.details && <span className="error-message-workexp">{errors.details}</span>}
         </div>
 
@@ -479,7 +471,7 @@ const WorkExperience = () => {  // Removed unused props
     <div className="work-experience-page-container">
       {content}
     </div>
-  ) : content;
+) : content;
 };
 
 export default WorkExperience;
