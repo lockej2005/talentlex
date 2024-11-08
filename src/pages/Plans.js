@@ -15,10 +15,10 @@ const Plans = ({ onClose, userId }) => {
 
     switch(selectedPlan) {
       case 'monthly':
-        priceId = 'price_1Q5v6H05kmxxE8ckRj5uBzNf';
+        priceId = 'price_1QIkbd05kmxxE8ckChpabgmf';
         break;
       case 'quarterly':
-        priceId = 'price_1Q7ldD05kmxxE8ckBibJNRvO';
+        priceId = 'price_1QIkcY05kmxxE8ckIuxpWEIk';
         break;
       default:
         setError('Invalid plan selected');
@@ -63,7 +63,7 @@ const Plans = ({ onClose, userId }) => {
     <div className="plans-overlay-plan">
       <div className="plans-content-plan">
         <h2>Choose Your Plan</h2>
-        <h3>Upgrade to a plan and get Infinite credits and Draft Generation</h3>
+        <h3>Upgrade to a plan and get Infinite credits, Watson Glaser feature and Draft Generation</h3>
         <div className="plan-options-plan">
           <label className={`plan-option-plan ${selectedPlan === 'monthly' ? 'selected-plan' : ''}`}>
             <input
@@ -75,7 +75,7 @@ const Plans = ({ onClose, userId }) => {
             />
             <span className="plan-details-plan">
               <span className="plan-name-plan">Monthly Plan</span>
-              <span className="plan-price-plan">£15/month</span>
+              <span className="plan-price-plan">£20/month</span>
             </span>
           </label>
           <label className={`plan-option-plan ${selectedPlan === 'quarterly' ? 'selected-plan' : ''}`}>
@@ -88,7 +88,7 @@ const Plans = ({ onClose, userId }) => {
             />
             <span className="plan-details-plan">
               <span className="plan-name-plan">Quarterly Plan</span>
-              <span className="plan-price-plan">£35/quarter</span>
+              <span className="plan-price-plan">£50/quarter</span>
               <span className="plan-savings-plan">Save £10/quarter</span>
             </span>
           </label>
