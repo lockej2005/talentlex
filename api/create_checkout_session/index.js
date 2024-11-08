@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import { createClient } from '@supabase/supabase-js';
 
 // Check for required environment variables
-const requiredEnvVars = ['OPENAI_API_KEY', 'SUPABASE_URL', 'SUPABASE_KEY'];
+const requiredEnvVars = ['OPENAI_API_KEY', 'SUPABASE_URL', 'SUPABASE_ANON_KEY'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
