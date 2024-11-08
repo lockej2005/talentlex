@@ -167,10 +167,6 @@ const WorkExperience = () => {  // Removed unused props
       errors.to = 'End date is required';
     }
 
-    if (experience.details && experience.details.length > 1000) {
-      errors.details = 'Details must be less than 1000 characters';
-    }
-
     return errors;
   };
 
