@@ -17,6 +17,7 @@ import { Menu } from 'lucide-react';
 import './Layout.css';
 import './Authentication2.css';
 import HowDidYouHearSurvey from './HowDidYouHearSurvey';
+import Announcement from './Announcement';
 
 const Layout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -203,6 +204,7 @@ const Layout = () => {
           <button className="menu-toggle" onClick={toggleMenu}>
             <Menu size={24} />
           </button>
+          <Announcement />
           <div className="content-area">
             {subscriptionError && (
               <div className="error-banner">
