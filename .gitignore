@@ -29,7 +29,7 @@ yarn-error.log*
 
 # Virtual Environment
 venv/
-.venv
+/src/search_backend/.venv
 env/
 *.pyc
 __pycache__/
