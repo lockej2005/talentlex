@@ -17,6 +17,7 @@ import Videos from './pages/Videos';
 import SpeakToFounders from './pages/SpeakToFounders';
 import DueDiligence from './pages/DueDiligence';
 import Profile from './pages/Profile';
+import TalentLexSearch from './pages/TalentLexSearch/TalentLexSearch';
 import useUserActivity from './hooks/useUserActivity';
 
 const PrivateRoute = ({ children }) => {
@@ -72,6 +73,7 @@ function App() {
             <Route path="videos" element={<Videos />} />
             <Route path="speak-to-founders" element={<SpeakToFounders />} />
             <Route path="due-diligence" element={<DueDiligence />} />
+            <Route path="talentlex-search" element={<TalentLexSearch />} />
           </Route>
         </Routes>
       </Router>

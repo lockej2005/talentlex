@@ -16,6 +16,7 @@ import { Menu } from 'lucide-react';
 import './Layout.css';
 import './Authentication2.css';
 import HowDidYouHearSurvey from './HowDidYouHearSurvey';
+import TalentLexSearch from './TalentLexSearch/TalentLexSearch';
 
 const Layout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -160,6 +161,16 @@ const Layout = () => {
                     </div>
                   </Link>
                 </li>
+                <li className={location.pathname === "/talentlex-search" ? "active" : ""}>
+                  <Link to="/talentlex-search">
+                    <div className='label-row'>
+                      TalentLex Search
+                      <span className="new-tag">New !</span>
+                    </div>
+                  </Link>
+                </li>
+                <li className="section-title">Firms</li>
+                <div className='seperator'></div>
                 <li className="section-title">Firms</li>
                 <div className='seperator'></div>
                 {selectedFirms.length > 0 ? (
@@ -208,6 +219,7 @@ const Layout = () => {
             <Routes>
               <Route path="/" element={<Profile />} />
               <Route path="/activity" element={<Activity userId={user?.id} selectedFirm={selectedFirm} onFirmChange={handleFirmChange} />} />
+              <Route path="/talentlex-search" element={<TalentLexSearch />} />
               <Route path="/firm/:id/*" element={<FirmDashboard key={location.pathname} />} />
               <Route path="/firm-selector" element={<FirmSelector />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
