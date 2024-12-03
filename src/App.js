@@ -15,11 +15,8 @@ import Videos from './pages/Videos';
 import SpeakToFounders from './pages/SpeakToFounders';
 import DueDiligence from './pages/DueDiligence';
 import Profile from './pages/Profile';
-<<<<<<< HEAD
 import TalentLexSearch from './pages/TalentLexSearch/TalentLexSearch';
-=======
 import WorkExperience from './pages/WorkExperience';
->>>>>>> dev
 import useUserActivity from './hooks/useUserActivity';
 
 const PrivateRoute = ({ children }) => {
