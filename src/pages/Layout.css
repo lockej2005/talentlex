@@ -541,4 +541,14 @@ a:hover {
 .no-firms-prompt::before {
   margin-right: 10px;
   font-size: 18px;
+<<<<<<< HEAD
+=======
+}
+
+.work-experience-page-container {
+  padding: 24px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+>>>>>>> dev
 }

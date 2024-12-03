@@ -12,11 +12,16 @@ import Plans from './Plans';
 import Success from './Success';
 import ManageSubscription from './ManageSubscription';
 import Activity from './Activity';
+import WorkExperience from './WorkExperience';
 import { Menu } from 'lucide-react';
 import './Layout.css';
 import './Authentication2.css';
 import HowDidYouHearSurvey from './HowDidYouHearSurvey';
+<<<<<<< HEAD
 import TalentLexSearch from './TalentLexSearch/TalentLexSearch';
+=======
+import Announcement from './Announcement';
+>>>>>>> dev
 
 const Layout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -153,12 +158,16 @@ const Layout = () => {
                 <li className={location.pathname === "/" ? "active" : ""}>
                   <Link to="/">Profile</Link>
                 </li>
+                <li className={location.pathname === "/work-experience" ? "active" : ""}>
+                  <Link to="/work-experience">Work Experience</Link>
+                </li>
                 <li className={location.pathname === "/activity" ? "active" : ""}>
                   <Link to="/activity">
                     <div className='label-row'>
                       Activity
                       <span className="new-tag">New !</span>
                     </div>
+<<<<<<< HEAD
                   </Link>
                 </li>
                 <li className={location.pathname === "/talentlex-search" ? "active" : ""}>
@@ -167,12 +176,17 @@ const Layout = () => {
                       TalentLex Search
                       <span className="new-tag">New !</span>
                     </div>
+=======
+>>>>>>> dev
                   </Link>
                 </li>
                 <li className="section-title">Firms</li>
                 <div className='seperator'></div>
+<<<<<<< HEAD
                 <li className="section-title">Firms</li>
                 <div className='seperator'></div>
+=======
+>>>>>>> dev
                 {selectedFirms.length > 0 ? (
                   <>
                     {selectedFirms.map(firm => (
@@ -210,6 +224,7 @@ const Layout = () => {
           <button className="menu-toggle" onClick={toggleMenu}>
             <Menu size={24} />
           </button>
+          <Announcement />
           <div className="content-area">
             {subscriptionError && (
               <div className="error-banner">
@@ -218,6 +233,7 @@ const Layout = () => {
             )}
             <Routes>
               <Route path="/" element={<Profile />} />
+              <Route path="/work-experience" element={<WorkExperience />} />
               <Route path="/activity" element={<Activity userId={user?.id} selectedFirm={selectedFirm} onFirmChange={handleFirmChange} />} />
               <Route path="/talentlex-search" element={<TalentLexSearch />} />
               <Route path="/firm/:id/*" element={<FirmDashboard key={location.pathname} />} />
