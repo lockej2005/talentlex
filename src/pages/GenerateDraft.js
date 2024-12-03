@@ -39,14 +39,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
   const [hasPlus, setHasPlus] = useState(false);
   const [showPlans, setShowPlans] = useState(false);
   const [actualFirmId, setActualFirmId] = useState(null);
-<<<<<<< HEAD
-  const [showImportEditor, setShowImportEditor] = useState(false);
-  const [importEditorState, setImportEditorState] = useState(EditorState.createEmpty());
-=======
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [importedDraft, setImportedDraft] = useState('');
-
-
+  
   const openPopup = () => {
     setIsPopupOpen(true);
   };
@@ -62,7 +55,6 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     setIsEdited(true);
     closePopup();
   };
->>>>>>> dev
 
   const containerRef = useRef(null);
   const dividerRef = useRef(null);
@@ -275,7 +267,6 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     setError(null);
 
     try {
-<<<<<<< HEAD
       const response = await fetch('/api/generate-draft', {
         method: 'POST',
         headers: {
@@ -308,19 +299,6 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
       }
 
       const data = await response.json();
-=======
-      const result = await handleDraftCreation(
-        user,
-        { id: actualFirmId, name: firmName },
-        selectedQuestion,
-        additionalInfo,
-        setDraftText,
-        setTotalTokens,
-        draftText // Pass the current draftText, which may be the imported draft
-      );
-      const endTime = Date.now();
-      setResponseTime((endTime - startTime) / 1000);
->>>>>>> dev
       
       // Process your data here
       setDraftText(data.generatedDraft);
@@ -332,11 +310,7 @@ function GenerateDraft({ firmId, selectedFirm, onDraftChange }) {
     } finally {
       setIsLoading(false);
     }
-<<<<<<< HEAD
   };
-=======
-  }, [user, actualFirmId, firmName, selectedQuestion, additionalInfo, setDraftText, setEditorState, saveDraft, draftText]);
->>>>>>> dev
 
   const onEditorChange = useCallback((newEditorState) => {
     setEditorState(newEditorState);

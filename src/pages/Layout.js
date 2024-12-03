@@ -17,11 +17,8 @@ import { Menu } from 'lucide-react';
 import './Layout.css';
 import './Authentication2.css';
 import HowDidYouHearSurvey from './HowDidYouHearSurvey';
-<<<<<<< HEAD
 import TalentLexSearch from './TalentLexSearch/TalentLexSearch';
-=======
 import Announcement from './Announcement';
->>>>>>> dev
 
 const Layout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -167,7 +164,6 @@ const Layout = () => {
                       Activity
                       <span className="new-tag">New !</span>
                     </div>
-<<<<<<< HEAD
                   </Link>
                 </li>
                 <li className={location.pathname === "/talentlex-search" ? "active" : ""}>
@@ -176,17 +172,10 @@ const Layout = () => {
                       TalentLex Search
                       <span className="new-tag">New !</span>
                     </div>
-=======
->>>>>>> dev
                   </Link>
                 </li>
                 <li className="section-title">Firms</li>
                 <div className='seperator'></div>
-<<<<<<< HEAD
-                <li className="section-title">Firms</li>
-                <div className='seperator'></div>
-=======
->>>>>>> dev
                 {selectedFirms.length > 0 ? (
                   <>
                     {selectedFirms.map(firm => (
