@@ -26,3 +26,14 @@ yarn-error.log*
 /create-checkout-session/
 
 .vercel
+
+# Virtual Environment
+venv/
+/src/search_backend/.venv
+env/
+*.pyc
+__pycache__/
+
+# Other common files to ignore
+.DS_Store
+.env

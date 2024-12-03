@@ -352,3 +352,222 @@
         margin: 10px 0;
     }
 }
+<<<<<<< HEAD
+
+.word-count-draft {
+    position: absolute;
+    bottom: 10px;
+    right: 15px;
+    color: #fff;
+    font-size: 0.9rem;
+    background-color: rgba(0, 0, 0, 0.5); /* Optional: background for better visibility */
+    padding: 5px 10px;
+    border-radius: 5px;
+    pointer-events: none; /* So it doesn't interfere with text selection */
+    z-index: 10;
+}
+
+.editor-container {
+    position: relative; /* Ensure the word count is positioned relative to the editor */
+    flex-grow: 1;
+}
+
+.save-toolbar {
+    background-color: #276D8B;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0;
+    transition: 1s;
+  }
+  
+  .save-toolbar input {
+    flex-grow: 1;
+    margin-right: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    color: #4A90B6;
+  }
+  
+  .save-toolbar input::placeholder {
+    color: #4A90B6;
+    opacity: 0.7;
+  }
+  
+  .save-toolbar button {
+    background-color: #444444;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .save-toolbar button:hover {
+    background-color: #333333;
+  }
+  
+  .comparison-container-draft {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .content-draft {
+    display: flex;
+    flex-grow: 1;
+  }
+
+  .draft-title {
+    color: #fff;
+    font-weight: 600;
+    padding-left: 50px;
+    font-size: 24px;
+  }
+  
+  /* Ensure the toolbar doesn't have rounded corners at the top */
+  .comparison-container-draft .save-toolbar {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+  .upgrade-bar {
+    background-color: #b41414;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    color: #fff;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .upgrade-button {
+    background-color: #276D8B;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .upgrade-button:hover {
+    background-color: #1c5a6f;
+  }
+  
+  .submit-button-draft:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+
+.firm-selection-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.import-button {
+  background-color: #276D8B;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.import-button:hover {
+  background-color: #1c5a6f;
+}
+
+.import-button svg {
+  margin-right: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .firm-selection-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .import-button {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}
+
+.import-editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.import-editor-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-import-editor {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.import-editor {
+  border: 1px solid #ccc;
+  min-height: 200px;
+  padding: 10px;
+  margin-bottom: 10px;
+  overflow-y: auto;
+}
+
+.import-editor .DraftEditor-root {
+  height: 100%;
+  min-height: 180px;
+}
+
+.import-editor .public-DraftEditorPlaceholder-root {
+  color: #999;
+}
+
+.apply-import {
+  background-color: #276D8B;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.apply-import:hover {
+  background-color: #1c5a6f;
+}
+=======
+>>>>>>> dev
