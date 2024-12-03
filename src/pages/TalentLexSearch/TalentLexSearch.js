@@ -19,6 +19,57 @@ const TalentLexSearch = () => {
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
   const [activeTab, setActiveTab] = useState('daily-updates');
   const [error, setError] = useState(null);
+  const [isVerified, setIsVerified] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
+
+  useEffect(() => {
+    checkUserVerificationAndAuth();
+  }, []);
+
+  const checkUserVerificationAndAuth = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserEmail(user.email);
+        
+        // Check verification status
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('verified')
+          .eq('email', user.email)
+          .single();
+
+        if (error) throw error;
+        setIsVerified(data?.verified || false);
+
+        // Only check auth if verified
+        if (data?.verified) {
+          await checkAuth();
+        }
+      }
+    } catch (error) {
+      console.error('Error checking user status:', error);
+      setError('Failed to check user status');
+    }
+  };
+
+  const sendVerificationEmail = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: currentUserEmail
+      });
+      if (error) throw error;
+      setVerificationSent(true);
+      setError(null);
+    } catch (error) {
+      console.error('Error sending verification:', error);
+      setError('Failed to send verification email. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     checkAuth();
@@ -63,6 +114,11 @@ const TalentLexSearch = () => {
   };
 
   const startGmailSync = async () => {
+
+    if (!isVerified) {
+      setError('Please verify your email before connecting Gmail');
+      return;
+    }
     try {
       setIsConnecting(true);
       console.log('Making request to /auth/gmail...');
@@ -126,6 +182,45 @@ const TalentLexSearch = () => {
       setIsConnecting(false);
     }
   };
+
+    // Render verification screen if not verified
+    if (!isVerified) {
+      return (
+        <div className="onboarding-screen">
+          <div className="onboarding-content">
+            <h1>Email Verification Required</h1>
+            <div className="verification-container">
+              <p className="description">
+                Before connecting your Gmail account, please verify your email address: 
+                <br />
+                <strong>{currentUserEmail}</strong>
+              </p>
+              {verificationSent ? (
+                <div className="verification-sent">
+                  <p>✓ Verification email sent!</p>
+                  <p>Please check your inbox and spam folder.</p>
+                  <button 
+                    onClick={() => window.location.reload()} 
+                    className="secondary-button"
+                  >
+                    I've Verified My Email
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={sendVerificationEmail}
+                  className="primary-button"
+                  disabled={loading}
+                >
+                  {loading ? 'Sending...' : 'Send Verification Email'}
+                </button>
+              )}
+              {error && <div className="error-message">{error}</div>}
+            </div>
+          </div>
+        </div>
+      );
+    }
 
   const startEmailMonitoring = () => {
     fetchTodayEmails();

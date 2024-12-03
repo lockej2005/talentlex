@@ -14,7 +14,7 @@ from datetime import datetime  # Add this import
 app = Flask(__name__)
 CORS(app, resources={
     r"/*": {
-        "origins": "http://localhost:3000",
+        "origins": "https://dev.talentlex.app/",
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }
@@ -47,21 +47,52 @@ def check_token():
         return False
 
 @app.route('/auth/check', methods=['GET'])
-def check_auth():
-    """Check if user is already authenticated"""
-    global current_user_email
+async def check_auth():
     try:
-        is_valid = check_token()
-        return jsonify({
-            "authenticated": is_valid,
-            "user_email": current_user_email
-        })
+        # Get user's stored credentials
+        result = supabase.table('profiles')\
+                        .select('gmail_oauth_credentials')\
+                        .eq('email', current_user_email)\
+                        .single()\
+                        .execute()
+
+        if not result.data or not result.data.get('gmail_oauth_credentials'):
+            return False
+
+        creds_dict = result.data['gmail_oauth_credentials']
+        
+        # Create Credentials object
+        creds = Credentials(
+            token=creds_dict['token'],
+            refresh_token=creds_dict['refresh_token'],
+            token_uri=creds_dict['token_uri'],
+            client_id=creds_dict['client_id'],
+            client_secret=creds_dict['client_secret'],
+            scopes=creds_dict['scopes']
+        )
+
+        # Check if credentials need refresh
+        if creds.expired:
+            creds.refresh(Request())
+            # Update stored credentials
+            creds_dict = {
+                'token': creds.token,
+                'refresh_token': creds.refresh_token,
+                'token_uri': creds.token_uri,
+                'client_id': creds.client_id,
+                'client_secret': creds.client_secret,
+                'scopes': creds.scopes
+            }
+            
+            supabase.table('profiles')\
+                    .update({'gmail_oauth_credentials': creds_dict})\
+                    .eq('email', current_user_email)\
+                    .execute()
+
+        return True
     except Exception as e:
         print(f"Auth check error: {e}")
-        return jsonify({
-            "authenticated": False,
-            "error": str(e)
-        })
+        return False
 
 @app.route('/auth/gmail', methods=['POST', 'OPTIONS'])
 def gmail_auth():
@@ -101,54 +132,52 @@ def gmail_auth():
 
 @app.route('/oauth2callback')
 def oauth2callback():
-    """Handle OAuth 2.0 callback"""
     try:
         print(f"Received callback at: {request.url}")
         
-        # Create flow with the callback URL
         flow = InstalledAppFlow.from_client_secrets_file(
             'credentials_boltmedia.json',
             SCOPES,
-            redirect_uri='http://localhost:5001/oauth2callback'
+            redirect_uri='your_production_url/oauth2callback'
         )
         
-        # Get the full URL including query parameters
         authorization_response = request.url
         if authorization_response.startswith('http:'):
             authorization_response = 'https://' + authorization_response[7:]
         
-        print(f"Authorization response: {authorization_response}")
-        
-        # Exchange the code
+        # Exchange code for credentials
         flow.fetch_token(authorization_response=authorization_response)
-        
-        # Save credentials
         creds = flow.credentials
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
 
-        # Set up email monitoring
-        global current_user_email, monitoring_active, monitoring_thread
-        service = get_gmail_service()[0]
-        current_user_email = get_user_email(service)
-        
-        # Start monitoring thread if not already running
-        if not monitoring_thread or not monitoring_thread.is_alive():
-            monitoring_active = True
-            monitoring_thread = threading.Thread(target=monitor_emails, daemon=True)
-            monitoring_thread.start()
-            print(f"Started monitoring thread for {current_user_email}")
+        # Convert credentials to a storable format
+        creds_dict = {
+            'token': creds.token,
+            'refresh_token': creds.refresh_token,
+            'token_uri': creds.token_uri,
+            'client_id': creds.client_id,
+            'client_secret': creds.client_secret,
+            'scopes': creds.scopes
+        }
 
-        print(f"Successfully authenticated for: {current_user_email}")
-            
+        # Store in Supabase
+        supabase.table('profiles')\
+                .update({'gmail_oauth_credentials': creds_dict})\
+                .eq('email', current_user_email)\
+                .execute()
+
         return """
-        The authentication flow has completed. You may close this window.
-        <script>
-            if (window.opener) {
-                window.opener.postMessage('oauth-complete', 'http://localhost:3000');
-            }
-            setTimeout(() => window.close(), 2000);
-        </script>
+        <html>
+            <body>
+                <h1>Authentication Successful!</h1>
+                <p>You can close this window and return to TalentLex Search.</p>
+                <script>
+                    if (window.opener) {
+                        window.opener.postMessage('oauth-complete', 'https://your-production-domain.com');
+                    }
+                    setTimeout(() => window.close(), 2000);
+                </script>
+            </body>
+        </html>
         """
     except Exception as e:
         print(f"Error in oauth2callback: {str(e)}")

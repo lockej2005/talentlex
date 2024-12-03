@@ -23,6 +23,8 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 APPROVED_SENDERS = [
     'pinsentmasons@ambertrack.co.uk'.lower(),
     'c.prakash@lse.ac.uk'.lower(),  # Make sure this is lowercase
+    'chaituprakash06@gmail.com'.lower(),  # Make sure this is lowercase
+    'recruitment@cvmail.net'.lower()
     # Add more email addresses here
 ]
 
