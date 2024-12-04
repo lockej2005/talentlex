@@ -1,5 +1,8 @@
 from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
+from supabase import create_client
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
 import threading
 import time
 import os
@@ -11,12 +14,23 @@ from urllib.parse import urlparse, urlencode, parse_qs
 from google.auth.transport.requests import Request
 from datetime import datetime  # Add this import
 
+# Only for development - remove in production!
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+# Supabase configuration
+SUPABASE_URL = "https://atbphpeswwgqvwlbplko.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU"
+# Initialize Supabase
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
 app = Flask(__name__)
 CORS(app, resources={
     r"/*": {
-        "origins": "https://dev.talentlex.app/",
+        "origins": ["http://localhost:3000"],
         "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization"]
+        "allow_headers": ["Content-Type", "Authorization", "X-User-Email"],
+        "expose_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
     }
 })
 
@@ -45,19 +59,65 @@ def check_token():
     except Exception as e:
         print(f"Error checking token: {e}")
         return False
+    
+@app.route('/verify-email', methods=['GET'])
+def verify_email():
+    try:
+        token = request.args.get('token')
+        if not token:
+            return 'Invalid verification link', 400
+
+        # Verify token
+        payload = jwt.decode(token, VERIFICATION_SECRET, algorithms=['HS256'])
+        email = payload['email']
+
+        # Update user's verification status in Supabase
+        supabase.table('profiles')\
+                .update({'verified': True})\
+                .eq('email', email)\
+                .execute()
+
+        return '''
+        <html>
+            <body>
+                <h1>Email Verified Successfully!</h1>
+                <p>You can now close this window and return to TalentLex Search.</p>
+                <script>
+                    window.close();
+                </script>
+            </body>
+        </html>
+        '''
+
+    except jwt.ExpiredSignatureError:
+        return 'Verification link has expired', 400
+    except jwt.InvalidTokenError:
+        return 'Invalid verification link', 400
+    except Exception as e:
+        print(f"Error verifying email: {e}")
+        return 'Verification failed', 500
 
 @app.route('/auth/check', methods=['GET'])
 async def check_auth():
     try:
+        # Get user email from request headers or query parameters
+        user_email = request.args.get('email') or request.headers.get('X-User-Email')
+        
+        if not user_email:
+            return jsonify({
+                'authenticated': False,
+                'error': 'No user email provided'
+            }), 400
+
         # Get user's stored credentials
         result = supabase.table('profiles')\
                         .select('gmail_oauth_credentials')\
-                        .eq('email', current_user_email)\
+                        .eq('email', user_email)\
                         .single()\
                         .execute()
 
         if not result.data or not result.data.get('gmail_oauth_credentials'):
-            return False
+            return jsonify({'authenticated': False}), 401
 
         creds_dict = result.data['gmail_oauth_credentials']
         
@@ -89,10 +149,20 @@ async def check_auth():
                     .eq('email', current_user_email)\
                     .execute()
 
-        return True
+        return jsonify({'authenticated': True}), 200
     except Exception as e:
         print(f"Auth check error: {e}")
-        return False
+        return jsonify({
+            'authenticated': False,
+            'error': str(e)
+        }), 500
+
+def handle_preflight():
+    response = make_response()
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
+    return response
 
 @app.route('/auth/gmail', methods=['POST', 'OPTIONS'])
 def gmail_auth():
@@ -100,28 +170,48 @@ def gmail_auth():
     print("Received Gmail auth request")
     
     if request.method == 'OPTIONS':
-        response = make_response()
-        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
-        return response
+        return handle_preflight()
 
     try:
-        print("Creating OAuth flow")
+        print("Request content type:", request.content_type)
+        print("Request data:", request.get_data())
+        
+        # Ensure we have JSON data
+        if not request.is_json:
+            return jsonify({
+                "success": False,
+                "error": "Expected JSON data"
+            }), 400
+
+        data = request.get_json()
+        print("Parsed JSON data:", data)
+
+        user_email = data.get('email')
+        if not user_email:
+            return jsonify({
+                "success": False,
+                "error": "No email provided in request"
+            }), 400
+
+        print(f"Creating OAuth flow for {user_email}")
         flow = InstalledAppFlow.from_client_secrets_file(
             'credentials_boltmedia.json',
             SCOPES,
             redirect_uri='http://localhost:5001/oauth2callback'
         )
         
-        auth_url, _ = flow.authorization_url(access_type='offline')
-        print(f"Generated auth URL: {auth_url}")
+        auth_url, _ = flow.authorization_url(
+            access_type='offline',
+            prompt='consent',
+            include_granted_scopes='true',
+            state=user_email
+        )
         
-        response = make_response(jsonify({
+        print(f"Generated auth URL: {auth_url}")
+        return jsonify({
             "success": True,
             "auth_url": auth_url
-        }))
-        return response
+        })
         
     except Exception as e:
         print(f"Error in Gmail auth: {str(e)}")
@@ -135,18 +225,19 @@ def oauth2callback():
     try:
         print(f"Received callback at: {request.url}")
         
+        # Get user email from query parameter
+        user_email = request.args.get('state')  # Gets email from state parameter
+        if not user_email:
+            raise ValueError("No user email provided")
+
         flow = InstalledAppFlow.from_client_secrets_file(
             'credentials_boltmedia.json',
             SCOPES,
-            redirect_uri='your_production_url/oauth2callback'
+            redirect_uri='http://localhost:5001/oauth2callback'
         )
         
-        authorization_response = request.url
-        if authorization_response.startswith('http:'):
-            authorization_response = 'https://' + authorization_response[7:]
-        
-        # Exchange code for credentials
-        flow.fetch_token(authorization_response=authorization_response)
+        # Handle the callback
+        flow.fetch_token(authorization_response=request.url)
         creds = flow.credentials
 
         # Convert credentials to a storable format
@@ -156,14 +247,17 @@ def oauth2callback():
             'token_uri': creds.token_uri,
             'client_id': creds.client_id,
             'client_secret': creds.client_secret,
-            'scopes': creds.scopes
+            'scopes': creds.scopes,
+            'expiry': creds.expiry.isoformat() if creds.expiry else None
         }
 
-        # Store in Supabase
-        supabase.table('profiles')\
-                .update({'gmail_oauth_credentials': creds_dict})\
-                .eq('email', current_user_email)\
-                .execute()
+        # Only update gmail_oauth_credentials
+        result = supabase.table('profiles')\
+            .update({
+                'gmail_oauth_credentials': creds_dict
+            })\
+            .eq('email', user_email)\
+            .execute()
 
         return """
         <html>
@@ -172,7 +266,7 @@ def oauth2callback():
                 <p>You can close this window and return to TalentLex Search.</p>
                 <script>
                     if (window.opener) {
-                        window.opener.postMessage('oauth-complete', 'https://your-production-domain.com');
+                        window.opener.postMessage('oauth-complete', 'http://localhost:3000');
                     }
                     setTimeout(() => window.close(), 2000);
                 </script>

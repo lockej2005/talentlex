@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../supabaseClient';
 import './TalentLexSearch.css';
 
@@ -22,213 +22,8 @@ const TalentLexSearch = () => {
   const [isVerified, setIsVerified] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
 
-  useEffect(() => {
-    checkUserVerificationAndAuth();
-  }, []);
-
-  const checkUserVerificationAndAuth = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setCurrentUserEmail(user.email);
-        
-        // Check verification status
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('verified')
-          .eq('email', user.email)
-          .single();
-
-        if (error) throw error;
-        setIsVerified(data?.verified || false);
-
-        // Only check auth if verified
-        if (data?.verified) {
-          await checkAuth();
-        }
-      }
-    } catch (error) {
-      console.error('Error checking user status:', error);
-      setError('Failed to check user status');
-    }
-  };
-
-  const sendVerificationEmail = async () => {
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: currentUserEmail
-      });
-      if (error) throw error;
-      setVerificationSent(true);
-      setError(null);
-    } catch (error) {
-      console.error('Error sending verification:', error);
-      setError('Failed to send verification email. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      startEmailMonitoring();
-    }
-  }, [isAuthenticated]);
-  
-  useEffect(() => {
-    const handleOAuthComplete = (event) => {
-      if (event.origin === 'http://localhost:5001' && event.data === 'oauth-complete') {
-        console.log('OAuth flow completed');
-        setIsConnecting(false);
-        checkAuth(); // This will update the authentication state
-      }
-    };
-  
-    window.addEventListener('message', handleOAuthComplete);
-    return () => window.removeEventListener('message', handleOAuthComplete);
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      console.log('Starting auth check...');
-      const response = await fetch('http://localhost:5001/auth/check');
-      const result = await response.json();
-      console.log('Full auth check result:', result);
-      
-      if (result.user_email) {
-        setCurrentUserEmail(result.user_email);
-      }
-      setIsAuthenticated(result.authenticated);
-      return result.authenticated;
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      setError('Failed to check authentication status');
-      return false;
-    }
-  };
-
-  const startGmailSync = async () => {
-
-    if (!isVerified) {
-      setError('Please verify your email before connecting Gmail');
-      return;
-    }
-    try {
-      setIsConnecting(true);
-      console.log('Making request to /auth/gmail...');
-      
-      const response = await fetch('http://localhost:5001/auth/gmail', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        mode: 'cors'
-      });
-  
-      console.log('Response received:', response);
-      const result = await response.json();
-      console.log('Parsed response:', result);
-      
-      if (result.auth_url) {
-        console.log('Opening auth URL:', result.auth_url);
-        
-        // Add message listener for OAuth completion
-        const messageListener = async (event) => {
-          if (event.origin === 'http://localhost:5001' && event.data === 'oauth-success') {
-            console.log('Received OAuth success message');
-            window.removeEventListener('message', messageListener);
-            const authStatus = await checkAuth();
-            if (authStatus) {
-              console.log('Authentication confirmed');
-              setIsAuthenticated(true);
-              startEmailMonitoring();
-            }
-            setIsConnecting(false);
-          }
-        };
-        
-        window.addEventListener('message', messageListener);
-        
-        // Open OAuth window
-        const authWindow = window.open(
-          result.auth_url,
-          'OAuth',
-          'width=600,height=800,menubar=no,toolbar=no,location=no,status=no'
-        );
-  
-        if (!authWindow) {
-          throw new Error('Popup was blocked by the browser');
-        }
-  
-        // Set timeout to clean up
-        setTimeout(() => {
-          window.removeEventListener('message', messageListener);
-          setIsConnecting(false);
-        }, 120000);
-        
-      } else {
-        throw new Error(result.error || 'Failed to get authentication URL');
-      }
-    } catch (error) {
-      console.error('Detailed error:', error);
-      setError('Failed to connect to Gmail. Please try again.');
-      setIsConnecting(false);
-    }
-  };
-
-    // Render verification screen if not verified
-    if (!isVerified) {
-      return (
-        <div className="onboarding-screen">
-          <div className="onboarding-content">
-            <h1>Email Verification Required</h1>
-            <div className="verification-container">
-              <p className="description">
-                Before connecting your Gmail account, please verify your email address: 
-                <br />
-                <strong>{currentUserEmail}</strong>
-              </p>
-              {verificationSent ? (
-                <div className="verification-sent">
-                  <p>✓ Verification email sent!</p>
-                  <p>Please check your inbox and spam folder.</p>
-                  <button 
-                    onClick={() => window.location.reload()} 
-                    className="secondary-button"
-                  >
-                    I've Verified My Email
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={sendVerificationEmail}
-                  className="primary-button"
-                  disabled={loading}
-                >
-                  {loading ? 'Sending...' : 'Send Verification Email'}
-                </button>
-              )}
-              {error && <div className="error-message">{error}</div>}
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-  const startEmailMonitoring = () => {
-    fetchTodayEmails();
-    const interval = setInterval(fetchTodayEmails, 10000);
-    return () => clearInterval(interval);
-  };
-
-  const fetchTodayEmails = async () => {
+  // Define fetchTodayEmails before it's used in startEmailMonitoring
+  const fetchTodayEmails = useCallback(async () => {
     try {
       setLoading(true);
       const today = new Date();
@@ -258,7 +53,201 @@ const TalentLexSearch = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  // Define startEmailMonitoring with useCallback
+  const startEmailMonitoring = useCallback(() => {
+    fetchTodayEmails();
+    const interval = setInterval(fetchTodayEmails, 10000);
+    return () => clearInterval(interval);
+  }, [fetchTodayEmails]);
+
+  // Define checkAuth with useCallback
+  const checkAuth = useCallback(async () => {
+    try {
+      if (!currentUserEmail) {
+        console.log('No user email available yet');
+        return false;
+      }
+
+      console.log('Starting auth check with email:', currentUserEmail);
+      const response = await fetch(`http://localhost:5001/auth/check?email=${currentUserEmail}`, {
+        headers: {
+          'X-User-Email': currentUserEmail
+        }
+      });
+      const result = await response.json();
+      console.log('Full auth check result:', result);
+      
+      setIsAuthenticated(result.authenticated);
+      return result.authenticated;
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setError('Failed to check authentication status');
+      return false;
+    }
+  }, [currentUserEmail]);
+
+  // Define checkUserVerificationAndAuth with useCallback
+  const checkUserVerificationAndAuth = useCallback(async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('Current user data:', user);
+      
+      if (user) {
+        console.log('Setting current user email:', user.email);
+        setCurrentUserEmail(user.email);
+        
+        // Debug log the profiles table query
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')  // Select all fields for debugging
+          .eq('email', user.email)
+          .single();
+  
+        if (error) {
+          console.error('Profile check error:', error);
+          throw error;
+        }
+        
+        console.log('Full profile data:', data);
+        console.log('Verification status from profiles:', data?.verified);
+        setIsVerified(data?.verified || false);
+  
+        if (data?.verified) {
+          await checkAuth();
+        }
+      } else {
+        console.log('No user found');
+      }
+    } catch (error) {
+      console.error('Error checking user status:', error);
+      setError('Failed to check user status: ' + error.message);
+    }
+  }, [checkAuth]);
+
+  const startGmailSync = useCallback(async () => {
+    try {
+      setIsConnecting(true);
+      console.log('Making request to /auth/gmail with email:', currentUserEmail);
+      
+      const response = await fetch('http://localhost:5001/auth/gmail', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email: currentUserEmail }), // Properly format JSON
+        mode: 'cors'
+      });
+  
+      console.log('Response received:', response);
+      const result = await response.json();
+      console.log('Parsed response:', result);
+      
+      if (result.auth_url) {
+        console.log('Opening auth URL:', result.auth_url);
+        
+        const messageListener = async (event) => {
+          if (event.origin === 'http://localhost:5001' && event.data === 'oauth-success') {
+            console.log('Received OAuth success message');
+            window.removeEventListener('message', messageListener);
+            const authStatus = await checkAuth();
+            if (authStatus) {
+              console.log('Authentication confirmed');
+              setIsAuthenticated(true);
+              startEmailMonitoring();
+            }
+            setIsConnecting(false);
+          }
+        };
+        
+        window.addEventListener('message', messageListener);
+        
+        const authWindow = window.open(
+          result.auth_url,
+          'OAuth',
+          'width=600,height=800,menubar=no,toolbar=no,location=no,status=no'
+        );
+  
+        if (!authWindow) {
+          throw new Error('Popup was blocked by the browser');
+        }
+  
+        setTimeout(() => {
+          window.removeEventListener('message', messageListener);
+          setIsConnecting(false);
+        }, 120000);
+        
+      } else {
+        throw new Error(result.error || 'Failed to get authentication URL');
+      }
+    } catch (error) {
+      console.error('Detailed error:', error);
+      setError('Failed to connect to Gmail. Please try again.');
+      setIsConnecting(false);
+    }
+  }, [isVerified, checkAuth, startEmailMonitoring, currentUserEmail]);
+
+  const sendVerificationEmail = async () => {
+    try {
+      setLoading(true);
+      
+      // Get the current user data directly from Supabase
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !user.email) {
+        throw new Error('No email address available');
+      }
+  
+      console.log('Sending verification email to:', user.email);
+  
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: user.email,
+        options: {
+          emailRedirectTo: 'http://localhost:3000/auth/callback'
+        }
+      });
+  
+      if (error) {
+        console.error('Supabase resend error:', error);
+        throw error;
+      }
+  
+      console.log('Verification email sent successfully');
+      setVerificationSent(true);
+      setError(null);
+    } catch (error) {
+      console.error('Error sending verification:', error);
+      setError(`Failed to send verification email: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // useEffect hooks
+  useEffect(() => {
+    checkUserVerificationAndAuth();
+  }, [checkUserVerificationAndAuth]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      startEmailMonitoring();
+    }
+  }, [isAuthenticated, startEmailMonitoring]);
+
+  useEffect(() => {
+    const handleOAuthComplete = (event) => {
+      if (event.origin === 'http://localhost:5001' && event.data === 'oauth-complete') {
+        console.log('OAuth flow completed');
+        setIsConnecting(false);
+        checkAuth();
+      }
+    };
+
+    window.addEventListener('message', handleOAuthComplete);
+    return () => window.removeEventListener('message', handleOAuthComplete);
+  }, [checkAuth]);
 
   const renderDailyUpdates = () => (
     <div className="feed-container">
@@ -305,6 +294,46 @@ const TalentLexSearch = () => {
     </div>
   );
 
+  // Render verification screen if not verified
+  if (!isVerified) {
+    return (
+      <div className="onboarding-screen">
+        <div className="onboarding-content">
+          <h1>Email Verification Required</h1>
+          <div className="verification-container">
+            <p className="description">
+              Before connecting your Gmail account, please verify your email address: 
+              <br />
+              <strong>{currentUserEmail}</strong>
+            </p>
+            {verificationSent ? (
+              <div className="verification-sent">
+                <p>✓ Verification email sent!</p>
+                <p>Please check your inbox and spam folder.</p>
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="secondary-button"
+                >
+                  I've Verified My Email
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={sendVerificationEmail}
+                className="primary-button"
+                disabled={loading}
+              >
+                {loading ? 'Sending...' : 'Send Verification Email'}
+              </button>
+            )}
+            {error && <div className="error-message">{error}</div>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render authentication screen if not authenticated
   if (!isAuthenticated) {
     return (
       <div className="onboarding-screen">
@@ -327,6 +356,7 @@ const TalentLexSearch = () => {
     );
   }
 
+  // Main app render
   return (
     <div className="container">
       <div className="main-app">
@@ -357,7 +387,6 @@ const TalentLexSearch = () => {
         
         <div className="tab-content">
           {activeTab === 'daily-updates' && renderDailyUpdates()}
-          {/* Add other tab content when implemented */}
         </div>
       </div>
     </div>

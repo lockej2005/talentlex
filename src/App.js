@@ -18,6 +18,7 @@ import Profile from './pages/Profile';
 import TalentLexSearch from './pages/TalentLexSearch/TalentLexSearch';
 import WorkExperience from './pages/WorkExperience';
 import useUserActivity from './hooks/useUserActivity';
+import VerificationCallback from './pages/TalentLexSearch/VerificationCallback';
 
 const PrivateRoute = ({ children }) => {
   const [session, setSession] = useState(null);
@@ -53,6 +54,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/auth/callback" element={<VerificationCallback />} />
           <Route
             path="/*"
             element={
