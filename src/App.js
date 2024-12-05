@@ -19,6 +19,7 @@ import TalentLexSearch from './pages/TalentLexSearch/TalentLexSearch';
 import WorkExperience from './pages/WorkExperience';
 import useUserActivity from './hooks/useUserActivity';
 import VerificationCallback from './pages/TalentLexSearch/VerificationCallback';
+import { Analytics } from "@vercel/analytics/react"
 
 const PrivateRoute = ({ children }) => {
   const [session, setSession] = useState(null);

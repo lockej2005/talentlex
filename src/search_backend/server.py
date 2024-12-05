@@ -100,15 +100,9 @@ def verify_email():
 @app.route('/auth/check', methods=['GET'])
 async def check_auth():
     try:
-        # Get user email from request headers or query parameters
         user_email = request.args.get('email') or request.headers.get('X-User-Email')
+        print(f"Checking auth for email: {user_email}")
         
-        if not user_email:
-            return jsonify({
-                'authenticated': False,
-                'error': 'No user email provided'
-            }), 400
-
         # Get user's stored credentials
         result = supabase.table('profiles')\
                         .select('gmail_oauth_credentials')\
@@ -116,39 +110,26 @@ async def check_auth():
                         .single()\
                         .execute()
 
+        print("Supabase result:", result.data)
+
         if not result.data or not result.data.get('gmail_oauth_credentials'):
+            print("No credentials found")
             return jsonify({'authenticated': False}), 401
 
         creds_dict = result.data['gmail_oauth_credentials']
+        print("Found credentials, starting email monitoring")
+
+        # Start email monitoring if authenticated
+        global monitoring_active, monitoring_thread, current_user_email
+        current_user_email = user_email
+        monitoring_active = True
+
+        if not monitoring_thread or not monitoring_thread.is_alive():
+            monitoring_thread = threading.Thread(target=monitor_emails)
+            monitoring_thread.daemon = True
+            monitoring_thread.start()
+            print("Started monitoring thread")
         
-        # Create Credentials object
-        creds = Credentials(
-            token=creds_dict['token'],
-            refresh_token=creds_dict['refresh_token'],
-            token_uri=creds_dict['token_uri'],
-            client_id=creds_dict['client_id'],
-            client_secret=creds_dict['client_secret'],
-            scopes=creds_dict['scopes']
-        )
-
-        # Check if credentials need refresh
-        if creds.expired:
-            creds.refresh(Request())
-            # Update stored credentials
-            creds_dict = {
-                'token': creds.token,
-                'refresh_token': creds.refresh_token,
-                'token_uri': creds.token_uri,
-                'client_id': creds.client_id,
-                'client_secret': creds.client_secret,
-                'scopes': creds.scopes
-            }
-            
-            supabase.table('profiles')\
-                    .update({'gmail_oauth_credentials': creds_dict})\
-                    .eq('email', current_user_email)\
-                    .execute()
-
         return jsonify({'authenticated': True}), 200
     except Exception as e:
         print(f"Auth check error: {e}")
@@ -284,14 +265,12 @@ def monitor_emails():
     
     while monitoring_active:
         try:
-            if check_token():
-                print(f"\n=== Starting email monitoring cycle at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ===")
-                service, creds = get_gmail_service()
-                process_emails(service, creds, current_user_email)
-            else:
-                print("⚠ Token invalid or expired. Waiting for next cycle...")
+            print("\n=== Checking for new emails ===")
+            service, creds = get_gmail_service()
+            process_emails(service, creds, current_user_email)
+            print("=== Completed email check ===")
             
-            print(f"Waiting 10 seconds before next check...")
+            print("Waiting 10 seconds before next check...")
             time.sleep(10)
             
         except Exception as e:

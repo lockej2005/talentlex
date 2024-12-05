@@ -11,6 +11,11 @@ const API_CONFIG = {
     }
 };
 
+// In TalentLexSearch.js, update the URLs
+const BASE_URL = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:5001'
+  : 'https://https://talentlex-qmkhyoua6-talentlex.vercel.app/talentlex-search';  // Your deployed backend URL
+
 const TalentLexSearch = () => {
   const [todayEmails, setTodayEmails] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -131,7 +136,7 @@ const TalentLexSearch = () => {
       setIsConnecting(true);
       console.log('Making request to /auth/gmail with email:', currentUserEmail);
       
-      const response = await fetch('http://localhost:5001/auth/gmail', {
+      const response = await fetch(`${BASE_URL}/auth/gmail`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
