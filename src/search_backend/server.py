@@ -6,6 +6,7 @@ from google.auth.transport.requests import Request
 import threading
 import time
 import os
+from dotenv import load_dotenv
 import pickle
 from log_email_supabase_app import get_gmail_service, process_emails, get_user_email
 from email.mime.multipart import MIMEMultipart
@@ -14,19 +15,26 @@ from urllib.parse import urlparse, urlencode, parse_qs
 from google.auth.transport.requests import Request
 from datetime import datetime  # Add this import
 
-# Only for development - remove in production!
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-
 # Supabase configuration
 SUPABASE_URL = "https://atbphpeswwgqvwlbplko.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU"
 # Initialize Supabase
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-app = Flask(__name__)
+# Get environment 
+ENVIRONMENT = os.getenv('VERCEL_ENV', 'development')
+IS_PRODUCTION = ENVIRONMENT == 'production'
+
+# Set OAuth callback URL based on environment
+if IS_PRODUCTION:
+    OAUTH_REDIRECT_URI = 'https://talentlex-dev.vercel.app/oauth2callback'
+else:
+    OAUTH_REDIRECT_URI = 'http://localhost:5001/oauth2callback'
+
+# Update CORS settings
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:3000"],
+        "origins": ["http://localhost:3000", "https://talentlex-dev.vercel.app"],
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization", "X-User-Email"],
         "expose_headers": ["Content-Type", "Authorization"],

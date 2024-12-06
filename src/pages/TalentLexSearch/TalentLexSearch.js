@@ -12,10 +12,10 @@ const API_CONFIG = {
 };
 
 // In TalentLexSearch.js, update the URLs
-const BASE_URL = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:5001'
-  : 'https://https://talentlex-qmkhyoua6-talentlex.vercel.app/talentlex-search';  // Your deployed backend URL
-
+const BASE_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://talentlex-dev.vercel.app/api'
+  : 'http://localhost:5001';
+  
 const TalentLexSearch = () => {
   const [todayEmails, setTodayEmails] = useState([]);
   const [loading, setLoading] = useState(false);
