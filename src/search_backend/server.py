@@ -21,20 +21,30 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 # Initialize Supabase
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+app = Flask(__name__)
+
+# Get the deployed URL from environment variable
+DEPLOYED_URL = os.getenv('VERCEL_URL', 'localhost:3000')
+FRONTEND_URL = f"https://{DEPLOYED_URL}" if DEPLOYED_URL != 'localhost:3000' else 'http://localhost:3000'
+
 # Get environment 
 ENVIRONMENT = os.getenv('VERCEL_ENV', 'development')
 IS_PRODUCTION = ENVIRONMENT == 'production'
 
 # Set OAuth callback URL based on environment
 if IS_PRODUCTION:
-    OAUTH_REDIRECT_URI = 'https://talentlex-dev.vercel.app/oauth2callback'
+    OAUTH_REDIRECT_URI = f"{FRONTEND_URL}/oauth2callback"
 else:
     OAUTH_REDIRECT_URI = 'http://localhost:5001/oauth2callback'
 
 # Update CORS settings
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:3000", "https://talentlex-dev.vercel.app"],
+        "origins": [
+            "http://localhost:3000",
+            FRONTEND_URL,
+            "https://*.vercel.app"  # Allow all Vercel preview deployments
+        ],
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization", "X-User-Email"],
         "expose_headers": ["Content-Type", "Authorization"],

@@ -13,9 +13,9 @@ const API_CONFIG = {
 
 // In TalentLexSearch.js, update the URLs
 const BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://talentlex-dev.vercel.app/api'
+  ? `${window.location.origin}/api`  // Changed to use window.location.origin
   : 'http://localhost:5001';
-  
+
 const TalentLexSearch = () => {
   const [todayEmails, setTodayEmails] = useState([]);
   const [loading, setLoading] = useState(false);
