@@ -26,7 +26,7 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__)
 
 # Get the deployed URL from environment variable
-DEPLOYED_URL = os.getenv('VERCEL_URL', 'localhost:3000')
+DEPLOYED_URL = os.getenv('VERCEL_URL', 'talentlex-qo5g224ga-talentlex.vercel.app')  # Update this
 FRONTEND_URL = f"https://{DEPLOYED_URL}" if DEPLOYED_URL != 'localhost:3000' else 'http://localhost:3000'
 
 # Get environment 
@@ -45,6 +45,7 @@ CORS(app, resources={
     r"/*": {
         "origins": [
             "http://localhost:3000",
+            "https://talentlex-qo5g224ga-talentlex.vercel.app",  # Add this
             FRONTEND_URL,
             "https://*.vercel.app"  # Allow all Vercel preview deployments
         ],
