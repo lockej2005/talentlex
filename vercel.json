@@ -13,7 +13,7 @@
     "routes": [
       {
         "src": "/api/(.*)",
-        "dest": "src/search_backend/index.py",
+        "dest": "/src/search_backend/index.py",
         "headers": {
           "Access-Control-Allow-Credentials": "true",
           "Access-Control-Allow-Origin": "*",
@@ -22,16 +22,11 @@
         }
       },
       {
-        "src": "/(.*)",
-        "dest": "/$1",
-        "continue": true
-      },
-      {
         "handle": "filesystem"
       },
       {
-        "src": "/.*",
-        "dest": "/index.html"
+        "src": "/(.*)",
+        "dest": "/index.html" 
       }
     ],
     "env": {

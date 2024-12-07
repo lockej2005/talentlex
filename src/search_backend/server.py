@@ -32,8 +32,8 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__)
 
 # Environment and URL configuration
-DEPLOYED_URL = os.getenv('VERCEL_URL')
-FRONTEND_URL = f"https://{DEPLOYED_URL}" if DEPLOYED_URL else 'http://localhost:3000'
+DEPLOYED_URL = os.getenv('VERCEL_URL', 'talentlex-dev-git-chaiedits-talentlex.vercel.app')
+FRONTEND_URL = f"https://{DEPLOYED_URL}" if IS_PRODUCTION else 'http://localhost:3000'
 ENVIRONMENT = os.getenv('VERCEL_ENV', 'development')
 IS_PRODUCTION = ENVIRONMENT == 'production'
 
@@ -45,7 +45,8 @@ CORS(app, resources={
     r"/*": {
         "origins": [
             "http://localhost:3000",
-            f"https://{DEPLOYED_URL}" if DEPLOYED_URL else None,
+            "https://talentlex-dev-git-chaiedits-talentlex.vercel.app",  # Add exact domain
+            FRONTEND_URL,
             "https://*.vercel.app"
         ],
         "methods": ["GET", "POST", "OPTIONS"],

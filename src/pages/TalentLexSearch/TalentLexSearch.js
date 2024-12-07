@@ -13,7 +13,7 @@ const API_CONFIG = {
 
 // In TalentLexSearch.js, update the URLs
 const BASE_URL = process.env.NODE_ENV === 'production' 
-  ? `${window.location.origin}/api`  // Changed to use window.location.origin
+  ? `${window.location.origin}/api`  // This will automatically use whatever domain the app is running on
   : 'http://localhost:5001';
 
 const TalentLexSearch = () => {
