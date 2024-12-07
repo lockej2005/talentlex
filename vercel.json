@@ -16,15 +16,8 @@
         "dest": "/src/search_backend/index.py"
       },
       {
-        "handle": "filesystem"
-      },
-      {
-        "src": "/",
-        "dest": "index.html"
-      },
-      {
-        "src": "/(.+)",
-        "dest": "index.html"
+        "src": "/(.*)",
+        "dest": "/index.html" 
       }
     ]
 }
