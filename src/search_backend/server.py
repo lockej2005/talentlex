@@ -15,6 +15,8 @@ from urllib.parse import urlparse, urlencode, parse_qs
 from google.auth.transport.requests import Request
 from datetime import datetime  # Add this import
 
+CREDENTIALS_FILE = os.path.join(os.path.dirname(__file__), 'credentials_boltmedia.json')
+
 # Supabase configuration
 SUPABASE_URL = "https://atbphpeswwgqvwlbplko.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU"
@@ -230,9 +232,9 @@ def oauth2callback():
             raise ValueError("No user email provided")
 
         flow = InstalledAppFlow.from_client_secrets_file(
-            'credentials_boltmedia.json',
+            CREDENTIALS_FILE,
             SCOPES,
-            redirect_uri='http://localhost:5001/oauth2callback'
+            redirect_uri=OAUTH_REDIRECT_URI
         )
         
         # Handle the callback
