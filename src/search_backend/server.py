@@ -34,10 +34,11 @@ ENVIRONMENT = os.getenv('VERCEL_ENV', 'development')
 IS_PRODUCTION = ENVIRONMENT == 'production'
 
 # Set OAuth callback URL based on environment
-if IS_PRODUCTION:
-    OAUTH_REDIRECT_URI = f"{FRONTEND_URL}/oauth2callback"
-else:
-    OAUTH_REDIRECT_URI = 'http://localhost:5001/oauth2callback'
+OAUTH_REDIRECT_URI = (
+    f"{FRONTEND_URL}/oauth2callback" 
+    if IS_PRODUCTION 
+    else "http://localhost:5001/oauth2callback"
+)
 
 # Update CORS settings
 CORS(app, resources={
@@ -116,6 +117,27 @@ def verify_email():
     except Exception as e:
         print(f"Error verifying email: {e}")
         return 'Verification failed', 500
+
+# Remove pickle file handling
+def get_credentials(user_email):
+    result = supabase.table('profiles')\
+        .select('gmail_oauth_credentials')\
+        .eq('email', user_email)\
+        .single()\
+        .execute()
+    
+    if not result.data:
+        return None
+        
+    creds_dict = result.data['gmail_oauth_credentials']
+    return Credentials(
+        token=creds_dict['token'],
+        refresh_token=creds_dict['refresh_token'],
+        token_uri=creds_dict['token_uri'],
+        client_id=creds_dict['client_id'],
+        client_secret=creds_dict['client_secret'],
+        scopes=creds_dict['scopes']
+    )
 
 @app.route('/auth/check', methods=['GET'])
 async def check_auth():
