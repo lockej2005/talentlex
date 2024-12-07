@@ -15,39 +15,38 @@ from urllib.parse import urlparse, urlencode, parse_qs
 from google.auth.transport.requests import Request
 from datetime import datetime  # Add this import
 
+# Load environment variables
+load_dotenv()
+
+# File paths
 CREDENTIALS_FILE = os.path.join(os.path.dirname(__file__), 'credentials_boltmedia.json')
 
 # Supabase configuration
-SUPABASE_URL = "https://atbphpeswwgqvwlbplko.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU"
+SUPABASE_URL = os.getenv('SUPABASE_URL', "https://atbphpeswwgqvwlbplko.supabase.co")
+SUPABASE_KEY = os.getenv('SUPABASE_KEY', "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF0YnBocGVzd3dncXZ3bGJwbGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjMyNzY2MDksImV4cCI6MjAzODg1MjYwOX0.Imv3PmtGs9pGt6MvrvscR6cuv6WWCXKsSvwTZGjF4xU")
+
 # Initialize Supabase
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+# Initialize Flask
 app = Flask(__name__)
 
-# Get the deployed URL from environment variable
-DEPLOYED_URL = os.getenv('VERCEL_URL', 'talentlex-qo5g224ga-talentlex.vercel.app')  # Update this
-FRONTEND_URL = f"https://{DEPLOYED_URL}" if DEPLOYED_URL != 'localhost:3000' else 'http://localhost:3000'
-
-# Get environment 
+# Environment and URL configuration
+DEPLOYED_URL = os.getenv('VERCEL_URL')
+FRONTEND_URL = f"https://{DEPLOYED_URL}" if DEPLOYED_URL else 'http://localhost:3000'
 ENVIRONMENT = os.getenv('VERCEL_ENV', 'development')
 IS_PRODUCTION = ENVIRONMENT == 'production'
 
-# Set OAuth callback URL based on environment
-OAUTH_REDIRECT_URI = (
-    f"{FRONTEND_URL}/oauth2callback" 
-    if IS_PRODUCTION 
-    else "http://localhost:5001/oauth2callback"
-)
+# OAuth configuration
+OAUTH_REDIRECT_URI = f"{FRONTEND_URL}/oauth2callback" if IS_PRODUCTION else 'http://localhost:5001/oauth2callback'
 
-# Update CORS settings
+# CORS configuration
 CORS(app, resources={
     r"/*": {
         "origins": [
             "http://localhost:3000",
-            "https://talentlex-qo5g224ga-talentlex.vercel.app",  # Add this
-            FRONTEND_URL,
-            "https://*.vercel.app"  # Allow all Vercel preview deployments
+            f"https://{DEPLOYED_URL}" if DEPLOYED_URL else None,
+            "https://*.vercel.app"
         ],
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization", "X-User-Email"],
@@ -56,6 +55,7 @@ CORS(app, resources={
     }
 })
 
+# Global variables for email monitoring
 monitoring_active = False
 monitoring_thread = None
 current_user_email = None
