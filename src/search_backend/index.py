@@ -1,6 +1,7 @@
-from flask import Request
+from flask import Flask, Request
 from server import app
 
 def handler(request: Request):
-    """Handle serverless requests"""
-    return app
+    """Handle incoming requests"""
+    with app.request_context(request):
+        return app.handle_request()
