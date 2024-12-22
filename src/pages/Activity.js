@@ -14,6 +14,7 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
   const [firms, setFirms] = useState([]);
   const [hoveredApp, setHoveredApp] = useState(null);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState(0);
 
   console.log('Component rendered. Current state:', { 
     applicationsCount: applications.length, 
@@ -26,6 +27,37 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
     loading,
     maxScore
   });
+
+  useEffect(() => {
+    // Setup presence channel
+    const channel = supabase.channel('tracking');
+
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        const userIds = [];
+        const presenceState = channel.presenceState();
+        
+        // Count unique users
+        for (const id in presenceState) {
+          userIds.push(presenceState[id][0].user_id);
+        }
+        
+        setOnlineUsers([...new Set(userIds)].length);
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({
+            online_at: new Date().toISOString(),
+            user_id: supabase.auth.getUser()?.id
+          });
+        }
+      });
+
+    // Cleanup on unmount
+    return () => {
+      channel.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     console.log('Fetching firms...');
@@ -324,6 +356,10 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
           <div className="main-content-skew">
             <div className="user-list-panel-skew">
               <h3>Applicants</h3>
+              <div className="flex items-center gap-1">
+                <div className="h-4 w-4 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-sm text-gray-400">{onlineUsers} online</span>
+                </div>
               <div className="user-list-skew">
                 {users.length > 0 ? (
                   users.map(user => (
