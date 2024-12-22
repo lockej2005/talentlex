@@ -32,10 +32,10 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__)
 
 # Environment and URL configuration
-DEPLOYED_URL = os.getenv('VERCEL_URL', 'talentlex-dev-git-chaiedits-talentlex.vercel.app')
-FRONTEND_URL = f"https://{DEPLOYED_URL}" if IS_PRODUCTION else 'http://localhost:3000'
 ENVIRONMENT = os.getenv('VERCEL_ENV', 'development')
 IS_PRODUCTION = ENVIRONMENT == 'production'
+DEPLOYED_URL = os.getenv('VERCEL_URL', 'talentlex-dev-git-chaiedits-talentlex.vercel.app')
+FRONTEND_URL = f"https://{DEPLOYED_URL}" if IS_PRODUCTION else 'http://localhost:3000'
 
 # OAuth configuration
 OAUTH_REDIRECT_URI = f"{FRONTEND_URL}/oauth2callback" if IS_PRODUCTION else 'http://localhost:5001/oauth2callback'
