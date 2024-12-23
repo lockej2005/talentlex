@@ -31,6 +31,9 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
   useEffect(() => {
     // Setup presence channel
     const channel = supabase.channel('tracking');
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser
+    }
 
     channel
       .on('presence', { event: 'sync' }, () => {
@@ -46,12 +49,20 @@ const Activity = ({ userId, selectedFirm, onFirmChange }) => {
       })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
-          await channel.track({
-            online_at: new Date().toISOString(),
-            user_id: supabase.auth.getUser()?.id
-          });
+          try {
+          const { data: { user } } = await supabase.auth.getUser;
+          if (user) {
+            await channel.track({
+              online_at: new Date().toISOString(),
+              user_id: users.id,
+            });
+            console.log('Tracked user presence:', user.id);
+          }
+        } catch (error) {
+          console.error('Error tracking presence:', error);
         }
-      });
+      }
+    });
 
     // Cleanup on unmount
     return () => {
