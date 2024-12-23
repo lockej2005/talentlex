@@ -26,3 +26,4 @@ yarn-error.log*
 /create-checkout-session/
 
 .vercel
+.env
